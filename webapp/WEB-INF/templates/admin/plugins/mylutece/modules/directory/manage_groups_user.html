@@ -1,0 +1,35 @@
+<div class="content-box" >
+    <h2>#i18n{module.mylutece.directory.manage_groups_user.table_title}</h2>
+    
+    <form method="post" action="jsp/admin/plugins/mylutece/modules/directory/DoAssignGroupsUser.jsp">
+        <input type="hidden" name="id_record" value="${user.idRecord}" />
+        <table>
+            <tr>
+                <th>#i18n{module.mylutece.directory.manage_groups_user.colName}</th>
+                <th>#i18n{module.mylutece.directory.manage_groups_user.colLabel}</th>
+                <th></th>
+            </tr>
+            <#list group_list as group >
+            <tr>
+                <td>${group.groupKey}</td>
+                <td>${group.groupDescription}</td>
+                <td>
+                    <#assign checkedString = '' > 
+                    <#list user_group_list as user_group >
+                    <#if user_group.groupKey = group.groupKey >
+                    <#assign checkedString >
+                    checked="checked"
+                    </#assign>
+                    <#break>
+                    </#if>
+                    </#list>
+                    <input type="checkbox" class="checkbox" name="group_key" value="${group.groupKey}" ${checkedString} />
+                       </td>
+            </tr>
+            </#list>
+        </table>
+        <p>
+            <input type="submit" class="button" value="#i18n{module.mylutece.directory.manage_groups_user.btnAssign}" />
+        </p>
+    </form>
+</div>

@@ -1,0 +1,57 @@
+<div id="content-box-actions">
+	<#if permission_advanced_parameter>
+		<form method="post" action="jsp/admin/plugins/mylutece/modules/directory/ManageAdvancedParameters.jsp">
+			<input type="submit" value="#i18n{module.mylutece.directory.manage_directory_record.buttonLabelManageAdvancedParameters}" class="button bt-toolbar" />
+		</form>
+    </#if>
+</div>
+<div class="content-box">
+<h2>#i18n{module.mylutece.directory.manage_directory.table_title}</h2>
+<@paginationAdmin paginator=paginator combo=1/>
+<table>
+	<tr>
+		<th>#i18n{module.mylutece.directory.manage_directory.row_title}</th>
+		<th>#i18n{module.mylutece.directory.manage_directory.row_assigned}</th>
+		<th>#i18n{module.mylutece.directory.manage_directory.row_actions}</th>
+	</tr>
+	<#if directory_display_list?has_content>
+		<#list directory_display_list as directory_display>
+			<#assign directory = directory_display.directory />
+			<#assign mylutece_directory = directory_display.mylutece_directory />
+			<tr>
+			<td>
+				<a href="jsp/admin/plugins/directory/ModifyDirectory.jsp?id_directory=${directory.idDirectory}">
+					<img src="images/admin/skin/plugins/mylutece/modules/directory/actions/jump_to.png" alt="#i18n{module.mylutece.directory.manage_directory.title_modify_directory}" title="#i18n{module.mylutece.directory.manage_directory.title_modify_directory}" />
+				</a>
+				${directory.title}
+			</td>
+			<td>
+				<#if mylutece_directory>
+					<img src="images/admin/skin/actions/enable.png" alt="#i18n{module.mylutece.directory.manage_directory.assigned}" title="#i18n{module.mylutece.directory.manage_directory.assigned}" />
+				<#else>
+					<img src="images/admin/skin/actions/disable.png" alt="#i18n{module.mylutece.directory.manage_directory.unassigned}" title="#i18n{module.mylutece.directory.manage_directory.unassigned}" />
+				</#if>
+			</td>
+			<td>
+				<#if mylutece_directory>
+					<a href="jsp/admin/plugins/mylutece/modules/directory/ManageMappings.jsp?id_directory=${directory.idDirectory}&amp;plugin_name=mylutece-directory">
+						<img src="images/admin/skin/plugins/mylutece/modules/directory/actions/manage_mappings.png" alt="#i18n{module.mylutece.directory.manage_directory.action.manage_mappings}" title="#i18n{module.mylutece.directory.manage_directory.action.manage_mappings}"/>
+					</a>
+					<a href="jsp/admin/plugins/mylutece/modules/directory/ManageRecords.jsp?id_directory=${directory.idDirectory}&amp;plugin_name=mylutece-directory">
+						<img src="images/admin/skin/plugins/mylutece/modules/directory/actions/manage_records.png" alt="#i18n{module.mylutece.directory.manage_directory.action.manage_records}" title="#i18n{module.mylutece.directory.manage_directory.action.manage_records}" />
+					</a>
+					<a href="jsp/admin/plugins/mylutece/modules/directory/ConfirmRemoveDirectory.jsp?id_directory=${directory.idDirectory}&amp;plugin_name=mylutece-directory">
+						<img src="images/admin/skin/actions/delete.png" alt="#i18n{module.mylutece.directory.manage_directory.action.delete_directory}" title="#i18n{module.mylutece.directory.manage_directory.action.delete_directory}" />
+					</a>
+				<#else>
+					<a href="jsp/admin/plugins/mylutece/modules/directory/DoAssignDirectory.jsp?id_directory=${directory.idDirectory}&amp;plugin_name=mylutece-directory">
+						<img src="images/admin/skin/actions/enable.png" alt="#i18n{module.mylutece.directory.manage_directory.action.assign}" title="#i18n{module.mylutece.directory.manage_directory.action.assign}" />
+					</a>
+				</#if>
+			</td>
+			</tr>
+		</#list>
+	</#if>
+</table>
+<@paginationAdmin paginator=paginator/>
+</div>

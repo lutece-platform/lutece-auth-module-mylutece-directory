@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="ISO-8859-1" standalone="no"?><plug-in>
+   <name>mylutece-directory</name>
+   <class>fr.paris.lutece.plugins.mylutece.modules.directory.authentication.service.MyluteceDirectoryPlugin</class>
+   <version>1.1.2</version>
+   <description>module.mylutece.directory.module.description</description>
+   <documentation/>
+   <installation/>
+   <changes/>
+   <user-guide/>
+   <provider>module.mylutece.directory.module.provider</provider>
+   <provider-url>http://lutece.paris.fr</provider-url>
+   <icon-url>images/admin/skin/plugins/mylutece/mylutece.png</icon-url>
+   <copyright>Copyright 2001-2009 Mairie de Paris</copyright>
+	<core-version-dependency>
+		<min-core-version>2.4.1</min-core-version>
+		<max-core-version/>	
+	</core-version-dependency>
+	
+	<!-- if the plugin must have a connection pool with parameter : 1 - yes, 0 - no -->   
+   <db-pool-required>1</db-pool-required>
+   
+   <!-- Applications -->
+   <applications>
+       <application>
+           <application-id>mylutecedirectory</application-id>
+           <application-class>fr.paris.lutece.plugins.mylutece.modules.directory.authentication.web.MyLuteceDirectoryApp</application-class>
+       </application>
+   </applications>
+   
+           <!--  Specific plugin CSS stylesheet   --> 
+    <css-stylesheets>
+          <css-stylesheet>mylutece/modules/directory/mylutece-directory.css</css-stylesheet> 
+    </css-stylesheets>
+    
+   <!-- Administration interface parameters -->
+   <admin-features>
+     <admin-feature>
+       <feature-id>MYLUTECE_DIRECTORY_MANAGEMENT</feature-id>
+       <feature-title>module.mylutece.directory.adminFeature.directory_management.name</feature-title>
+       <feature-description>module.mylutece.directory.adminFeature.directory_management.description</feature-description>
+       <feature-level>1</feature-level>
+       <feature-group>SYSTEM</feature-group>
+       <feature-url>jsp/admin/plugins/mylutece/modules/directory/ManageDirectory.jsp</feature-url>
+     </admin-feature>
+     <admin-feature>
+       <feature-id>MYLUTECE_DIRECTORY_MANAGEMENT_USERS</feature-id>
+       <feature-title>module.mylutece.directory.adminFeature.directory_management_user.name</feature-title>
+       <feature-description>module.mylutece.directory.adminFeature.directory_management_user.description</feature-description>
+       <feature-level>3</feature-level>
+       <feature-group>USERS</feature-group>
+       <feature-url>jsp/admin/plugins/mylutece/modules/directory/ManageRecords.jsp</feature-url>
+     </admin-feature>
+   </admin-features>
+   
+   <!-- RBAC Resources -->
+	<rbac-resource-types>
+		<rbac-resource-type>
+			<rbac-resource-type-class>
+				fr.paris.lutece.plugins.mylutece.modules.directory.authentication.service.MyluteceDirectoryResourceIdService
+			</rbac-resource-type-class>
+		</rbac-resource-type>
+	</rbac-resource-types>
+   
+   <!-- Admin Dashboard  components -->
+    <admindashboard-components>
+    	<admindashboard-component>
+            <dashboard-component-name>myluteceDirectoryAdminDashboardComponent</dashboard-component-name>
+            <dashboard-component-class>fr.paris.lutece.plugins.mylutece.modules.directory.authentication.web.MyluteceDirectoryAdminDashboardComponent</dashboard-component-class>
+        </admindashboard-component>
+    </admindashboard-components>
+</plug-in>

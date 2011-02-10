@@ -1,0 +1,58 @@
+<div class="content-box" >
+    
+    <h2>#i18n{module.mylutece.directory.create_mapping.table_title}</h2>
+    <#if empty_list>
+    	<p>
+    		<em>#i18n{module.mylutece.directory.create_mapping.no_mapping_available}</em>
+    	</p>
+    	<br/>
+    	<p>
+    		<input class="button" type="button" onclick="javascript:history.go(-1)" value="#i18n{portal.admin.message.buttonCancel}" />
+		</p>
+		<br/>
+    <#else>
+    <form method="post" name="create_mapping" action="jsp/admin/plugins/mylutece/modules/directory/DoCreateMapping.jsp">
+        <p>
+            <label for="id_entry">#i18n{module.mylutece.directory.create_mapping.entry} * : </label>
+            <select name="id_entry" id="id_entry" >
+	            <#list entry_list as entry>
+	            	<option value="${entry.idEntry}" />${entry.title}</option>
+	            </#list>
+            </select>
+        </p>
+
+        <p>
+            <label for="attribute_key">#i18n{module.mylutece.directory.create_mapping.attribute} * : </label>
+            <select name="attribute_key" id="attribute_key">
+      			<#assign attributeTitle0 = "" />
+				<#assign attributeTitle = "user" />
+        			<#list attributes_list as attribute>
+      					<#assign attributeTitle = "" />
+       					<#list attribute.code?split(".") as attributePart>
+        					<#if attributePart_has_next>
+        						<#if attributePart_index &gt; 0>
+        							<#assign attributeTitle = attributeTitle + "." />
+      							</#if>
+       							<#assign attributeTitle = attributeTitle + attributePart />
+     						</#if>
+       					</#list>
+       					<#if attributeTitle0 != attributeTitle>
+       						<#if attributeTitle0 != "">
+       							</optgroup>
+   							</#if>
+       						<optgroup label="#i18n{portal.security.${attributeTitle}}">
+       						<#assign attributeTitle0 = attributeTitle />
+       					</#if>
+	            		<option value="${attribute.code}" />#i18n{portal.security.${attribute.code}}</option>
+		            </#list>
+		            </optgroup>
+	            </select>
+        </p>
+        <p>
+			<input type="hidden" name="id_directory" value="${id_directory}" />
+            <input type="submit" class="button" value="#i18n{module.mylutece.directory.create_mapping.btnCreate}" tabindex="5" />
+            <input class="button" type="button" onclick="javascript:history.go(-1)" value="#i18n{portal.admin.message.buttonCancel}" />
+        </p>
+    </form>
+    </#if>
+</div>

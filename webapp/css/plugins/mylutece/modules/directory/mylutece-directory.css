@@ -1,0 +1,18 @@
+/******************************************************************************/
+/*                       MYLUTECE-DIRECTORY                                   */
+/******************************************************************************/
+
+
+.button-mylutecedirectory{
+	padding-left: 2em;
+}
+
+#button-return 
+{
+	 background: url(../../../../../images/local/skin/buttons/b_back.png) no-repeat left; 
+}
+
+.directory-entries .form-label{
+	float: none;
+	width: auto;
+}

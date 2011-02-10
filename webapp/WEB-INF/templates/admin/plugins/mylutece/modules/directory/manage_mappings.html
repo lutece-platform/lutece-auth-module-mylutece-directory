@@ -1,0 +1,71 @@
+<div class="content-box" >
+    <h2>#i18n{module.mylutece.directory.manage_mappings.table_title}</h2>
+<table>
+	<tr>
+		<th>#i18n{module.mylutece.directory.manage_mappings.row_title}</th>
+		<th>#i18n{module.mylutece.directory.manage_mappings.row_attribute}</th>
+		<th>#i18n{module.mylutece.directory.manage_mappings.row_actions}</th>
+	</tr>
+	<#if mapping_display_list?has_content>
+		<#list mapping_display_list as mapping_display>
+			<#assign entry = mapping_display.entry />
+			<#if !mapping_display.mapping?has_content>
+			<form method="post" action="jsp/admin/plugins/mylutece/modules/directory/DoCreateMapping.jsp">
+				<input type="hidden" name="id_entry" value="${entry.idEntry}" />
+				<input type="hidden" name="id_directory" value="${id_directory}" />
+			</#if>
+			<tr>
+			<td>${entry.title}</td>
+			<td>
+				<#if mapping_display.mapping?has_content>
+					<em>#i18n{portal.security.${mapping_display.mapping.attributeKey}}</em>
+				<#else>
+		            <select name="attribute_key" id="attribute_key">
+           			<#assign attributeTitle0 = "" />
+					<#assign attributeTitle = "user" />
+         			<#list attributes_list as attribute>
+       					<#assign attributeTitle = "" />
+        				<#list attribute.code?split(".") as attributePart>
+         					<#if attributePart_has_next>
+         						<#if attributePart_index &gt; 0>
+         							<#assign attributeTitle = attributeTitle + "." />
+       							</#if>
+        						<#assign attributeTitle = attributeTitle + attributePart />
+      						</#if>
+        				</#list>
+        				<#if attributeTitle0 != attributeTitle>
+        					<#if attributeTitle0 != "">
+        						</optgroup>
+       						</#if>
+        					<optgroup label="#i18n{portal.security.${attributeTitle}}">
+        					<#assign attributeTitle0 = attributeTitle />
+         				</#if>
+		            	<option value="${attribute.code}" />#i18n{portal.security.${attribute.code}}</option>
+			            </#list>
+			            </optgroup>
+		            </select>
+				</#if>
+			</td>
+			<td>
+				<#if mapping_display.mapping?has_content>
+					<a href="jsp/admin/plugins/mylutece/modules/directory/ConfirmRemoveMapping.jsp?id_directory=${id_directory}&id_entry=${mapping_display.mapping.idEntry}">
+						<img src="images/admin/skin/actions/delete.png" alt="#i18n{module.mylutece.directory.manage_mappings.action.delete_mapping}" title="#i18n{module.mylutece.directory.manage_mappings.action.delete_mapping}" />
+					</a>
+				<#else>
+					<input type="submit" value="#i18n{module.mylutece.directory.manage_mappings.buttonAssign}" class="button" />
+				</#if>
+			</td>
+			</tr>
+			<#if !mapping_display.mapping?has_content>
+			</form>
+			</#if>
+		</#list>
+	</#if>
+</table>
+<form method="post" action="jsp/admin/plugins/mylutece/modules/directory/CreateMapping.jsp">
+	<p>
+		<input type="hidden" name="id_directory" value="${id_directory}" />
+		<input type="submit" value="#i18n{module.mylutece.directory.manage_mappings.buttonCreate}" class="button" />
+	</p>
+</form>
+</div>

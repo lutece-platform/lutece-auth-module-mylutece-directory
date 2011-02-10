@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+
+<beans>
+  
+  <bean id="myluteceDirectoryUserDAO"  class="fr.paris.lutece.plugins.mylutece.modules.directory.authentication.business.MyluteceDirectoryUserDAO" />
+  <bean id="myluteceDirectoryDAO"  class="fr.paris.lutece.plugins.mylutece.modules.directory.authentication.business.MyluteceDirectoryDAO" />
+  <bean id="myluteceDirectoryAttributeMappingDAO"  class="fr.paris.lutece.plugins.mylutece.modules.directory.authentication.business.AttributeMappingDAO" />
+  <bean id="myluteceDirectory.authentication" class="fr.paris.lutece.plugins.mylutece.modules.directory.authentication.BaseAuthentication" />
+
+  <bean id="myluteceDirectoryUserFieldListenerService" class="fr.paris.lutece.plugins.mylutece.service.attribute.MyLuteceUserFieldListenerService" />
+  <bean id="myluteceDirectory.myluteceDirectoryParameterDAO" class="fr.paris.lutece.plugins.mylutece.modules.directory.authentication.business.parameter.MyluteceDirectoryParameterDAO" />
+</beans>
