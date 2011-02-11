@@ -15,7 +15,7 @@
         <repository>
             <id>lutece</id>
             <name>luteceRepository</name>
-            <url>http://dev.lutece.paris.fr/maven_repository</url>
+            <url>http://dev.lutece.paris.fr/maven_repository/module-mylutece-directory</url>
             <layout>default</layout>
         </repository>
     </repositories>
@@ -42,8 +42,8 @@
     </properties>
 
     <scm>
-        <connection>scm:svn:http://dev.lutece.paris.fr/svn/lutece/portal/trunk/plugins/authentication</connection>
-        <developerConnection>scm:svn:https://dev.lutece.paris.fr/svn/lutece/portal/trunk/plugins/authentication</developerConnection>
-        <url>http://dev.lutece.paris.fr/viewvc/portal/trunk/plugins/authentication</url>
+        <connection>scm:svn:http://dev.lutece.paris.fr/svn/lutece/portal/trunk/plugins/authentication/module-mylutece-directory</connection>
+        <developerConnection>scm:svn:https://dev.lutece.paris.fr/svn/lutece/portal/trunk/plugins/authentication/module-mylutece-directory</developerConnection>
+        <url>http://dev.lutece.paris.fr/viewvc/portal/trunk/plugins/authentication/module-mylutece-directory</url>
     </scm>
 </project>
