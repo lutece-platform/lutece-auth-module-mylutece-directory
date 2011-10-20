@@ -1,20 +1,19 @@
-<?xml version="1.0" encoding="ISO-8859-1" standalone="no"?>
-<plug-in>
+<?xml version="1.0" encoding="ISO-8859-1" standalone="no"?><plug-in>
     <name>mylutece-directory</name>
     <class>fr.paris.lutece.plugins.mylutece.modules.directory.authentication.service.MyluteceDirectoryPlugin</class>
     <version>1.1.2</version>
     <description>module.mylutece.directory.module.description</description>
-    <documentation />
-    <installation />
-    <changes />
-    <user-guide />
+    <documentation/>
+    <installation/>
+    <changes/>
+    <user-guide/>
     <provider>module.mylutece.directory.module.provider</provider>
     <provider-url>http://lutece.paris.fr</provider-url>
     <icon-url>images/admin/skin/plugins/mylutece/mylutece.png</icon-url>
     <copyright>Copyright 2001-2011 Mairie de Paris</copyright>
     <core-version-dependency>
         <min-core-version>2.4.1</min-core-version>
-        <max-core-version />
+        <max-core-version/>
     </core-version-dependency>
 
     <!-- if the plugin must have a connection pool with parameter : 1 - yes, 0 - no -->
