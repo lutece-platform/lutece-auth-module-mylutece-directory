@@ -36,11 +36,19 @@ package fr.paris.lutece.plugins.mylutece.modules.directory.authentication.servic
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
 import fr.paris.lutece.plugins.directory.business.DirectoryRemovalListenerService;
+import fr.paris.lutece.plugins.directory.business.EntryFilter;
+import fr.paris.lutece.plugins.directory.business.EntryHome;
+import fr.paris.lutece.plugins.directory.business.IEntry;
+import fr.paris.lutece.plugins.directory.business.Record;
+import fr.paris.lutece.plugins.directory.business.RecordField;
+import fr.paris.lutece.plugins.directory.utils.DirectoryErrorException;
+import fr.paris.lutece.plugins.directory.utils.DirectoryUtils;
 import fr.paris.lutece.plugins.mylutece.authentication.MultiLuteceAuthentication;
 import fr.paris.lutece.plugins.mylutece.business.attribute.AttributeField;
 import fr.paris.lutece.plugins.mylutece.business.attribute.AttributeFieldHome;
@@ -53,14 +61,15 @@ import fr.paris.lutece.plugins.mylutece.modules.directory.authentication.busines
 import fr.paris.lutece.plugins.mylutece.modules.directory.authentication.business.MyluteceDirectoryDirectoryRemovalListener;
 import fr.paris.lutece.plugins.mylutece.modules.directory.authentication.business.MyluteceDirectoryUser;
 import fr.paris.lutece.plugins.mylutece.modules.directory.authentication.business.parameter.MyluteceDirectoryParameterHome;
+import fr.paris.lutece.plugins.mylutece.modules.directory.authentication.web.FormErrors;
 import fr.paris.lutece.plugins.mylutece.service.MyLutecePlugin;
 import fr.paris.lutece.portal.business.rbac.RBAC;
 import fr.paris.lutece.portal.business.user.AdminUser;
+import fr.paris.lutece.portal.service.i18n.I18nService;
 import fr.paris.lutece.portal.service.plugin.Plugin;
 import fr.paris.lutece.portal.service.plugin.PluginService;
 import fr.paris.lutece.portal.service.rbac.RBACService;
 import fr.paris.lutece.portal.service.spring.SpringContextService;
-import fr.paris.lutece.portal.service.user.AdminUserResourceIdService;
 import fr.paris.lutece.portal.service.util.AppLogService;
 import fr.paris.lutece.portal.service.util.AppPropertiesService;
 import fr.paris.lutece.util.url.UrlItem;
@@ -96,6 +105,13 @@ public class MyluteceDirectoryService
     private static final String MARK_ENABLE_PASSWORD_ENCRYPTION = "enable_password_encryption";
     private static final String MARK_ENCRYPTION_ALGORITHM = "encryption_algorithm";
     private static final String MARK_ENCRYPTION_ALGORITHMS_LIST = "encryption_algorithms_list";
+    
+    // ERRORS
+    private static final String ERROR_DIRECTORY_FIELD = "error_directory_field";
+
+    // PROPERTIES
+    private static final String PROPERTY_ERROR_FIELD = "module.mylutece.directory.message.error.field";
+    private static final String PROPERTY_ERROR_MANDATORY_FIELDS = "module.mylutece.directory.message.account.errorMandatoryFields";
 
     private static MyluteceDirectoryService _singleton = new MyluteceDirectoryService(  );
     private static MyluteceDirectoryDirectoryRemovalListener _listenerDirectory;
@@ -201,6 +217,106 @@ public class MyluteceDirectoryService
         model.put( MARK_SORT_SEARCH_ATTRIBUTE, strSortSearchAttribute );
         
         return listFilteredUserIds;
+    }
+
+    /**
+     * Get the map of id entry - list record fields from a given record
+     * @param record the record
+     * @return a map of id entry - list record fields
+     */
+    public Map<String, List<RecordField>> getMapIdEntryListRecordField( Record record )
+    {
+    	Map<String, List<RecordField>> map = new HashMap<String, List<RecordField>>(  );
+    	List<RecordField> listRecordFields = record.getListRecordField(  );
+    	if ( listRecordFields != null && !listRecordFields.isEmpty(  ) )
+    	{
+    		for ( RecordField recordField : listRecordFields )
+    		{
+    			String strIdEntry = Integer.toString( recordField.getEntry(  ).getIdEntry(  ) );
+    			List<RecordField> listAssociatedRecordFields = map.get( strIdEntry );
+    			if ( listAssociatedRecordFields == null )
+    			{
+    				listAssociatedRecordFields = new ArrayList<RecordField>(  );
+    			}
+    			listAssociatedRecordFields.add( recordField );
+    			map.put( strIdEntry, listAssociatedRecordFields );
+    		}
+    	}
+
+        return map;
+    }
+
+    /**
+     * Get the directory record data
+     * @param request the HTTP request
+     * @param record the record
+     * @param pluginDirectory the plugin
+     * @param locale the locale
+     * @param formErrors the form errors
+     */
+    public void getDirectoryRecordData( HttpServletRequest request, Record record, Plugin pluginDirectory, Locale locale, 
+    		FormErrors formErrors )
+    {
+    	List<RecordField> listRecordFieldResult = new ArrayList<RecordField>(  );
+        EntryFilter filter = new EntryFilter(  );
+        filter.setIdDirectory( record.getDirectory(  ).getIdDirectory(  ) );
+        filter.setIsComment( EntryFilter.FILTER_FALSE );
+        filter.setIsEntryParentNull( EntryFilter.FILTER_TRUE );
+
+        List<IEntry> listEntryFirstLevel = EntryHome.getEntryList( filter, pluginDirectory );
+
+        for ( IEntry entry : listEntryFirstLevel )
+        {
+        	entry = EntryHome.findByPrimaryKey( entry.getIdEntry(  ), pluginDirectory );
+        	if ( entry.getEntryType(  ).getGroup(  ) )
+        	{
+        		for ( IEntry entryChild : entry.getChildren(  ) )
+        		{
+        			getDirectoryRecordFieldData( record, request, entryChild.getIdEntry(  ), listRecordFieldResult, pluginDirectory, locale, formErrors );
+        		}
+        	}
+        	else if ( !entry.getEntryType(  ).getComment(  ) )
+        	{
+        		getDirectoryRecordFieldData( record, request, entry.getIdEntry(  ), listRecordFieldResult, pluginDirectory, locale, formErrors );
+        	}
+        }
+        
+        record.setListRecordField( listRecordFieldResult );
+    }
+
+    /**
+     * Get the directory record field data
+     * @param record the record
+     * @param request the request
+     * @param nIdEntry the id entry
+     * @param listRecordFieldResult the list of record field
+     * @param pluginDirectory the plugin
+     * @param locale the locale
+     * @param formErrors the form errors
+     */
+    private void getDirectoryRecordFieldData( Record record, HttpServletRequest request, int nIdEntry, 
+    		List<RecordField> listRecordFieldResult, Plugin pluginDirectory, Locale locale, FormErrors formErrors )
+    {
+    	try
+		{
+			DirectoryUtils.getDirectoryRecordFieldData( record, request, nIdEntry, true,
+			        listRecordFieldResult, pluginDirectory, locale );
+		}
+		catch ( DirectoryErrorException e )
+		{
+			if ( e.isMandatoryError(  ) )
+			{
+				Object[] params = { e.getTitleField(  ) };
+				String strErrorMessage = I18nService.getLocalizedString( PROPERTY_ERROR_MANDATORY_FIELDS, params, locale );
+				formErrors.addError( ERROR_DIRECTORY_FIELD, strErrorMessage );
+			}
+			else
+			{
+				Object[] params = { e.getTitleField(  ), e.getErrorMessage(  ) };
+				String strErrorMessage = I18nService.getLocalizedString( PROPERTY_ERROR_FIELD, params, locale );
+				formErrors.addError( ERROR_DIRECTORY_FIELD, strErrorMessage );
+			}
+		}
     }
     
     /**

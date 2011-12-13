@@ -33,6 +33,20 @@
  */
 package fr.paris.lutece.plugins.mylutece.modules.directory.authentication.web;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+
+import org.apache.commons.lang.StringUtils;
+
 import fr.paris.lutece.plugins.directory.business.Directory;
 import fr.paris.lutece.plugins.directory.business.DirectoryHome;
 import fr.paris.lutece.plugins.directory.business.EntryFilter;
@@ -46,7 +60,7 @@ import fr.paris.lutece.plugins.mylutece.modules.directory.authentication.busines
 import fr.paris.lutece.plugins.mylutece.modules.directory.authentication.business.MyluteceDirectoryHome;
 import fr.paris.lutece.plugins.mylutece.modules.directory.authentication.business.MyluteceDirectoryUser;
 import fr.paris.lutece.plugins.mylutece.modules.directory.authentication.business.MyluteceDirectoryUserHome;
-
+import fr.paris.lutece.plugins.mylutece.modules.directory.authentication.service.MyluteceDirectoryService;
 import fr.paris.lutece.portal.service.captcha.CaptchaSecurityService;
 import fr.paris.lutece.portal.service.i18n.I18nService;
 import fr.paris.lutece.portal.service.mail.MailService;
@@ -67,17 +81,6 @@ import fr.paris.lutece.portal.web.xpages.XPageApplication;
 import fr.paris.lutece.util.html.HtmlTemplate;
 import fr.paris.lutece.util.string.StringUtil;
 import fr.paris.lutece.util.url.UrlItem;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import javax.servlet.http.HttpServletRequest;
 
 
 /**
@@ -105,6 +108,7 @@ public class MyLuteceDirectoryApp implements XPageApplication
     private static final String MARK_IS_ACTIVE_CAPTCHA = "is_active_captcha";
     private static final String MARK_CAPTCHA = "captcha";
     private static final String MARK_MAP_ID_ENTRY_LIST_RECORD_FIELD = "map_id_entry_list_record_field";
+    private static final String MARK_FORM_ERROR = "form_error";
      
     // Parameters
     private static final String PARAMETER_ACTION = "action";
@@ -119,6 +123,7 @@ public class MyLuteceDirectoryApp implements XPageApplication
     private static final String PARAMETER_ACTION_SUCCESSFUL = "action_successful";
     private static final String PARAMETER_LOGIN = "login";
     private static final String PARAMETER_PASSWORD = "password";
+    private static final String PARAMETER_DIRECTORY_RECORD = "directory_record";
 
     // Actions
     private static final String ACTION_MODIFY_ACCOUNT = "modifyAccount";
@@ -126,6 +131,7 @@ public class MyLuteceDirectoryApp implements XPageApplication
     private static final String ACTION_LOST_PASSWORD = "lostPassword";
     private static final String ACTION_ACCESS_DENIED = "accessDenied";
     private static final String ACTION_CREATE_ACCOUNT = "createAccount";
+    private static final String ACTION_DO_CREATE_ACCOUNT = "doCreateAccount";
 
     // Errors
     private static final String ERROR_OLD_PASSWORD = "error_old_password";
@@ -137,7 +143,6 @@ public class MyLuteceDirectoryApp implements XPageApplication
     private static final String ERROR_MANDATORY_FIELDS = "error_mandatory_fields";
     private static final String ERROR_LOGIN_ALREADY_EXISTS = "error_login_already_exists";
     private static final String ERROR_LOGIN_ACCENTS_OR_BLANK = "error_login_accents_or_blank";
-    private static final String ERROR_EMAIL_ALREADY_EXISTS = "error_email_already_exists";
     private static final String ERROR_JCAPTCHA = "error_jcaptcha";
     private static final String ERROR_DIRECTORY_FIELD = "error_directory_field";
     private static final String ERROR_DIRECTORY_MESSAGE = "error_directory_message";
@@ -176,17 +181,25 @@ public class MyLuteceDirectoryApp implements XPageApplication
     private static final String PROPERTY_LOST_PASSWORD_TITLE = "module.mylutece.directory.xpage.lostPassword.title";
     private static final String PROPERTY_CREATE_ACCOUNT_LABEL = "module.mylutece.directory.xpage.createAccount.label";
     private static final String PROPERTY_CREATE_ACCOUNT_TITLE = "module.mylutece.directory.xpage.createAccount.title";
+    private static final String PROPERTY_CREATE_ACCOUNT_LOGIN = "module.mylutece.directory.xpage.create_account.login";
+    private static final String PROPERTY_CREATE_ACCOUNT_PASSWORD = "module.mylutece.directory.xpage.create_account.password";
+    private static final String PROPERTY_CREATE_ACCOUNT_CONFIRMATION = "module.mylutece.directory.xpage.create_account.confirmation";
     private static final String PROPERTY_EMAIL_OBJECT = "module.mylutece.directory.email.object";
     private static final String PROPERTY_ACCESS_DENIED_ERROR_MESSAGE = "module.mylutece.directory.siteMessage.access_denied.errorMessage";
     private static final String PROPERTY_ACCESS_DENIED_TITLE_MESSAGE = "module.mylutece.directory.siteMessage.access_denied.title";
-    private static final String PROPERTY_ERROR_MANDATORY_FIELD_MESSAGE="module.mylutece.directory.message.mandatory.field";
-    private static final String PROPERTY_FIELD_ERROR_MESSAGE="module.mylutece.directory.message.error.field";
+    private static final String PROPERTY_ERROR_MANDATORY_FIELDS = "module.mylutece.directory.message.account.errorMandatoryFields";
+    private static final String PROPERTY_ERROR_LOGIN_ACCENTS = "module.mylutece.directory.message.create_account.errorLogin.accents";
+    private static final String PROPERTY_ERROR_BAD_JCAPTCHA = "module.mylutece.directory.message.account.errorBadJcaptcha";
+    private static final String PROPERTY_ERROR_CONFIRMATION = "module.mylutece.directory.message.account.errorConfirmation";
+    private static final String PROPERTY_ERROR_LOGIN = "module.mylutece.directory.message.create_account.errorLogin";
     
     //Constants
     private static final String JCAPTCHA_PLUGIN = "jcaptcha";
+    private static final String REGEX_LOGIN = "[^a-zA-Z_0-9]";
     
-    // private fields
-    private static final String PREFIX_LUTECE_USER = "user.";
+    // Sessions
+    private static final String SESSION_MYLUTECE_DIRECTORY_RECORD = "MYLUTECE_DIRECTORY_RECORD";
+    
     private Plugin _plugin;
     private Locale _locale;
 
@@ -217,21 +230,26 @@ public class MyLuteceDirectoryApp implements XPageApplication
         String strAction = request.getParameter( PARAMETER_ACTION );
         init( request, plugin );
 
-        if ( strAction.equals( ACTION_MODIFY_ACCOUNT ) )
+        if ( ACTION_MODIFY_ACCOUNT.equals( strAction ) )
         {
             page = getModifyAccountPage( page, request );
         }
-        else if ( strAction.equals( ACTION_VIEW_ACCOUNT ) )
+        else if ( ACTION_VIEW_ACCOUNT.equals( strAction ) )
         {
             page = getViewAccountPage( page, request );
         }
-        else if ( strAction.equals( ACTION_LOST_PASSWORD ) )
+        else if ( ACTION_LOST_PASSWORD.equals( strAction ) )
         {
             page = getLostPasswordPage( page, request );
         }
-        else if ( strAction.equals( ACTION_CREATE_ACCOUNT ) )
+        else if ( ACTION_CREATE_ACCOUNT.equals( strAction ) )
         {
             page = getCreateAccountPage( page, request );
+        }
+        else if ( ACTION_DO_CREATE_ACCOUNT.equals( strAction ) )
+        {
+        	FormErrors formErrors = doCreateAccount( request );
+        	page = getCreateAccountPage( page, request, formErrors );
         }
 
         if ( strAction.equals( ACTION_ACCESS_DENIED ) || ( page == null ) )
@@ -344,7 +362,7 @@ public class MyLuteceDirectoryApp implements XPageApplication
 
         return page;
     }
-
+    
     /**
      * Build the createAccount page
      * @param page The XPage object to fill
@@ -353,38 +371,42 @@ public class MyLuteceDirectoryApp implements XPageApplication
      */
     private XPage getCreateAccountPage( XPage page, HttpServletRequest request )
     {
-    	Plugin directoryPlugin = PluginService.getPlugin(DirectoryPlugin.PLUGIN_NAME);
+    	return getCreateAccountPage( page, request, null );
+    }
+
+    /**
+     * Build the createAccount page
+     * @param page The XPage object to fill
+     * @param request The HTTP request
+     * @return The XPage object containing the page content
+     */
+    private XPage getCreateAccountPage( XPage page, HttpServletRequest request, FormErrors formErrors )
+    {
+    	Plugin directoryPlugin = PluginService.getPlugin( DirectoryPlugin.PLUGIN_NAME );
     	HashMap<String,Object> model = new HashMap<String,Object>(  );
     	MyluteceDirectoryUser user = new MyluteceDirectoryUser(  );
     	
-    	String strErrorCode = request.getParameter( PARAMETER_ERROR_CODE );
-    	String strLogin = request.getParameter( PARAMETER_LOGIN );
-    	String strErrorField = request.getParameter( PARAMETER_ERROR_FIELD );
-    	String strErrorMessage = request.getParameter( PARAMETER_ERROR_MESSAGE );
-    	
-    	List<IEntry> listEntry = new ArrayList<IEntry>();
-    	String strSuccess = request.getParameter( PARAMETER_ACTION_SUCCESSFUL );
+    	List<IEntry> listEntry = new ArrayList<IEntry>(  );
 
-    	if ( strLogin != null )
-    	{
-    		user.setLogin( strLogin );
-    	}
     	Iterator<Integer> itIdDirectory = MyluteceDirectoryHome.findMappedDirectories( _plugin ).iterator(  );      
-    	if(itIdDirectory.hasNext())
+    	if( itIdDirectory.hasNext(  ) )
     	{
     		int nIdDirectory =  itIdDirectory.next(  );    	
         	EntryFilter filter = new EntryFilter(  );
-        	filter.setIdDirectory(nIdDirectory);
+        	filter.setIdDirectory( nIdDirectory );
         	
         	listEntry = DirectoryUtils.getFormEntriesByFilter( filter,directoryPlugin );
-        	
     	}
     	else
-    	{    		
-    		strErrorCode = ERROR_DIRECTORY_UNDEFINED ;        		   		
+    	{
+    		if ( formErrors == null )
+    		{
+    			formErrors = new FormErrors(  );
+    		}
+    		formErrors.addError( ERROR_DIRECTORY_UNDEFINED, ERROR_DIRECTORY_UNDEFINED );
     	}
-    	
 
+		// Add Captcha
     	boolean bIsCaptchaEnabled = PluginService.isPluginEnable( JCAPTCHA_PLUGIN ) 
     		&& Boolean.parseBoolean( AppPropertiesService.getProperty(PROPERTY_USE_CAPTCHA, "true") );
     	model.put( MARK_IS_ACTIVE_CAPTCHA, bIsCaptchaEnabled );
@@ -393,16 +415,36 @@ public class MyLuteceDirectoryApp implements XPageApplication
     		CaptchaSecurityService captchaService = new CaptchaSecurityService(  );
     		model.put( MARK_CAPTCHA, captchaService.getHtmlCode(  ) );
     	}
+    	
+    	// Get directory record data
+    	if ( formErrors != null )
+    	{
+    		Record record = (Record) formErrors.getLastValue( PARAMETER_DIRECTORY_RECORD );
+    		if ( record != null )
+    		{
+    			model.put( MARK_MAP_ID_ENTRY_LIST_RECORD_FIELD, 
+    					MyluteceDirectoryService.getInstance(  ).getMapIdEntryListRecordField( record ) );
+    		}
+    		String strLogin = (String) formErrors.getLastValue( PARAMETER_LOGIN );
+    		if ( StringUtils.isNotBlank( strLogin ) )
+    		{
+    			user.setLogin( strLogin );
+    		}
+    	}
+    	
+    	// Check if the creation is successful
+    	String strActionSuccessful = null;
+    	if ( formErrors != null && !formErrors.hasError(  ) )
+    	{
+    		strActionSuccessful = getDefaultRedirectUrl(  );
+    	}
 
     	model.put( MARK_ENTRY_LIST, listEntry );
     	model.put( MARK_LOCALE, _locale );
-
     	model.put( MARK_PLUGIN_NAME, _plugin.getName(  ) );
-    	model.put( MARK_ERROR_CODE, strErrorCode );
-    	model.put( MARK_ERROR_MESSAGE, strErrorMessage );    	
-    	model.put( MARK_ERROR_FIELD, strErrorField );    	
     	model.put( MARK_USER, user );
-    	model.put( MARK_ACTION_SUCCESSFUL, strSuccess );
+    	model.put( MARK_ACTION_SUCCESSFUL, strActionSuccessful );
+    	model.put( MARK_FORM_ERROR, formErrors );
 
     	HtmlTemplate t = AppTemplateService.getTemplate( TEMPLATE_CREATE_ACCOUNT_PAGE, _locale, model );
     	page.setContent( t.getHtml(  ) );
@@ -417,113 +459,108 @@ public class MyLuteceDirectoryApp implements XPageApplication
      * @param request The HTTP request
      * @return The URL to forward depending of the result of the change.
      */
-    public String doCreateAccount( HttpServletRequest request )
+    public FormErrors doCreateAccount( HttpServletRequest request )
     {
-    	Plugin directoryPlugin = PluginService.getPlugin(DirectoryPlugin.PLUGIN_NAME);
     	Plugin plugin = PluginService.getPlugin( request.getParameter( PARAMETER_PLUGIN_NAME ) );
-    	MyluteceDirectoryUser directoryUser = new MyluteceDirectoryUser(  );
     	init( request, plugin );
 
-    	UrlItem url = new UrlItem( AppPathService.getBaseUrl( request ) + getNewAccountUrl(  ) );
-    	url.addParameter( PARAMETER_PLUGIN_NAME, _plugin.getName(  ) );
-
-    	String strError = null;
+    	FormErrors formErrors = new FormErrors(  );
+    	
     	String strLogin = request.getParameter( PARAMETER_LOGIN );
     	String strPassword = request.getParameter( PARAMETER_PASSWORD );
     	String strConfirmation = request.getParameter( PARAMETER_CONFIRMATION_PASSWORD );
-    	
-    	url.addParameter( PARAMETER_LOGIN, strLogin );    	
-    
-    	if ( ( strLogin == null ) || ( strPassword == null ) || ( strConfirmation == null ) || 
-    			 strLogin.equals( "" ) || strPassword.equals( "" ) ||
-    			strConfirmation.equals( "" )  )
-    	{    		
-    		strError = ERROR_MANDATORY_FIELDS;
+
+		// Check if classic mandatory fields
+    	if ( StringUtils.isBlank( strLogin ) )
+    	{
+    		String strFieldName = I18nService.getLocalizedString( PROPERTY_CREATE_ACCOUNT_LOGIN, _locale );
+    		Object[] params = { strFieldName };
+    		formErrors.addError( PARAMETER_LOGIN, I18nService.getLocalizedString( 
+    				PROPERTY_ERROR_MANDATORY_FIELDS, params, _locale ) );
+    	}
+    	if ( StringUtils.isBlank( strPassword ) )
+    	{
+    		String strFieldName = I18nService.getLocalizedString( PROPERTY_CREATE_ACCOUNT_PASSWORD, _locale );
+    		Object[] params = { strFieldName };
+    		formErrors.addError( PARAMETER_PASSWORD, I18nService.getLocalizedString( 
+    				PROPERTY_ERROR_MANDATORY_FIELDS, params, _locale ) );
+    	}
+    	if ( StringUtils.isBlank( strConfirmation ) )
+    	{
+    		String strFieldName = I18nService.getLocalizedString( PROPERTY_CREATE_ACCOUNT_CONFIRMATION, _locale );
+    		Object[] params = { strFieldName };
+    		formErrors.addError( PARAMETER_CONFIRMATION_PASSWORD, I18nService.getLocalizedString( 
+    				PROPERTY_ERROR_MANDATORY_FIELDS, params, _locale ) );
     	}
 
-    	//Check if the login contain an accent
-    	Pattern pattern = Pattern.compile("[^a-zA-Z_0-9]");
-    	Matcher matcher = pattern.matcher(strLogin);
-    	Boolean bAccentFound = false;
-    	while( matcher.find(  ) ) {
+    	formErrors.addLastValue( PARAMETER_LOGIN, strLogin );
+
+    	// Check if the login contain an accent
+    	Pattern pattern = Pattern.compile( REGEX_LOGIN );
+    	Matcher matcher = pattern.matcher( strLogin );
+    	boolean bAccentFound = false;
+    	while ( matcher.find(  ) )
+    	{ 
     		bAccentFound = true;
+    		break;
     	}
-    	if ( strError == null  && bAccentFound==true) {
-    		strError = ERROR_LOGIN_ACCENTS_OR_BLANK;
+    	if ( bAccentFound )
+    	{
+    		formErrors.addError( ERROR_LOGIN_ACCENTS_OR_BLANK, I18nService.getLocalizedString( 
+    				PROPERTY_ERROR_LOGIN_ACCENTS, _locale ) );
     	}
     	
-    	//Check login unique code
-    	if ( ( strError == null ) && !MyluteceDirectoryUserHome.findDirectoryUsersListForLogin( strLogin, _plugin ).isEmpty(  ) )
+    	// Check login unique code
+    	if ( !MyluteceDirectoryUserHome.findDirectoryUsersListForLogin( strLogin, _plugin ).isEmpty(  ) )
     	{
-    		strError = ERROR_LOGIN_ALREADY_EXISTS;
+    		formErrors.addError( ERROR_LOGIN_ALREADY_EXISTS, I18nService.getLocalizedString( 
+    				PROPERTY_ERROR_LOGIN, _locale ) );
     	}   	
-    	
 
-    	//Check password confirmation
-    	if ( ( strError == null ) && !checkPassword( strPassword, strConfirmation ) )
+    	// Check password confirmation
+    	if ( !checkPassword( strPassword, strConfirmation ) )
     	{
-    		strError = ERROR_CONFIRMATION_PASSWORD;
+    		formErrors.addError( ERROR_CONFIRMATION_PASSWORD, I18nService.getLocalizedString( 
+    				PROPERTY_ERROR_CONFIRMATION, _locale ) );
     	}
     	
-    	   //test the captcha
+    	// Test the captcha
         if ( PluginService.isPluginEnable( JCAPTCHA_PLUGIN )  )
         {
         	CaptchaSecurityService captchaService = new CaptchaSecurityService(  );
 
-            if ( ( strError == null ) && ( !captchaService.validate( request ) ) )
+            if ( !captchaService.validate( request ) )
             {
-            	strError = ERROR_JCAPTCHA;
+            	formErrors.addError( ERROR_JCAPTCHA, I18nService.getLocalizedString( 
+        				PROPERTY_ERROR_BAD_JCAPTCHA, _locale ) );
             }
         }
 
-    	if ( strError != null )
+        // Get directory record data
+        Iterator<Integer> itIdDirectory = MyluteceDirectoryHome.findMappedDirectories( _plugin ).iterator(  );   
+
+		if( !itIdDirectory.hasNext(  ) )
+		{
+			formErrors.addError( ERROR_DIRECTORY_UNDEFINED, ERROR_DIRECTORY_UNDEFINED );
+			return formErrors;
+		}
+
+		int nIdDirectory = itIdDirectory.next(  );
+
+		Plugin directoryPlugin = PluginService.getPlugin(DirectoryPlugin.PLUGIN_NAME);
+		Directory directory = DirectoryHome.findByPrimaryKey( nIdDirectory, directoryPlugin );
+
+		Record record = new Record(  );
+		record.setDirectory( directory );
+
+		MyluteceDirectoryService.getInstance(  ).getDirectoryRecordData( request, record, directoryPlugin, _locale, formErrors );
+		formErrors.addLastValue( PARAMETER_DIRECTORY_RECORD, record );
+
+    	if ( !formErrors.hasError(  ) )
     	{
-    		url.addParameter( PARAMETER_ERROR_CODE, strError );
-
-    		return url.getUrl(  );
-    	}
-    	else
-    	{
-
-    		Iterator<Integer> itIdDirectory = MyluteceDirectoryHome.findMappedDirectories( _plugin ).iterator(  );   
-    		
-    		if( ! itIdDirectory.hasNext(  ) )
-    		{
-    			url.addParameter( PARAMETER_ERROR_CODE, ERROR_DIRECTORY_UNDEFINED );
-
-        		return url.getUrl(  );
-    		}
-    		int nIdDirectory =   itIdDirectory.next(  );
-    		
-    		Directory directory = DirectoryHome.findByPrimaryKey( nIdDirectory, directoryPlugin );
-
-    		Record record = new Record(  );
-    		record.setDirectory( directory );
-
-    		try
-    		{
-    			DirectoryUtils.getDirectoryRecordData( request, record, directoryPlugin, _locale );
-    		}
-    		catch ( DirectoryErrorException error )
-    		{    			
-    			if ( error.isMandatoryError(  ) )
-    			{    				
-    				strError = ERROR_DIRECTORY_FIELD;
-    			}
-    			else
-    			{
-    				url.addParameter( PARAMETER_ERROR_MESSAGE, error.getTitleField(  ) );    	
-    				strError = ERROR_DIRECTORY_MESSAGE;
-    			}
-    			
-    			url.addParameter( PARAMETER_ERROR_FIELD, error.getTitleField(  ) );
-    			url.addParameter( PARAMETER_ERROR_CODE, strError );
-
-        		return url.getUrl(  );
-    		}
-
     		record.setDateCreation( DirectoryUtils.getCurrentTimestamp(  ) );
-    		//Autopublication
+
+    		// Autopublication
     		record.setEnabled( true );
     		int nIdRecord = RecordHome.create( record, directoryPlugin );
 
@@ -537,20 +574,17 @@ public class MyLuteceDirectoryApp implements XPageApplication
     			.executeActionAutomatic( record.getIdRecord(  ), Record.WORKFLOW_RESOURCE_TYPE,
     					directory.getIdWorkflow(  ), Integer.valueOf( directory.getIdDirectory(  ) ) );
     		}
-    		
-    		directoryUser.setLogin( strLogin );    		
+
+    		boolean bNeedActivation = Boolean.parseBoolean( AppPropertiesService.getProperty( PROPERTY_NEED_ACTIVATION, "false" ) );
+
+    		// Create the directory user
+    		MyluteceDirectoryUser directoryUser = new MyluteceDirectoryUser(  );
+    		directoryUser.setLogin( strLogin );
     		directoryUser.setIdRecord( nIdRecord );
-    		boolean bNeedActivation = Boolean.parseBoolean( AppPropertiesService.getProperty( PROPERTY_NEED_ACTIVATION, "false") );
-    		if( !bNeedActivation )
-    		{
-    			directoryUser.setActivated( true );
-    		}    		
+    		directoryUser.setActivated( !bNeedActivation );
     		MyluteceDirectoryUserHome.create( directoryUser, strPassword, _plugin );
     	}
-
-    	url.addParameter( PARAMETER_ACTION_SUCCESSFUL, getDefaultRedirectUrl(  ) );
-
-    	return url.getUrl(  );
+		return formErrors;
     }
 
     /**
@@ -895,5 +929,48 @@ public class MyLuteceDirectoryApp implements XPageApplication
         MyluteceDirectoryUser user = (MyluteceDirectoryUser) listUsers.iterator(  ).next(  );
 
         return user;
+    }
+
+    /**
+     * Store the record in the session
+     * @param request the HTTP request
+     * @param record the record to store
+     */
+    private void storeRecordInSession( HttpServletRequest request, Record record )
+    {
+    	HttpSession session = request.getSession(  );
+    	if ( session != null )
+    	{
+    		session.setAttribute( SESSION_MYLUTECE_DIRECTORY_RECORD, record );
+    	}
+    }
+
+    /**
+     * Get the record from the session
+     * @param request the HTTP request
+     * @return the record
+     */
+    private Record getRecordFromSession( HttpServletRequest request )
+    {
+    	Record record = null;
+    	HttpSession session = request.getSession( false );
+    	if ( session != null )
+    	{
+    		record = (Record) session.getAttribute( SESSION_MYLUTECE_DIRECTORY_RECORD );
+    	}
+    	return record;
+    }
+
+    /**
+     * Remove the record from the session
+     * @param request the HTTP request
+     */
+    private void removeRecordFromSession( HttpServletRequest request )
+    {
+    	HttpSession session = request.getSession( false );
+    	if ( session != null )
+    	{
+    		session.removeAttribute( SESSION_MYLUTECE_DIRECTORY_RECORD );
+    	}
     }
 }
