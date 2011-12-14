@@ -44,6 +44,7 @@ import fr.paris.lutece.portal.service.plugin.Plugin;
 import fr.paris.lutece.portal.service.plugin.PluginService;
 import fr.paris.lutece.portal.service.security.LuteceAuthentication;
 import fr.paris.lutece.portal.service.spring.SpringContextService;
+import fr.paris.lutece.portal.service.util.AppLogService;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -96,6 +97,12 @@ public final class MyluteceDirectoryHome
 
         Plugin directoryPlugin = PluginService.getPlugin( DirectoryPlugin.PLUGIN_NAME );
         Record record = RecordHome.findByPrimaryKey( directoryUser.getIdRecord(  ), directoryPlugin );
+        if ( record == null )
+        {
+        	AppLogService.error( "MyLuteceDirectory - Inconsistency between the MyLuteceDirectoryUser and the directory record : " +
+        			"Record is null whereas MyLuteceDirectoryUser is not." );
+        	return null;
+        }
         record.setListRecordField( RecordFieldHome.getRecordFieldList( filter, directoryPlugin ) );
 
         // Create the BaseUser
