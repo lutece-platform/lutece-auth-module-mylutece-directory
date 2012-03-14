@@ -3,11 +3,18 @@
 
 <beans>
   
-  <bean id="myluteceDirectoryUserDAO"  class="fr.paris.lutece.plugins.mylutece.modules.directory.authentication.business.MyluteceDirectoryUserDAO" />
-  <bean id="myluteceDirectoryDAO"  class="fr.paris.lutece.plugins.mylutece.modules.directory.authentication.business.MyluteceDirectoryDAO" />
-  <bean id="myluteceDirectoryAttributeMappingDAO"  class="fr.paris.lutece.plugins.mylutece.modules.directory.authentication.business.AttributeMappingDAO" />
-  <bean id="myluteceDirectory.authentication" class="fr.paris.lutece.plugins.mylutece.modules.directory.authentication.BaseAuthentication" />
+	<bean id="myluteceDirectoryUserDAO"  class="fr.paris.lutece.plugins.mylutece.modules.directory.authentication.business.MyluteceDirectoryUserDAO" />
+	<bean id="myluteceDirectoryDAO"  class="fr.paris.lutece.plugins.mylutece.modules.directory.authentication.business.MyluteceDirectoryDAO" />
+	<bean id="myluteceDirectoryAttributeMappingDAO"  class="fr.paris.lutece.plugins.mylutece.modules.directory.authentication.business.AttributeMappingDAO" />
+	<bean id="myluteceDirectory.myluteceDirectoryParameterDAO" class="fr.paris.lutece.plugins.mylutece.modules.directory.authentication.business.parameter.MyluteceDirectoryParameterDAO" />
+	<bean id="mylutece-directory.myluteceDirectoryUserKeyDAO" class="fr.paris.lutece.plugins.mylutece.modules.directory.authentication.business.key.MyluteceDirectoryUserKeyDAO" />
+	<bean id="myluteceDirectory.authentication" class="fr.paris.lutece.plugins.mylutece.modules.directory.authentication.BaseAuthentication" />
 
-  <bean id="myluteceDirectoryUserFieldListenerService" class="fr.paris.lutece.plugins.mylutece.service.attribute.MyLuteceUserFieldListenerService" />
-  <bean id="myluteceDirectory.myluteceDirectoryParameterDAO" class="fr.paris.lutece.plugins.mylutece.modules.directory.authentication.business.parameter.MyluteceDirectoryParameterDAO" />
+	<!-- SERVICES -->
+	<bean id="myluteceDirectoryUserFieldListenerService" class="fr.paris.lutece.plugins.mylutece.service.attribute.MyLuteceUserFieldListenerService" />
+	<bean id="mylutece-directory.myluteceDirectoryService" class="fr.paris.lutece.plugins.mylutece.modules.directory.authentication.service.MyluteceDirectoryService" />
+	<bean id="mylutece-directory.myluteceDirectoryParameterService" class="fr.paris.lutece.plugins.mylutece.modules.directory.authentication.service.parameter.MyluteceDirectoryParameterService" />
+	<bean id="mylutece-directory.securityService" class="fr.paris.lutece.plugins.mylutece.modules.directory.authentication.service.security.MyluteceDirectorySecurityService" />
+	<bean id="mylutece-directory.attributeMappingService" class="fr.paris.lutece.plugins.mylutece.modules.directory.authentication.service.AttributeMappingService" />
+	<bean id="mylutece-directory.myluteceDirectoryUserKeyService" class="fr.paris.lutece.plugins.mylutece.modules.directory.authentication.service.key.MyluteceDirectoryUserKeyService" />
 </beans>

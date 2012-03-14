@@ -54,33 +54,13 @@ public final class MyluteceDirectoryUserDAO implements IMyluteceDirectoryUserDAO
     private static final String SQL_QUERY_UPDATE_PASSWORD = " UPDATE mylutece_directory_user SET user_password = ? WHERE id_record = ? ";
     private static final String SQL_QUERY_SELECTALL = " SELECT id_record, user_login, activated FROM mylutece_directory_user ORDER BY user_login ";
     private static final String SQL_QUERY_SELECTALL_FOR_LOGIN = " SELECT id_record, user_login, activated FROM mylutece_directory_user WHERE user_login = ? ";
-   
     private static final String SQL_QUERY_CHECK_PASSWORD_FOR_USER_ID = " SELECT count(*) FROM mylutece_directory_user WHERE user_login = ? AND user_password = ? ";
     private static final String SQL_QUERY_CHECK_ACTIVATED = " SELECT count(*) FROM mylutece_directory_user WHERE user_login = ? AND activated = 1 ";
-    /** This class implements the Singleton design pattern. */
-    private static MyluteceDirectoryUserDAO _dao = new MyluteceDirectoryUserDAO(  );
 
     /**
-     * Creates a new directoryUserDAO object.
+     * {@inheritDoc}
      */
-    private MyluteceDirectoryUserDAO(  )
-    {
-    }
-
-    /**
-     * Returns the unique instance of the singleton.
-     *
-     * @return the instance
-     */
-    static MyluteceDirectoryUserDAO getInstance(  )
-    {
-        return _dao;
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see fr.paris.lutece.plugins.mylutece.modules.directory.authentication.business.IMyluteceDirectoryUserDAO#insert(fr.paris.lutece.plugins.mylutece.modules.directory.authentication.business.MyluteceDirectoryUser, java.lang.String, fr.paris.lutece.portal.service.plugin.Plugin)
-     */
+    @Override
     public void insert( MyluteceDirectoryUser directoryUser, String strPassword, Plugin plugin )
     {
         DAOUtil daoUtil = new DAOUtil( SQL_QUERY_INSERT, plugin );
@@ -93,10 +73,10 @@ public final class MyluteceDirectoryUserDAO implements IMyluteceDirectoryUserDAO
         daoUtil.free(  );
     }
 
-    /*
-     * (non-Javadoc)
-     * @see fr.paris.lutece.plugins.mylutece.modules.directory.authentication.business.IMyluteceDirectoryUserDAO#load(int, fr.paris.lutece.portal.service.plugin.Plugin)
+    /**
+     * {@inheritDoc}
      */
+    @Override
     public MyluteceDirectoryUser load( int nIdRecord, Plugin plugin )
     {
         DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECT, plugin );
@@ -118,10 +98,10 @@ public final class MyluteceDirectoryUserDAO implements IMyluteceDirectoryUserDAO
         return directoryUser;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see fr.paris.lutece.plugins.mylutece.modules.directory.authentication.business.IMyluteceDirectoryUserDAO#delete(fr.paris.lutece.plugins.mylutece.modules.directory.authentication.business.MyluteceDirectoryUser, fr.paris.lutece.portal.service.plugin.Plugin)
+    /**
+     * {@inheritDoc}
      */
+    @Override
     public void delete( MyluteceDirectoryUser directoryUser, Plugin plugin )
     {
         DAOUtil daoUtil = new DAOUtil( SQL_QUERY_DELETE, plugin );
@@ -131,25 +111,25 @@ public final class MyluteceDirectoryUserDAO implements IMyluteceDirectoryUserDAO
         daoUtil.free(  );
     }
 
-    /*
-     * (non-Javadoc)
-     * @see fr.paris.lutece.plugins.mylutece.modules.directory.authentication.business.IMyluteceDirectoryUserDAO#store(fr.paris.lutece.plugins.mylutece.modules.directory.authentication.business.MyluteceDirectoryUser, fr.paris.lutece.portal.service.plugin.Plugin)
+    /**
+     * {@inheritDoc}
      */
+    @Override
     public void store( MyluteceDirectoryUser directoryUser, Plugin plugin )
     {
         DAOUtil daoUtil = new DAOUtil( SQL_QUERY_UPDATE, plugin );
         daoUtil.setString( 1, directoryUser.getLogin(  ) );
-        daoUtil.setBoolean( 2, directoryUser.isActivated(  ) );        
+        daoUtil.setBoolean( 2, directoryUser.isActivated(  ) );
         daoUtil.setInt( 3, directoryUser.getIdRecord(  ) );
 
         daoUtil.executeUpdate(  );
         daoUtil.free(  );
     }
 
-    /*
-     * (non-Javadoc)
-     * @see fr.paris.lutece.plugins.mylutece.modules.directory.authentication.business.IMyluteceDirectoryUserDAO#updatePassword(fr.paris.lutece.plugins.mylutece.modules.directory.authentication.business.MyluteceDirectoryUser, java.lang.String, fr.paris.lutece.portal.service.plugin.Plugin)
+    /**
+     * {@inheritDoc}
      */
+    @Override
     public void updatePassword( MyluteceDirectoryUser directoryUser, String strNewPassword, Plugin plugin )
     {
         DAOUtil daoUtil = new DAOUtil( SQL_QUERY_UPDATE_PASSWORD, plugin );
@@ -160,10 +140,10 @@ public final class MyluteceDirectoryUserDAO implements IMyluteceDirectoryUserDAO
         daoUtil.free(  );
     }
 
-    /*
-     * (non-Javadoc)
-     * @see fr.paris.lutece.plugins.mylutece.modules.directory.authentication.business.IMyluteceDirectoryUserDAO#selectPasswordByPrimaryKey(int, fr.paris.lutece.portal.service.plugin.Plugin)
+    /**
+     * {@inheritDoc}
      */
+    @Override
     public String selectPasswordByPrimaryKey( int nIdRecord, Plugin plugin )
     {
         String strPassword = null;
@@ -181,10 +161,10 @@ public final class MyluteceDirectoryUserDAO implements IMyluteceDirectoryUserDAO
         return strPassword;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see fr.paris.lutece.plugins.mylutece.modules.directory.authentication.business.IMyluteceDirectoryUserDAO#selectDirectoryUserList(fr.paris.lutece.portal.service.plugin.Plugin)
+    /**
+     * {@inheritDoc}
      */
+    @Override
     public Collection<MyluteceDirectoryUser> selectDirectoryUserList( Plugin plugin )
     {
         Collection<MyluteceDirectoryUser> listDirectoryUsers = new ArrayList<MyluteceDirectoryUser>(  );
@@ -205,10 +185,10 @@ public final class MyluteceDirectoryUserDAO implements IMyluteceDirectoryUserDAO
         return listDirectoryUsers;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see fr.paris.lutece.plugins.mylutece.modules.directory.authentication.business.IMyluteceDirectoryUserDAO#selectDirectoryUserListForLogin(java.lang.String, fr.paris.lutece.portal.service.plugin.Plugin)
+    /**
+     * {@inheritDoc}
      */
+    @Override
     public Collection<MyluteceDirectoryUser> selectDirectoryUserListForLogin( String strLogin, Plugin plugin )
     {
         Collection<MyluteceDirectoryUser> listDirectoryUsers = new ArrayList<MyluteceDirectoryUser>(  );
@@ -228,13 +208,12 @@ public final class MyluteceDirectoryUserDAO implements IMyluteceDirectoryUserDAO
         daoUtil.free(  );
 
         return listDirectoryUsers;
-    }    
-   
+    }
 
-    /*
-     * (non-Javadoc)
-     * @see fr.paris.lutece.plugins.mylutece.modules.directory.authentication.business.IMyluteceDirectoryUserDAO#checkPassword(java.lang.String, java.lang.String, fr.paris.lutece.portal.service.plugin.Plugin)
+    /**
+     * {@inheritDoc}
      */
+    @Override
     public boolean checkPassword( String strLogin, String strPassword, Plugin plugin )
     {
         int nCount = 0;
@@ -253,20 +232,24 @@ public final class MyluteceDirectoryUserDAO implements IMyluteceDirectoryUserDAO
         return ( nCount == 1 ) ? true : false;
     }
 
-    public boolean checkActivated(String strLogin, Plugin plugin) 
-    {    
-    	int nCount = 0;
-    	DAOUtil daoUtil = new DAOUtil( SQL_QUERY_CHECK_ACTIVATED, plugin );
-    	daoUtil.setString( 1, strLogin );
-    	daoUtil.executeQuery(  );
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean checkActivated( String strLogin, Plugin plugin )
+    {
+        int nCount = 0;
+        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_CHECK_ACTIVATED, plugin );
+        daoUtil.setString( 1, strLogin );
+        daoUtil.executeQuery(  );
 
-    	if ( daoUtil.next(  ) )
-    	{
-    		nCount = daoUtil.getInt( 1 );
-    	}
+        if ( daoUtil.next(  ) )
+        {
+            nCount = daoUtil.getInt( 1 );
+        }
 
-    	daoUtil.free(  );
+        daoUtil.free(  );
 
-    	return ( nCount == 1 ) ? true : false;
-	}
+        return ( nCount == 1 ) ? true : false;
+    }
 }

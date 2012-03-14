@@ -14,8 +14,12 @@
 		        </p>
 		
 		        <p>
-		            <label for="password">#i18n{module.mylutece.directory.modify_user.password} * : </label>
-		            <input type="password" name="password" maxlength="100" size="35" tabindex="2" value="${password!}" />
+		            <label for="password">#i18n{module.mylutece.directory.modify_user.password} : </label>
+		            <input type="password" name="password" maxlength="100" size="35" tabindex="2" value="" />
+		            <br />
+		            <label for="modify_password">&nbsp;</label>
+		            <input type="checkbox" name="modify_password" value="modify_password" />
+		            #i18n{module.mylutece.directory.modify_user.password_comment}
 		        </p>
 		        
 		        <p>

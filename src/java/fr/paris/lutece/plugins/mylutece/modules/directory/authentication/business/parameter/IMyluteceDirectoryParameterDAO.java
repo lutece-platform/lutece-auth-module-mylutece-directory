@@ -36,25 +36,26 @@ package fr.paris.lutece.plugins.mylutece.modules.directory.authentication.busine
 import fr.paris.lutece.portal.service.plugin.Plugin;
 import fr.paris.lutece.util.ReferenceItem;
 
+
 /**
- * 
+ *
  * IMyluteceDirectoryParameterDAO
  *
  */
-public interface IMyluteceDirectoryParameterDAO 
+public interface IMyluteceDirectoryParameterDAO
 {
-	/**
-     * Load the parameter value
-     * @param strParameterKey the parameter key
-     * @param plugin Plugin
-     * @return The parameter
-     */
+    /**
+    * Load the parameter value
+    * @param strParameterKey the parameter key
+    * @param plugin Plugin
+    * @return The parameter
+    */
     ReferenceItem load( String strParameterKey, Plugin plugin );
-    
+
     /**
      * Update the parameter value
      * @param param the parameter
-     * @param plugin
+     * @param plugin the plugin
      */
     void store( ReferenceItem param, Plugin plugin );
 }

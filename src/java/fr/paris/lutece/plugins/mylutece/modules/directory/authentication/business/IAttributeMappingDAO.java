@@ -40,7 +40,7 @@ import java.util.Collection;
 
 /**
  *
- * @author lyaete
+ * IAttributeMappingDAO
  *
  */
 public interface IAttributeMappingDAO
@@ -50,20 +50,20 @@ public interface IAttributeMappingDAO
      * @param nIdEntry The id of the entry
      * @param plugin The plugin
      */
-    public abstract void delete( int nIdEntry, Plugin plugin );
+    void delete( int nIdEntry, Plugin plugin );
 
     /**
      * Delete all records
      * @param plugin The plugin
      */
-    public abstract void deleteAll( Plugin plugin );
+    void deleteAll( Plugin plugin );
 
     /**
      * Find All mappings
      * @param plugin The {@link Plugin}
      * @return The {@link Collection} of {@link AttributeMapping}
      */
-    public abstract Collection<AttributeMapping> findAll( Plugin plugin );
+    Collection<AttributeMapping> findAll( Plugin plugin );
 
     /**
      * Find the {@link AttributeMapping} for the specified entry id
@@ -71,7 +71,7 @@ public interface IAttributeMappingDAO
      * @param plugin The {@link Plugin}
      * @return The {@link AttributeMapping} of null
      */
-    public abstract AttributeMapping findByPrimaryKey( int nIdEntry, Plugin plugin );
+    AttributeMapping findByPrimaryKey( int nIdEntry, Plugin plugin );
 
     /**
      * Find the {@link AttributeMapping} list for the specified attributeKey
@@ -79,12 +79,12 @@ public interface IAttributeMappingDAO
      * @param plugin The {@link Plugin}
      * @return The {@link AttributeMapping} or null
      */
-    public abstract AttributeMapping findByAttributeKey( String strAttributeKey, Plugin plugin );
+    AttributeMapping findByAttributeKey( String strAttributeKey, Plugin plugin );
 
     /**
      * Insert a new {@link AttributeMapping}
      * @param attributeMapping The new {@link AttributeMapping}
      * @param plugin The {@link Plugin}
      */
-    public abstract void insert( AttributeMapping attributeMapping, Plugin plugin );
+    void insert( AttributeMapping attributeMapping, Plugin plugin );
 }

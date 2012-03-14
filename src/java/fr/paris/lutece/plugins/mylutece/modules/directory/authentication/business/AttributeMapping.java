@@ -33,8 +33,6 @@
  */
 package fr.paris.lutece.plugins.mylutece.modules.directory.authentication.business;
 
-import fr.paris.lutece.plugins.directory.business.EntryRemovalListenerService;
-
 
 /**
  * This class represent the object {@link AttributeMapping}
@@ -42,22 +40,8 @@ import fr.paris.lutece.plugins.directory.business.EntryRemovalListenerService;
  */
 public class AttributeMapping
 {
-    private static AttributeMappingEntryRemovalListener _listenerEntry;
     private int _nIdEntry;
     private String _strAttributeKey;
-
-    /**
-     * Initialize the AttributeMapping
-     */
-    public static void init(  )
-    {
-        // Create removal listeners for Entry (Directory) and register them
-        if ( _listenerEntry == null )
-        {
-            _listenerEntry = new AttributeMappingEntryRemovalListener(  );
-            EntryRemovalListenerService.getService(  ).registerListener( _listenerEntry );
-        }
-    }
 
     /**
      * @return the idEntry

@@ -31,49 +31,61 @@
  *
  * License 1.0
  */
-package fr.paris.lutece.plugins.mylutece.modules.directory.authentication.business.parameter;
+package fr.paris.lutece.plugins.mylutece.modules.directory.authentication.service.key;
 
-import fr.paris.lutece.portal.service.plugin.Plugin;
-import fr.paris.lutece.portal.service.spring.SpringContextService;
-import fr.paris.lutece.util.ReferenceItem;
+import fr.paris.lutece.plugins.mylutece.modules.directory.authentication.business.key.MyluteceDirectoryUserKey;
+
+import javax.servlet.http.HttpServletRequest;
 
 
 /**
  *
- * MyluteceDirectoryParameterHome
+ * IMyluteceDirectoryUserKeyService
  *
  */
-public final class MyluteceDirectoryParameterHome
+public interface IMyluteceDirectoryUserKeyService
 {
-    // Static variable pointed at the DAO instance
-    private static IMyluteceDirectoryParameterDAO _dao = (IMyluteceDirectoryParameterDAO) SpringContextService.getPluginBean( "mylutece-directory",
-            "myluteceDirectory.myluteceDirectoryParameterDAO" );
-
     /**
-     * Private constructor
+     * Create a new user key from a given user id
+     * @param nIdRecord the id record
+     * @return the key
      */
-    private MyluteceDirectoryParameterHome(  )
-    {
-    }
+    MyluteceDirectoryUserKey create( int nIdRecord );
 
     /**
-    * Load the parameter value
-    * @param strParameterKey the parameter key
-    * @param plugin Plugin
-    * @return The parameter
-    */
-    public static ReferenceItem findByKey( String strParameterKey, Plugin plugin )
-    {
-        return _dao.load( strParameterKey, plugin );
-    }
-
-    /**
-     * Update the parameter value
-     * @param param the parameter
-     * @param plugin Plugin
+     * Find the key
+     * @param strKey the key
+     * @return the key
      */
-    public static void update( ReferenceItem param, Plugin plugin )
-    {
-        _dao.store( param, plugin );
-    }
+    MyluteceDirectoryUserKey findByPrimaryKey( String strKey );
+
+    /**
+     * Remove a key
+     * @param strKey the key
+     */
+    void remove( String strKey );
+
+    /**
+     * Remove a key from a given id user
+     * @param nIdRecord the id record
+     */
+    void removeByIdRecord( int nIdRecord );
+
+    // GET
+
+    /**
+     * Build the validation url
+     * @param strKey the key
+     * @param request the HTTP request
+     * @return the validation url
+     */
+    String getValidationUrl( String strKey, HttpServletRequest request );
+
+    /**
+     * Get reinit url
+     * @param strKey the key
+     * @param request the HTTP request
+     * @return the url
+     */
+    String getReinitUrl( String strKey, HttpServletRequest request );
 }

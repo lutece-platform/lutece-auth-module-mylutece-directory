@@ -36,23 +36,31 @@ package fr.paris.lutece.plugins.mylutece.modules.directory.authentication.servic
 import fr.paris.lutece.plugins.mylutece.service.attribute.MyLuteceUserFieldListenerService;
 import fr.paris.lutece.portal.service.spring.SpringContextService;
 
+
 /**
- * 
+ *
  * DatabaseMyLuteceUserFieldListenerService
  *
  */
-public class MyluteceDirectoryUserFieldListenerService 
+public class MyluteceDirectoryUserFieldListenerService
 {
-	private static final String SPRING_CONTEXT_NAME = "mylutece-directory";
-	private static final String BEAN_DATABASE_MYLUTECE_USER_FIELD_SERVICE = "myluteceDirectoryUserFieldListenerService";
-	
-	/**
-	 * Get MyLuteceUserFieldListenerService
-	 * @return the service
-	 */
-	public static MyLuteceUserFieldListenerService getService(  )
-	{
-		return (MyLuteceUserFieldListenerService) SpringContextService.getPluginBean( SPRING_CONTEXT_NAME,
-				BEAN_DATABASE_MYLUTECE_USER_FIELD_SERVICE );
-	}
+    private static final String SPRING_CONTEXT_NAME = "mylutece-directory";
+    private static final String BEAN_DATABASE_MYLUTECE_USER_FIELD_SERVICE = "myluteceDirectoryUserFieldListenerService";
+
+    /**
+     * Private constructor
+     */
+    private MyluteceDirectoryUserFieldListenerService(  )
+    {
+    }
+
+    /**
+     * Get MyLuteceUserFieldListenerService
+     * @return the service
+     */
+    public static MyLuteceUserFieldListenerService getService(  )
+    {
+        return (MyLuteceUserFieldListenerService) SpringContextService.getPluginBean( SPRING_CONTEXT_NAME,
+            BEAN_DATABASE_MYLUTECE_USER_FIELD_SERVICE );
+    }
 }

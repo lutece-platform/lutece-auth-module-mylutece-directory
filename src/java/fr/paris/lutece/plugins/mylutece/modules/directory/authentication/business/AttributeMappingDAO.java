@@ -42,7 +42,7 @@ import java.util.Collection;
 
 /**
  *
- * @author ELY
+ * AttributeMappingDAO
  *
  */
 public class AttributeMappingDAO implements IAttributeMappingDAO
@@ -54,9 +54,10 @@ public class AttributeMappingDAO implements IAttributeMappingDAO
     private static final String SQL_QUERY_DELETE = " DELETE FROM mylutece_directory_mapping WHERE id_entry = ? ";
     private static final String SQL_QUERY_DELETE_ALL = " DELETE FROM mylutece_directory_mapping ";
 
-    /* (non-Javadoc)
-         * @see fr.paris.lutece.plugins.mylutece.modules.directory.authentication.business.IAttributeMappingDAO#delete(int, int, fr.paris.lutece.portal.service.plugin.Plugin)
-         */
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void delete( int nIdEntry, Plugin plugin )
     {
         DAOUtil daoUtil = new DAOUtil( SQL_QUERY_DELETE, plugin );
@@ -66,10 +67,10 @@ public class AttributeMappingDAO implements IAttributeMappingDAO
         daoUtil.free(  );
     }
 
-    /*
-     * (non-Javadoc)
-     * @see fr.paris.lutece.plugins.mylutece.modules.directory.authentication.business.IAttributeMappingDAO#deleteAll(fr.paris.lutece.portal.service.plugin.Plugin)
+    /**
+     * {@inheritDoc}
      */
+    @Override
     public void deleteAll( Plugin plugin )
     {
         DAOUtil daoUtil = new DAOUtil( SQL_QUERY_DELETE_ALL, plugin );
@@ -78,10 +79,10 @@ public class AttributeMappingDAO implements IAttributeMappingDAO
         daoUtil.free(  );
     }
 
-    /*
-     * (non-Javadoc)
-     * @see fr.paris.lutece.plugins.mylutece.modules.directory.authentication.business.IAttributeMappingDAO#findAll(fr.paris.lutece.portal.service.plugin.Plugin)
+    /**
+     * {@inheritDoc}
      */
+    @Override
     public Collection<AttributeMapping> findAll( Plugin plugin )
     {
         Collection<AttributeMapping> mappingList = new ArrayList<AttributeMapping>(  );
@@ -102,10 +103,10 @@ public class AttributeMappingDAO implements IAttributeMappingDAO
         return mappingList;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see fr.paris.lutece.plugins.mylutece.modules.directory.authentication.business.IAttributeMappingDAO#findByPrimaryKey(int, fr.paris.lutece.portal.service.plugin.Plugin)
+    /**
+     * {@inheritDoc}
      */
+    @Override
     public AttributeMapping findByPrimaryKey( int nIdEntry, Plugin plugin )
     {
         AttributeMapping mapping = null;
@@ -126,10 +127,10 @@ public class AttributeMappingDAO implements IAttributeMappingDAO
         return mapping;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see fr.paris.lutece.plugins.mylutece.modules.directory.authentication.business.IAttributeMappingDAO#findByAttributeKey(java.lang.String, fr.paris.lutece.portal.service.plugin.Plugin)
+    /**
+     * {@inheritDoc}
      */
+    @Override
     public AttributeMapping findByAttributeKey( String strAttributeKey, Plugin plugin )
     {
         AttributeMapping mapping = null;
@@ -150,9 +151,10 @@ public class AttributeMappingDAO implements IAttributeMappingDAO
         return mapping;
     }
 
-    /* (non-Javadoc)
-         * @see fr.paris.lutece.plugins.mylutece.modules.directory.authentication.business.IAttributeMappingDAO#insert(fr.paris.lutece.plugins.mylutece.modules.directory.authentication.business.AttributeMapping, fr.paris.lutece.portal.service.plugin.Plugin)
-         */
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void insert( AttributeMapping attributeMapping, Plugin plugin )
     {
         DAOUtil daoUtil = new DAOUtil( SQL_QUERY_INSERT, plugin );

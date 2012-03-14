@@ -44,7 +44,7 @@ import java.util.Collection;
  * @author lyaete
  *
  */
-public class AttributeMappingHome
+public final class AttributeMappingHome
 {
     // Static variable pointed at the DAO instance
     private static IAttributeMappingDAO _dao = (IAttributeMappingDAO) SpringContextService.getPluginBean( "mylutece-directory",

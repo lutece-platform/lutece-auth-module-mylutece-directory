@@ -31,59 +31,45 @@
  *
  * License 1.0
  */
-package fr.paris.lutece.plugins.mylutece.modules.directory.authentication.business.parameter;
+package fr.paris.lutece.plugins.mylutece.modules.directory.authentication.service.parameter;
 
 import fr.paris.lutece.portal.service.plugin.Plugin;
 import fr.paris.lutece.util.ReferenceItem;
-import fr.paris.lutece.util.sql.DAOUtil;
 
 
 /**
  *
- * MyluteceDirectoryParameterDAO
+ * IMyluteceDirectoryParameterService
  *
  */
-public class MyluteceDirectoryParameterDAO implements IMyluteceDirectoryParameterDAO
+public interface IMyluteceDirectoryParameterService
 {
-    private static final String SQL_QUERY_SELECT_PARAMETERS_VALUE = " SELECT parameter_value FROM mylutece_directory_parameter WHERE parameter_key = ? ";
-    private static final String SQL_QUERY_UPDATE_PARAMETERS = " UPDATE mylutece_directory_parameter SET parameter_value = ? WHERE parameter_key = ? ";
+    /**
+     * Get the parameter from a given key
+     * @param strParameterKey the key
+     * @param plugin the plugin
+     * @return the parameter
+     */
+    ReferenceItem findByKey( String strParameterKey, Plugin plugin );
 
     /**
-     * {@inheritDoc}
+     * Update a parameter
+     * @param userParam the parameter
+     * @param plugin the plugin
      */
-    @Override
-    public ReferenceItem load( String strParameterKey, Plugin plugin )
-    {
-        ReferenceItem userParam = null;
-        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECT_PARAMETERS_VALUE, plugin );
-        daoUtil.setString( 1, strParameterKey );
-        daoUtil.executeQuery(  );
-
-        if ( daoUtil.next(  ) )
-        {
-            userParam = new ReferenceItem(  );
-            userParam.setCode( strParameterKey );
-            userParam.setName( daoUtil.getString( 1 ) );
-            userParam.setChecked( Boolean.valueOf( userParam.getName(  ) ) );
-        }
-
-        daoUtil.free(  );
-
-        return userParam;
-    }
+    void update( ReferenceItem userParam, Plugin plugin );
 
     /**
-     * {@inheritDoc}
+     * Check if the passwords must be encrypted or not
+     * @param plugin the plugin
+     * @return true if they are encrypted, false otherwise
      */
-    @Override
-    public void store( ReferenceItem param, Plugin plugin )
-    {
-        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_UPDATE_PARAMETERS, plugin );
+    boolean isPasswordEncrypted( Plugin plugin );
 
-        daoUtil.setString( 1, param.getName(  ) );
-        daoUtil.setString( 2, param.getCode(  ) );
-
-        daoUtil.executeUpdate(  );
-        daoUtil.free(  );
-    }
+    /**
+     * Get the encryption algorithm
+     * @param plugin the plugin
+     * @return the encryption algorithm
+     */
+    String getEncryptionAlgorithm( Plugin plugin );
 }

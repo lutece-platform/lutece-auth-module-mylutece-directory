@@ -48,6 +48,7 @@ import fr.paris.lutece.portal.service.util.AppLogService;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Locale;
 
 
@@ -97,12 +98,16 @@ public final class MyluteceDirectoryHome
 
         Plugin directoryPlugin = PluginService.getPlugin( DirectoryPlugin.PLUGIN_NAME );
         Record record = RecordHome.findByPrimaryKey( directoryUser.getIdRecord(  ), directoryPlugin );
+
         if ( record == null )
         {
-        	AppLogService.error( "MyLuteceDirectory - Inconsistency between the MyLuteceDirectoryUser and the directory record : " +
-        			"Record is null whereas MyLuteceDirectoryUser is not." );
-        	return null;
+            AppLogService.error( 
+                "MyLuteceDirectory - Inconsistency between the MyLuteceDirectoryUser and the directory record : " +
+                "Record is null whereas MyLuteceDirectoryUser is not." );
+
+            return null;
         }
+
         record.setListRecordField( RecordFieldHome.getRecordFieldList( filter, directoryPlugin ) );
 
         // Create the BaseUser
@@ -129,6 +134,7 @@ public final class MyluteceDirectoryHome
     /**
      * Load the list of {@link BaseUser}
      * @param plugin The Plugin using this data access service
+     * @param authenticationService the authentication service
      * @return The Collection of the {@link BaseUser}
      */
     public static Collection<BaseUser> findDirectoryUsersList( Plugin plugin, LuteceAuthentication authenticationService )
@@ -176,7 +182,6 @@ public final class MyluteceDirectoryHome
      * Assign a directory as a user directory
      * @param nIdDirectory The directory identifier
      * @param plugin The Plugin using this data access service
-     * @return true if the directory is mapped, false else
      */
     public static void assignDirectory( int nIdDirectory, Plugin plugin )
     {
@@ -230,7 +235,7 @@ public final class MyluteceDirectoryHome
      * @param plugin The Plugin using this data access service
      * @return ArrayList the role key list corresponding to the login
      */
-    public static ArrayList<String> findUserRolesFromLogin( String strLogin, Plugin plugin )
+    public static List<String> findUserRolesFromLogin( String strLogin, Plugin plugin )
     {
         return _dao.selectUserRolesFromLogin( strLogin, plugin );
     }
@@ -263,15 +268,14 @@ public final class MyluteceDirectoryHome
      * @param plugin The Plugin using this data access service
      * @return ArrayList the group key list corresponding to the login
      */
-    public static ArrayList<String> findUserGroupsFromLogin( String strLogin, Plugin plugin )
+    public static List<String> findUserGroupsFromLogin( String strLogin, Plugin plugin )
     {
         return _dao.selectUserGroupsFromLogin( strLogin, plugin );
     }
 
     /**
      * Delete groups for a user
-         * @param nIdDirectory The id of the user
-         * @param nIdRecord The id of the user
+     * @param nIdRecord The id of the user
      * @param plugin The Plugin using this data access service
      */
     public static void removeGroupsForUser( int nIdRecord, Plugin plugin )

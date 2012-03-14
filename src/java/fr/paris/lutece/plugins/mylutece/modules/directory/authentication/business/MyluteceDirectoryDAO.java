@@ -38,6 +38,7 @@ import fr.paris.lutece.util.sql.DAOUtil;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 
 /**
@@ -62,25 +63,13 @@ public class MyluteceDirectoryDAO implements IMyluteceDirectoryDAO
     private static final String SQL_QUERY_DELETE_GROUPS_FOR_USER = "DELETE FROM mylutece_directory_user_group WHERE id_record = ?";
     private static final String SQL_QUERY_INSERT_GROUP_FOR_USER = "INSERT INTO mylutece_directory_user_group ( id_record, group_key ) VALUES ( ?, ? ) ";
 
-    /** This class implements the Singleton design pattern. */
-    private static IMyluteceDirectoryDAO _dao = new MyluteceDirectoryDAO(  );
-
     /**
-     * Returns the unique instance of the singleton.
-     *
-     * @return the instance
+     * {@inheritDoc}
      */
-    static IMyluteceDirectoryDAO getInstance(  )
+    @Override
+    public List<String> selectUserRolesFromLogin( String strLogin, Plugin plugin )
     {
-        return _dao;
-    }
-
-    /* (non-Javadoc)
-         * @see fr.paris.lutece.plugins.mylutece.modules.directory.authentication.business.IMyluteceDirectoryDAO#selectUserRolesFromLogin(java.lang.String, fr.paris.lutece.portal.service.plugin.Plugin)
-         */
-    public ArrayList<String> selectUserRolesFromLogin( String strLogin, Plugin plugin )
-    {
-        ArrayList<String> arrayRoles = new ArrayList<String>(  );
+        List<String> arrayRoles = new ArrayList<String>(  );
         DAOUtil daoUtil = new DAOUtil( SQL_QUERY_FIND_ROLES_FROM_LOGIN, plugin );
         daoUtil.setString( 1, strLogin );
         daoUtil.executeQuery(  );
@@ -95,9 +84,10 @@ public class MyluteceDirectoryDAO implements IMyluteceDirectoryDAO
         return arrayRoles;
     }
 
-    /* (non-Javadoc)
-         * @see fr.paris.lutece.plugins.mylutece.modules.directory.authentication.business.IMyluteceDirectoryDAO#deleteRolesForUser(int, fr.paris.lutece.portal.service.plugin.Plugin)
-         */
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void deleteRolesForUser( int nIdRecord, Plugin plugin )
     {
         DAOUtil daoUtil = new DAOUtil( SQL_QUERY_DELETE_ROLES_FOR_USER, plugin );
@@ -107,9 +97,10 @@ public class MyluteceDirectoryDAO implements IMyluteceDirectoryDAO
         daoUtil.free(  );
     }
 
-    /* (non-Javadoc)
-         * @see fr.paris.lutece.plugins.mylutece.modules.directory.authentication.business.IMyluteceDirectoryDAO#createRoleForUser(int, java.lang.String, fr.paris.lutece.portal.service.plugin.Plugin)
-         */
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void createRoleForUser( int nIdRecord, String strRoleKey, Plugin plugin )
     {
         DAOUtil daoUtil = new DAOUtil( SQL_QUERY_INSERT_ROLE_FOR_USER, plugin );
@@ -120,12 +111,13 @@ public class MyluteceDirectoryDAO implements IMyluteceDirectoryDAO
         daoUtil.free(  );
     }
 
-    /* (non-Javadoc)
-         * @see fr.paris.lutece.plugins.mylutece.modules.directory.authentication.business.IMyluteceDirectoryDAO#selectUserGroupsFromLogin(java.lang.String, fr.paris.lutece.portal.service.plugin.Plugin)
-         */
-    public ArrayList<String> selectUserGroupsFromLogin( String strLogin, Plugin plugin )
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<String> selectUserGroupsFromLogin( String strLogin, Plugin plugin )
     {
-        ArrayList<String> arrayGroups = new ArrayList<String>(  );
+        List<String> arrayGroups = new ArrayList<String>(  );
         DAOUtil daoUtil = new DAOUtil( SQL_QUERY_FIND_GROUPS_FROM_LOGIN, plugin );
         daoUtil.setString( 1, strLogin );
         daoUtil.executeQuery(  );
@@ -140,9 +132,10 @@ public class MyluteceDirectoryDAO implements IMyluteceDirectoryDAO
         return arrayGroups;
     }
 
-    /* (non-Javadoc)
-         * @see fr.paris.lutece.plugins.mylutece.modules.directory.authentication.business.IMyluteceDirectoryDAO#selectLoginListForRoleKey(java.lang.String, fr.paris.lutece.portal.service.plugin.Plugin)
-         */
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public Collection<String> selectLoginListForRoleKey( String strRoleKey, Plugin plugin )
     {
         Collection<String> listLogins = new ArrayList<String>(  );
@@ -160,9 +153,10 @@ public class MyluteceDirectoryDAO implements IMyluteceDirectoryDAO
         return listLogins;
     }
 
-    /* (non-Javadoc)
-         * @see fr.paris.lutece.plugins.mylutece.modules.directory.authentication.business.IMyluteceDirectoryDAO#deleteGroupsForUser(int, fr.paris.lutece.portal.service.plugin.Plugin)
-         */
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void deleteGroupsForUser( int nIdRecord, Plugin plugin )
     {
         DAOUtil daoUtil = new DAOUtil( SQL_QUERY_DELETE_GROUPS_FOR_USER, plugin );
@@ -172,9 +166,10 @@ public class MyluteceDirectoryDAO implements IMyluteceDirectoryDAO
         daoUtil.free(  );
     }
 
-    /* (non-Javadoc)
-         * @see fr.paris.lutece.plugins.mylutece.modules.directory.authentication.business.IMyluteceDirectoryDAO#createGroupForUser(int, java.lang.String, fr.paris.lutece.portal.service.plugin.Plugin)
-         */
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void createGroupForUser( int nIdRecord, String strGroupKey, Plugin plugin )
     {
         DAOUtil daoUtil = new DAOUtil( SQL_QUERY_INSERT_GROUP_FOR_USER, plugin );
@@ -185,9 +180,10 @@ public class MyluteceDirectoryDAO implements IMyluteceDirectoryDAO
         daoUtil.free(  );
     }
 
-    /* (non-Javadoc)
-     * @see fr.paris.lutece.plugins.mylutece.modules.directory.authentication.business.IMyluteceDirectoryDAO#isMapped(int, java.lang.String, fr.paris.lutece.portal.service.plugin.Plugin)
+    /**
+     * {@inheritDoc}
      */
+    @Override
     public boolean isMapped( int nIdDirectory, Plugin plugin )
     {
         boolean bMapped = false;
@@ -208,10 +204,10 @@ public class MyluteceDirectoryDAO implements IMyluteceDirectoryDAO
         return bMapped;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see fr.paris.lutece.plugins.mylutece.modules.directory.authentication.business.IMyluteceDirectoryDAO#selectMappedDirectories(fr.paris.lutece.portal.service.plugin.Plugin)
+    /**
+     * {@inheritDoc}
      */
+    @Override
     public Collection<Integer> selectMappedDirectories( Plugin plugin )
     {
         Collection<Integer> listIdDirectory = new ArrayList<Integer>(  );
@@ -221,7 +217,7 @@ public class MyluteceDirectoryDAO implements IMyluteceDirectoryDAO
 
         while ( daoUtil.next(  ) )
         {
-            listIdDirectory.add( new Integer( daoUtil.getInt( 1 ) ) );
+            listIdDirectory.add( daoUtil.getInt( 1 ) );
         }
 
         daoUtil.free(  );
@@ -229,10 +225,10 @@ public class MyluteceDirectoryDAO implements IMyluteceDirectoryDAO
         return listIdDirectory;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see fr.paris.lutece.plugins.mylutece.modules.directory.authentication.business.IMyluteceDirectoryDAO#assignDirectory(int, fr.paris.lutece.portal.service.plugin.Plugin)
+    /**
+     * {@inheritDoc}
      */
+    @Override
     public void assignDirectory( int nIdDirectory, Plugin plugin )
     {
         DAOUtil daoUtil = new DAOUtil( SQL_QUERY_ASSIGN_DIRECTORY, plugin );
@@ -242,10 +238,10 @@ public class MyluteceDirectoryDAO implements IMyluteceDirectoryDAO
         daoUtil.free(  );
     }
 
-    /*
-     * (non-Javadoc)
-     * @see fr.paris.lutece.plugins.mylutece.modules.directory.authentication.business.IMyluteceDirectoryDAO#unAssignDirectories(fr.paris.lutece.portal.service.plugin.Plugin)
+    /**
+     * {@inheritDoc}
      */
+    @Override
     public void unAssignDirectories( Plugin plugin )
     {
         DAOUtil daoUtil = new DAOUtil( SQL_QUERY_UNASSIGN_DIRECTORIES, plugin );
@@ -254,10 +250,10 @@ public class MyluteceDirectoryDAO implements IMyluteceDirectoryDAO
         daoUtil.free(  );
     }
 
-    /*
-     * (non-Javadoc)
-     * @see fr.paris.lutece.plugins.mylutece.modules.directory.authentication.business.IMyluteceDirectoryDAO#unAssignDirectory(int, fr.paris.lutece.portal.service.plugin.Plugin)
+    /**
+     * {@inheritDoc}
      */
+    @Override
     public void unAssignDirectory( int nIdDirectory, Plugin plugin )
     {
         DAOUtil daoUtil = new DAOUtil( SQL_QUERY_UNASSIGN_DIRECTORY, plugin );

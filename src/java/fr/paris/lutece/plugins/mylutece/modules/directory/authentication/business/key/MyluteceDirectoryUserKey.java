@@ -31,59 +31,52 @@
  *
  * License 1.0
  */
-package fr.paris.lutece.plugins.mylutece.modules.directory.authentication.business.parameter;
-
-import fr.paris.lutece.portal.service.plugin.Plugin;
-import fr.paris.lutece.util.ReferenceItem;
-import fr.paris.lutece.util.sql.DAOUtil;
+package fr.paris.lutece.plugins.mylutece.modules.directory.authentication.business.key;
 
 
 /**
  *
- * MyluteceDirectoryParameterDAO
+ * DatabaseUserKey
  *
  */
-public class MyluteceDirectoryParameterDAO implements IMyluteceDirectoryParameterDAO
+public class MyluteceDirectoryUserKey
 {
-    private static final String SQL_QUERY_SELECT_PARAMETERS_VALUE = " SELECT parameter_value FROM mylutece_directory_parameter WHERE parameter_key = ? ";
-    private static final String SQL_QUERY_UPDATE_PARAMETERS = " UPDATE mylutece_directory_parameter SET parameter_value = ? WHERE parameter_key = ? ";
+    private String _strKey;
+    private int _nIdRecord;
 
     /**
-     * {@inheritDoc}
+     * Set the key
+     * @param strKey the key
      */
-    @Override
-    public ReferenceItem load( String strParameterKey, Plugin plugin )
+    public void setKey( String strKey )
     {
-        ReferenceItem userParam = null;
-        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECT_PARAMETERS_VALUE, plugin );
-        daoUtil.setString( 1, strParameterKey );
-        daoUtil.executeQuery(  );
-
-        if ( daoUtil.next(  ) )
-        {
-            userParam = new ReferenceItem(  );
-            userParam.setCode( strParameterKey );
-            userParam.setName( daoUtil.getString( 1 ) );
-            userParam.setChecked( Boolean.valueOf( userParam.getName(  ) ) );
-        }
-
-        daoUtil.free(  );
-
-        return userParam;
+        _strKey = strKey;
     }
 
     /**
-     * {@inheritDoc}
+     * Get the key
+     * @return the key
      */
-    @Override
-    public void store( ReferenceItem param, Plugin plugin )
+    public String getKey(  )
     {
-        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_UPDATE_PARAMETERS, plugin );
+        return _strKey;
+    }
 
-        daoUtil.setString( 1, param.getName(  ) );
-        daoUtil.setString( 2, param.getCode(  ) );
+    /**
+     * Set the user login
+     * @param nIdRecord the id record
+     */
+    public void setIdRecord( int nIdRecord )
+    {
+        _nIdRecord = nIdRecord;
+    }
 
-        daoUtil.executeUpdate(  );
-        daoUtil.free(  );
+    /**
+     * Get the user login
+     * @return the id record
+     */
+    public int getIdRecord(  )
+    {
+        return _nIdRecord;
     }
 }

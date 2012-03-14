@@ -33,49 +33,52 @@
  */
 package fr.paris.lutece.plugins.mylutece.modules.directory.authentication.web;
 
-import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
-
+import fr.paris.lutece.plugins.mylutece.modules.directory.authentication.service.IMyluteceDirectoryService;
 import fr.paris.lutece.plugins.mylutece.modules.directory.authentication.service.MyluteceDirectoryResourceIdService;
 import fr.paris.lutece.plugins.mylutece.modules.directory.authentication.service.MyluteceDirectoryService;
 import fr.paris.lutece.portal.business.rbac.RBAC;
 import fr.paris.lutece.portal.business.user.AdminUser;
 import fr.paris.lutece.portal.service.dashboard.admin.AdminDashboardComponent;
 import fr.paris.lutece.portal.service.rbac.RBACService;
+import fr.paris.lutece.portal.service.spring.SpringContextService;
 import fr.paris.lutece.portal.service.template.AppTemplateService;
 import fr.paris.lutece.util.html.HtmlTemplate;
 
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+
+
 /**
- * 
+ *
  * MyluteceDirectoryAdminDashboardComponent
  *
  */
 public class MyluteceDirectoryAdminDashboardComponent extends AdminDashboardComponent
 {
-	// CONSTANTS
-	private static final String EMPTY_STRING = "";
-	
-	// TEMPLATES
-	private static final String TEMPLATE_ADMIN_DASHBOARD = "admin/plugins/mylutece/modules/directory/directory_admindashboard.html";
-	
-	/**
-	 * 
-	 * {@inheritDoc}
-	 */
-	@Override
-	public String getDashboardData( AdminUser user, HttpServletRequest request )
-	{
-		if ( RBACService.isAuthorized( MyluteceDirectoryResourceIdService.RESOURCE_TYPE, RBAC.WILDCARD_RESOURCES_ID, 
-				MyluteceDirectoryResourceIdService.PERMISSION_MANAGE, user ) )
-    	{
-			Map<String, Object> model = MyluteceDirectoryService.getManageAdvancedParameters( user );
-			HtmlTemplate template = AppTemplateService.getTemplate( TEMPLATE_ADMIN_DASHBOARD, user.getLocale(  ), model );
-			
-			return template.getHtml(  );
-    	}
-		
-		return EMPTY_STRING;
-	}
+    // CONSTANTS
+    private static final String EMPTY_STRING = "";
 
+    // TEMPLATES
+    private static final String TEMPLATE_ADMIN_DASHBOARD = "admin/plugins/mylutece/modules/directory/directory_admindashboard.html";
+
+    /**
+     *
+     * {@inheritDoc}
+     */
+    @Override
+    public String getDashboardData( AdminUser user, HttpServletRequest request )
+    {
+        if ( RBACService.isAuthorized( MyluteceDirectoryResourceIdService.RESOURCE_TYPE, RBAC.WILDCARD_RESOURCES_ID,
+                    MyluteceDirectoryResourceIdService.PERMISSION_MANAGE, user ) )
+        {
+            IMyluteceDirectoryService service = (IMyluteceDirectoryService) SpringContextService.getBean( MyluteceDirectoryService.BEAN_SERVICE );
+            Map<String, Object> model = service.getManageAdvancedParameters( user );
+            HtmlTemplate template = AppTemplateService.getTemplate( TEMPLATE_ADMIN_DASHBOARD, user.getLocale(  ), model );
+
+            return template.getHtml(  );
+        }
+
+        return EMPTY_STRING;
+    }
 }

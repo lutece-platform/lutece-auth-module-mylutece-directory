@@ -31,59 +31,66 @@
  *
  * License 1.0
  */
-package fr.paris.lutece.plugins.mylutece.modules.directory.authentication.business.parameter;
+package fr.paris.lutece.plugins.mylutece.modules.directory.authentication.business.key;
 
+import fr.paris.lutece.plugins.mylutece.modules.directory.authentication.service.MyluteceDirectoryPlugin;
 import fr.paris.lutece.portal.service.plugin.Plugin;
-import fr.paris.lutece.util.ReferenceItem;
-import fr.paris.lutece.util.sql.DAOUtil;
+import fr.paris.lutece.portal.service.plugin.PluginService;
+import fr.paris.lutece.portal.service.spring.SpringContextService;
 
 
 /**
  *
- * MyluteceDirectoryParameterDAO
+ * DatabaseUserKeyHome
  *
  */
-public class MyluteceDirectoryParameterDAO implements IMyluteceDirectoryParameterDAO
+public final class MyluteceDirectoryUserKeyHome
 {
-    private static final String SQL_QUERY_SELECT_PARAMETERS_VALUE = " SELECT parameter_value FROM mylutece_directory_parameter WHERE parameter_key = ? ";
-    private static final String SQL_QUERY_UPDATE_PARAMETERS = " UPDATE mylutece_directory_parameter SET parameter_value = ? WHERE parameter_key = ? ";
+    private static final String BEAN_DAO = "mylutece-directory.myluteceDirectoryUserKeyDAO";
+    private static Plugin _plugin = PluginService.getPlugin( MyluteceDirectoryPlugin.PLUGIN_NAME );
+    private static IMyluteceDirectoryUserKeyDAO _dao = (IMyluteceDirectoryUserKeyDAO) SpringContextService.getBean( BEAN_DAO );
 
     /**
-     * {@inheritDoc}
+     * Private constructor - this class need not be instantiated
      */
-    @Override
-    public ReferenceItem load( String strParameterKey, Plugin plugin )
+    private MyluteceDirectoryUserKeyHome(  )
     {
-        ReferenceItem userParam = null;
-        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECT_PARAMETERS_VALUE, plugin );
-        daoUtil.setString( 1, strParameterKey );
-        daoUtil.executeQuery(  );
-
-        if ( daoUtil.next(  ) )
-        {
-            userParam = new ReferenceItem(  );
-            userParam.setCode( strParameterKey );
-            userParam.setName( daoUtil.getString( 1 ) );
-            userParam.setChecked( Boolean.valueOf( userParam.getName(  ) ) );
-        }
-
-        daoUtil.free(  );
-
-        return userParam;
     }
 
     /**
-     * {@inheritDoc}
+     * Create a new key
+     * @param userKey the key
      */
-    @Override
-    public void store( ReferenceItem param, Plugin plugin )
+    public static void create( MyluteceDirectoryUserKey userKey )
     {
-        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_UPDATE_PARAMETERS, plugin );
+        _dao.insert( userKey, _plugin );
+    }
 
-        daoUtil.setString( 1, param.getName(  ) );
-        daoUtil.setString( 2, param.getCode(  ) );
+    /**
+     * Remove a key from a given key
+     * @param strKey the key
+     */
+    public static void remove( String strKey )
+    {
+        _dao.delete( strKey, _plugin );
+    }
 
-        daoUtil.executeUpdate(  );
-        daoUtil.free(  );
+    /**
+     * Remove a key from a given id user
+     * @param nIdRecord the id record
+     */
+    public static void removeByIdRecord( int nIdRecord )
+    {
+        _dao.deleteByIdRecord( nIdRecord, _plugin );
+    }
+
+    /**
+     * Find a key from a given key
+     * @param strKey the key
+     * @return a {@link MyluteceDirectoryUserKey}
+     */
+    public static MyluteceDirectoryUserKey findByPrimaryKey( String strKey )
+    {
+        return _dao.load( strKey, _plugin );
     }
 }

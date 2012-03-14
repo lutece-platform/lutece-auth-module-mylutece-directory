@@ -38,95 +38,98 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+
 /**
- * 
+ *
  * FormErrors
  *
  */
 public class FormErrors
 {
-	private Map<String, List<String>> _mapErrors;
-	private Map<String, Object> _mapLastValues;
+    private Map<String, List<String>> _mapErrors;
+    private Map<String, Object> _mapLastValues;
 
-	/**
-	 * Constructor
-	 */
-	public FormErrors(  )
-	{
-		_mapErrors = new HashMap<String, List<String>>(  );
-		_mapLastValues = new HashMap<String, Object>(  );
-	}
+    /**
+     * Constructor
+     */
+    public FormErrors(  )
+    {
+        _mapErrors = new HashMap<String, List<String>>(  );
+        _mapLastValues = new HashMap<String, Object>(  );
+    }
 
-	/**
-	 * Check if there are errors
-	 * @return true if there are errors, false otherwise
-	 */
-	public boolean hasError(  )
-	{
-		return !_mapErrors.isEmpty(  );
-	}
+    /**
+     * Check if there are errors
+     * @return true if there are errors, false otherwise
+     */
+    public boolean hasError(  )
+    {
+        return !_mapErrors.isEmpty(  );
+    }
 
-	/**
-	 * Check if the given key has error
-	 * @param strKey the key
-	 * @return true if there is an error, false otherwise
-	 */
-	public boolean hasError( String strKey )
-	{
-		return _mapErrors.get( strKey ) != null;
-	}
+    /**
+     * Check if the given key has error
+     * @param strKey the key
+     * @return true if there is an error, false otherwise
+     */
+    public boolean hasError( String strKey )
+    {
+        return _mapErrors.get( strKey ) != null;
+    }
 
-	/**
-	 * Add error in the list
-	 * @param strKey the key
-	 * @param strMessage the message
-	 */
-	public void addError( String strKey, String strMessage )
-	{
-		List<String> listErrors = _mapErrors.get( strKey );
-		if ( listErrors == null )
-		{
-			listErrors = new ArrayList<String>(  );
-		}
-		listErrors.add( strMessage );
-		_mapErrors.put( strKey, listErrors );
-	}
+    /**
+     * Add error in the list
+     * @param strKey the key
+     * @param strMessage the message
+     */
+    public void addError( String strKey, String strMessage )
+    {
+        List<String> listErrors = _mapErrors.get( strKey );
 
-	/**
-	 * Add last value to the map
-	 * @param strKey the key
-	 * @param lastValue the last value
-	 */
-	public void addLastValue( String strKey, Object lastValue )
-	{
-		_mapLastValues.put( strKey, lastValue );
-	}
+        if ( listErrors == null )
+        {
+            listErrors = new ArrayList<String>(  );
+        }
 
-	/**
-	 * Get the map errors
-	 * @return the map errors
-	 */
-	public Map<String, List<String>> getErrors(  )
-	{
-		return _mapErrors;
-	}
+        listErrors.add( strMessage );
+        _mapErrors.put( strKey, listErrors );
+    }
 
-	/**
-	 * Get the map last values
-	 * @return the map last values
-	 */
-	public Map<String, Object> getLastValues(  )
-	{
-		return _mapLastValues;
-	}
+    /**
+     * Add last value to the map
+     * @param strKey the key
+     * @param lastValue the last value
+     */
+    public void addLastValue( String strKey, Object lastValue )
+    {
+        _mapLastValues.put( strKey, lastValue );
+    }
 
-	/**
-	 * Get the last value from a given key
-	 * @param strKey the key
-	 * @return the last value
-	 */
-	public Object getLastValue( String strKey )
-	{
-		return _mapLastValues.get( strKey );
-	}
+    /**
+     * Get the map errors
+     * @return the map errors
+     */
+    public Map<String, List<String>> getErrors(  )
+    {
+        return _mapErrors;
+    }
+
+    /**
+     * Get the map last values
+     * @return the map last values
+     */
+    public Map<String, Object> getLastValues(  )
+    {
+        return _mapLastValues;
+    }
+
+    /**
+     * Get the last value from a given key
+     * @param strKey the key
+     * @return the last value
+     */
+    public Object getLastValue( String strKey )
+    {
+        return _mapLastValues.get( strKey );
+    }
 }

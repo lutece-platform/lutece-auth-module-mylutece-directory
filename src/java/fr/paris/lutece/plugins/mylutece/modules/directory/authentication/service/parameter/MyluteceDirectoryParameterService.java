@@ -31,59 +31,80 @@
  *
  * License 1.0
  */
-package fr.paris.lutece.plugins.mylutece.modules.directory.authentication.business.parameter;
+package fr.paris.lutece.plugins.mylutece.modules.directory.authentication.service.parameter;
 
+import fr.paris.lutece.plugins.mylutece.modules.directory.authentication.business.parameter.MyluteceDirectoryParameterHome;
 import fr.paris.lutece.portal.service.plugin.Plugin;
 import fr.paris.lutece.util.ReferenceItem;
-import fr.paris.lutece.util.sql.DAOUtil;
+
+import org.apache.commons.lang.StringUtils;
 
 
 /**
  *
- * MyluteceDirectoryParameterDAO
+ * MyluteceDirectoryParameterService
  *
  */
-public class MyluteceDirectoryParameterDAO implements IMyluteceDirectoryParameterDAO
+public class MyluteceDirectoryParameterService implements IMyluteceDirectoryParameterService
 {
-    private static final String SQL_QUERY_SELECT_PARAMETERS_VALUE = " SELECT parameter_value FROM mylutece_directory_parameter WHERE parameter_key = ? ";
-    private static final String SQL_QUERY_UPDATE_PARAMETERS = " UPDATE mylutece_directory_parameter SET parameter_value = ? WHERE parameter_key = ? ";
+    public static final String BEAN_SERVICE = "mylutece-directory.myluteceDirectoryParameterService";
+
+    // PARAMETERS
+    private static final String PARAMETER_ENABLE_PASSWORD_ENCRYPTION = "enable_password_encryption";
+    private static final String PARAMETER_ENCRYPTION_ALGORITHM = "encryption_algorithm";
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public ReferenceItem load( String strParameterKey, Plugin plugin )
+    public ReferenceItem findByKey( String strParameterKey, Plugin plugin )
     {
-        ReferenceItem userParam = null;
-        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECT_PARAMETERS_VALUE, plugin );
-        daoUtil.setString( 1, strParameterKey );
-        daoUtil.executeQuery(  );
-
-        if ( daoUtil.next(  ) )
-        {
-            userParam = new ReferenceItem(  );
-            userParam.setCode( strParameterKey );
-            userParam.setName( daoUtil.getString( 1 ) );
-            userParam.setChecked( Boolean.valueOf( userParam.getName(  ) ) );
-        }
-
-        daoUtil.free(  );
-
-        return userParam;
+        return MyluteceDirectoryParameterHome.findByKey( strParameterKey, plugin );
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void store( ReferenceItem param, Plugin plugin )
+    public void update( ReferenceItem userParam, Plugin plugin )
     {
-        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_UPDATE_PARAMETERS, plugin );
+        if ( userParam != null )
+        {
+            MyluteceDirectoryParameterHome.update( userParam, plugin );
+        }
+    }
 
-        daoUtil.setString( 1, param.getName(  ) );
-        daoUtil.setString( 2, param.getCode(  ) );
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isPasswordEncrypted( Plugin plugin )
+    {
+        boolean bIsPasswordEncrypted = false;
+        ReferenceItem userParam = findByKey( PARAMETER_ENABLE_PASSWORD_ENCRYPTION, plugin );
 
-        daoUtil.executeUpdate(  );
-        daoUtil.free(  );
+        if ( ( userParam != null ) && userParam.isChecked(  ) )
+        {
+            bIsPasswordEncrypted = true;
+        }
+
+        return bIsPasswordEncrypted;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getEncryptionAlgorithm( Plugin plugin )
+    {
+        String strAlgorithm = StringUtils.EMPTY;
+        ReferenceItem userParam = findByKey( PARAMETER_ENCRYPTION_ALGORITHM, plugin );
+
+        if ( userParam != null )
+        {
+            strAlgorithm = userParam.getName(  );
+        }
+
+        return strAlgorithm;
     }
 }

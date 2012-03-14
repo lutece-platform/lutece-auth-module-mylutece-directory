@@ -163,8 +163,7 @@ public final class MyluteceDirectoryUserHome
     {
         return _dao.selectDirectoryUserListForLogin( strLogin, plugin );
     }
-   
-    
+
     /**
      * Returns a collection of DirectoryUser objects for a LuteceUser Attribute
      *
@@ -254,11 +253,11 @@ public final class MyluteceDirectoryUserHome
     {
         return _dao.checkPassword( strLogin, strPassword, plugin );
     }
-    
+
     /**
      * Check if user is activated
      *
-     * @param strLogin The user login of DirectoryUser     
+     * @param strLogin The user login of DirectoryUser
      * @param plugin The Plugin using this data access service
      * @return true if user is activated
      */
@@ -302,7 +301,8 @@ public final class MyluteceDirectoryUserHome
 
         for ( RecordField field : listRecordField )
         {
-            if ( field.getEntry(  ).convertRecordFieldValueToString( field, locale, false, false ).equalsIgnoreCase( strAttributeValue ) )
+            if ( field.getEntry(  ).convertRecordFieldValueToString( field, locale, false, false )
+                          .equalsIgnoreCase( strAttributeValue ) )
             {
                 listIdRecord.add( field.getRecord(  ).getIdRecord(  ) );
             }
@@ -310,17 +310,18 @@ public final class MyluteceDirectoryUserHome
 
         return listIdRecord;
     }
-    
+
     /**
      * Get the list of emails given an ID record
      * @param nIdRecord the ID record
      * @param plugin Plugin
+     * @param locale the locale
      * @return the list of emails
      */
     public static List<String> getEmails( int nIdRecord, Plugin plugin, Locale locale )
     {
-    	List<String> listEmails = new ArrayList<String>(  );
-    	String strAttributeKeys = AppPropertiesService.getProperty( PROPERTY_MYLUTECE_LUTECE_USER_ATTRIBUTE_KEY_EMAIL,
+        List<String> listEmails = new ArrayList<String>(  );
+        String strAttributeKeys = AppPropertiesService.getProperty( PROPERTY_MYLUTECE_LUTECE_USER_ATTRIBUTE_KEY_EMAIL,
                 DEFAULT_LUTECE_USER_ATTRIBUTE_KEY_EMAIL );
         Collection<AttributeMapping> mappinglist = new ArrayList<AttributeMapping>(  );
 
@@ -334,30 +335,34 @@ public final class MyluteceDirectoryUserHome
                 mappinglist.add( mappingTemp );
             }
         }
+
         Collection<Integer> mappedDirectories = MyluteceDirectoryHome.findMappedDirectories( plugin );
 
         // No mapping => no email
-        if ( mappinglist.size(  ) == 0 || mappedDirectories.size(  ) != 1 )
+        if ( ( mappinglist.size(  ) == 0 ) || ( mappedDirectories.size(  ) != 1 ) )
         {
             return null;
         }
-        
+
         for ( AttributeMapping mapping : mappinglist )
         {
-        	//Search the RecordField list corresponding to entry Id
+            //Search the RecordField list corresponding to entry Id
             RecordFieldFilter filter = new RecordFieldFilter(  );
             filter.setIdDirectory( mappedDirectories.iterator(  ).next(  ).intValue(  ) );
             filter.setIdEntry( mapping.getIdEntry(  ) );
+
             List<RecordField> listRecordFields = RecordFieldHome.getRecordFieldList( filter, plugin );
+
             for ( RecordField recordField : listRecordFields )
             {
-            	if ( recordField.getRecord(  ).getIdRecord(  ) == nIdRecord )
-            	{
-            		listEmails.add( recordField.getEntry(  ).convertRecordFieldValueToString( recordField, locale, false, false ) );
-            	}
+                if ( recordField.getRecord(  ).getIdRecord(  ) == nIdRecord )
+                {
+                    listEmails.add( recordField.getEntry(  )
+                                               .convertRecordFieldValueToString( recordField, locale, false, false ) );
+                }
             }
         }
-        
+
         return listEmails;
     }
 }

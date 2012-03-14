@@ -4,6 +4,7 @@ DROP TABLE IF EXISTS mylutece_directory_user_role;
 DROP TABLE IF EXISTS mylutece_directory_user_group;
 DROP TABLE IF EXISTS mylutece_directory_mapping;
 DROP TABLE IF EXISTS mylutece_directory_parameter;
+DROP TABLE IF EXISTS mylutece_directory_key;
 
 --
 -- Table struture for mylutece_directory_directory
@@ -58,4 +59,13 @@ CREATE TABLE mylutece_directory_parameter (
 	parameter_key varchar(100) NOT NULL,
 	parameter_value varchar(100) NOT NULL,
 	PRIMARY KEY (parameter_key)
+);
+
+--
+-- Table structure for table mylutece_directory_key
+--
+CREATE TABLE mylutece_directory_key(
+	mylutece_directory_user_key VARCHAR(255) DEFAULT '' NOT NULL,
+	id_record int NOT NULL,
+	PRIMARY KEY (mylutece_directory_user_key)
 );

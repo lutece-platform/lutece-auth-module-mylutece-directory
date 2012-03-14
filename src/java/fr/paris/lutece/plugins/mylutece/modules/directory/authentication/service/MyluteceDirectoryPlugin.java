@@ -33,22 +33,57 @@
  */
 package fr.paris.lutece.plugins.mylutece.modules.directory.authentication.service;
 
+import fr.paris.lutece.plugins.directory.business.DirectoryRemovalListenerService;
+import fr.paris.lutece.plugins.directory.business.EntryRemovalListenerService;
+import fr.paris.lutece.plugins.directory.service.RecordRemovalListenerService;
+import fr.paris.lutece.plugins.mylutece.authentication.MultiLuteceAuthentication;
+import fr.paris.lutece.plugins.mylutece.modules.directory.authentication.BaseAuthentication;
+import fr.paris.lutece.plugins.mylutece.modules.directory.authentication.business.AttributeMappingEntryRemovalListener;
+import fr.paris.lutece.plugins.mylutece.modules.directory.authentication.business.MyluteceDirectoryDirectoryRemovalListener;
+import fr.paris.lutece.plugins.mylutece.modules.directory.authentication.business.MyluteceDirectoryUserFieldListener;
+import fr.paris.lutece.plugins.mylutece.modules.directory.authentication.business.MyluteceDirectoryUserRecordRemovalListener;
+import fr.paris.lutece.plugins.mylutece.modules.directory.authentication.business.MyluteceDirectoryUserRoleRemovalListener;
 import fr.paris.lutece.portal.service.plugin.PluginDefaultImplementation;
+import fr.paris.lutece.portal.service.role.RoleRemovalListenerService;
+import fr.paris.lutece.portal.service.spring.SpringContextService;
+import fr.paris.lutece.portal.service.util.AppLogService;
 
 
 /**
- * class DatabasePlugin
+ *
+ * class MyluteceDirectoryPlugin
+ *
  */
 public class MyluteceDirectoryPlugin extends PluginDefaultImplementation
 {
     public static final String PLUGIN_NAME = "mylutece-directory";
 
     /**
-     * Initialize the module Database
+     * Initialize the module
      */
     public void init(  )
     {
         // Initialize the Database service
-        MyluteceDirectoryService.getInstance(  ).init(  );
+        DirectoryRemovalListenerService.getService(  )
+                                       .registerListener( new MyluteceDirectoryDirectoryRemovalListener(  ) );
+        // Create removal listeners and register them
+        RoleRemovalListenerService.getService(  ).registerListener( new MyluteceDirectoryUserRoleRemovalListener(  ) );
+        RecordRemovalListenerService.getService(  ).registerListener( new MyluteceDirectoryUserRecordRemovalListener(  ) );
+        MyluteceDirectoryUserFieldListenerService.getService(  )
+                                                 .registerListener( new MyluteceDirectoryUserFieldListener(  ) );
+        EntryRemovalListenerService.getService(  ).registerListener( new AttributeMappingEntryRemovalListener(  ) );
+
+        // Init base authentication
+        BaseAuthentication baseAuthentication = (BaseAuthentication) SpringContextService.getBean( BaseAuthentication.AUTHENTICATION_BEAN_NAME );
+
+        if ( baseAuthentication != null )
+        {
+            MultiLuteceAuthentication.registerAuthentication( baseAuthentication );
+        }
+        else
+        {
+            AppLogService.error( 
+                "BaseAuthentication not found, please check your mylutece-directory_context.xml configuration" );
+        }
     }
 }

@@ -33,10 +33,6 @@
  */
 package fr.paris.lutece.plugins.mylutece.modules.directory.authentication.business;
 
-import fr.paris.lutece.plugins.directory.service.RecordRemovalListenerService;
-import fr.paris.lutece.plugins.mylutece.modules.directory.authentication.service.MyluteceDirectoryUserFieldListenerService;
-import fr.paris.lutece.portal.service.role.RoleRemovalListenerService;
-
 
 /**
  * This class represents the business object DatabaseUser
@@ -44,40 +40,9 @@ import fr.paris.lutece.portal.service.role.RoleRemovalListenerService;
 public class MyluteceDirectoryUser
 {
     // Variables declarations
-    private static MyluteceDirectoryUserRoleRemovalListener _listenerRole;
-    private static MyluteceDirectoryUserRecordRemovalListener _listenerRecord;
-    private static MyluteceDirectoryUserFieldListener _listenerField;
     private int _nIdRecord;
     private String _strLogin;
-    private String _strEmail;
     private boolean _bIsActivated;
-
-    /**
-     * Initialize the MyluteceDirectoryUser
-     */
-    public static void init(  )
-    {
-        // Create removal listeners and register them
-        if ( _listenerRole == null )
-        {
-            _listenerRole = new MyluteceDirectoryUserRoleRemovalListener(  );
-            RoleRemovalListenerService.getService(  ).registerListener( _listenerRole );
-        }
-
-        // Create removal listeners for Record (Directory) and register them
-        if ( _listenerRecord == null )
-        {
-            _listenerRecord = new MyluteceDirectoryUserRecordRemovalListener(  );
-            RecordRemovalListenerService.getService(  ).registerListener( _listenerRecord );
-        }
-        
-        // Create user field listeners
-        if ( _listenerField == null )
-    	{
-        	_listenerField = new MyluteceDirectoryUserFieldListener(  );
-    		MyluteceDirectoryUserFieldListenerService.getService(  ).registerListener( _listenerField );
-    	}
-    }
 
     /**
      * Returns the IdRecord
@@ -118,22 +83,22 @@ public class MyluteceDirectoryUser
     {
         _strLogin = strLogin;
     }
-    
-     /**
-      * Set if the user is activated or not
-      * @param isActivated the boolean 
-      */
-     public void setActivated( boolean isActivated) 
-     {		
-    	  _bIsActivated = isActivated;
-     }
-     
-     /**
-      * Return true if the user is validated
-      * @return the boolean 
-      */
-     public boolean isActivated() 
-     {		
-    	 return _bIsActivated;
-     }
+
+    /**
+     * Set if the user is activated or not
+     * @param isActivated the boolean
+     */
+    public void setActivated( boolean isActivated )
+    {
+        _bIsActivated = isActivated;
+    }
+
+    /**
+     * Return true if the user is validated
+     * @return the boolean
+     */
+    public boolean isActivated(  )
+    {
+        return _bIsActivated;
+    }
 }

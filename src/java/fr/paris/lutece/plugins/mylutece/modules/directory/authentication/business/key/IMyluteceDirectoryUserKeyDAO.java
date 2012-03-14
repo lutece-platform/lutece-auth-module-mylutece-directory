@@ -31,59 +31,44 @@
  *
  * License 1.0
  */
-package fr.paris.lutece.plugins.mylutece.modules.directory.authentication.business.parameter;
+package fr.paris.lutece.plugins.mylutece.modules.directory.authentication.business.key;
 
 import fr.paris.lutece.portal.service.plugin.Plugin;
-import fr.paris.lutece.util.ReferenceItem;
-import fr.paris.lutece.util.sql.DAOUtil;
 
 
 /**
  *
- * MyluteceDirectoryParameterDAO
+ * IDatabaseUserKey
  *
  */
-public class MyluteceDirectoryParameterDAO implements IMyluteceDirectoryParameterDAO
+public interface IMyluteceDirectoryUserKeyDAO
 {
-    private static final String SQL_QUERY_SELECT_PARAMETERS_VALUE = " SELECT parameter_value FROM mylutece_directory_parameter WHERE parameter_key = ? ";
-    private static final String SQL_QUERY_UPDATE_PARAMETERS = " UPDATE mylutece_directory_parameter SET parameter_value = ? WHERE parameter_key = ? ";
+    /**
+     * Load an instance of {@link MyluteceDirectoryUserKey}
+     * @param strKey the key
+     * @param plugin the plugin
+     * @return an instance of {@link MyluteceDirectoryUserKey}
+     */
+    MyluteceDirectoryUserKey load( String strKey, Plugin plugin );
 
     /**
-     * {@inheritDoc}
+     * Insert a new {@link MyluteceDirectoryUserKey}
+     * @param userKey the {@link MyluteceDirectoryUserKey}
+     * @param plugin the plugin
      */
-    @Override
-    public ReferenceItem load( String strParameterKey, Plugin plugin )
-    {
-        ReferenceItem userParam = null;
-        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECT_PARAMETERS_VALUE, plugin );
-        daoUtil.setString( 1, strParameterKey );
-        daoUtil.executeQuery(  );
-
-        if ( daoUtil.next(  ) )
-        {
-            userParam = new ReferenceItem(  );
-            userParam.setCode( strParameterKey );
-            userParam.setName( daoUtil.getString( 1 ) );
-            userParam.setChecked( Boolean.valueOf( userParam.getName(  ) ) );
-        }
-
-        daoUtil.free(  );
-
-        return userParam;
-    }
+    void insert( MyluteceDirectoryUserKey userKey, Plugin plugin );
 
     /**
-     * {@inheritDoc}
+     * Delete a {@link MyluteceDirectoryUserKey}
+     * @param strKey the key
+     * @param plugin the plugin
      */
-    @Override
-    public void store( ReferenceItem param, Plugin plugin )
-    {
-        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_UPDATE_PARAMETERS, plugin );
+    void delete( String strKey, Plugin plugin );
 
-        daoUtil.setString( 1, param.getName(  ) );
-        daoUtil.setString( 2, param.getCode(  ) );
-
-        daoUtil.executeUpdate(  );
-        daoUtil.free(  );
-    }
+    /**
+     * Delete by id user
+     * @param nIdRecord the id record
+     * @param plugin the plugin
+     */
+    void deleteByIdRecord( int nIdRecord, Plugin plugin );
 }

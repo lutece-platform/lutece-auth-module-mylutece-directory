@@ -31,49 +31,40 @@
  *
  * License 1.0
  */
-package fr.paris.lutece.plugins.mylutece.modules.directory.authentication.business.parameter;
-
-import fr.paris.lutece.portal.service.plugin.Plugin;
-import fr.paris.lutece.portal.service.spring.SpringContextService;
-import fr.paris.lutece.util.ReferenceItem;
+package fr.paris.lutece.plugins.mylutece.modules.directory.authentication.service.security;
 
 
 /**
  *
- * MyluteceDirectoryParameterHome
+ * IMyluteceDirectorySecurityService
  *
  */
-public final class MyluteceDirectoryParameterHome
+public interface IMyluteceDirectorySecurityService
 {
-    // Static variable pointed at the DAO instance
-    private static IMyluteceDirectoryParameterDAO _dao = (IMyluteceDirectoryParameterDAO) SpringContextService.getPluginBean( "mylutece-directory",
-            "myluteceDirectory.myluteceDirectoryParameterDAO" );
-
     /**
-     * Private constructor
+     * Check the password.
+     * <br />
+     * This method first check if there is the password encryption is activated.
+     * If so, then it encrypts the password and compares it to the one stored in DB.
+     * @param strUserName the user name
+     * @param strUserPassword the user password
+     * @return true if the password is correct, false otherwise
      */
-    private MyluteceDirectoryParameterHome(  )
-    {
-    }
+    boolean checkPassword( String strUserName, String strUserPassword );
 
     /**
-    * Load the parameter value
-    * @param strParameterKey the parameter key
-    * @param plugin Plugin
-    * @return The parameter
-    */
-    public static ReferenceItem findByKey( String strParameterKey, Plugin plugin )
-    {
-        return _dao.load( strParameterKey, plugin );
-    }
-
-    /**
-     * Update the parameter value
-     * @param param the parameter
-     * @param plugin Plugin
+     * Check if the account is activated or not
+     * @param strUserName the user name
+     * @return true if the account is activated, false otherwise
      */
-    public static void update( ReferenceItem param, Plugin plugin )
-    {
-        _dao.store( param, plugin );
-    }
+    boolean checkActivated( String strUserName );
+
+    /**
+     * Build the password depending of the encryption.
+     * If the encryption is enable, then it returns the password encrypted,
+     * otherwise it just returns the password given in parameter.
+     * @param strUserPassword the password
+     * @return the password encrypted or not
+     */
+    String buildPassword( String strUserPassword );
 }

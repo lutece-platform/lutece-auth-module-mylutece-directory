@@ -33,11 +33,6 @@
  */
 package fr.paris.lutece.plugins.mylutece.modules.directory.authentication.business;
 
-import java.util.List;
-import java.util.Locale;
-
-import javax.servlet.http.HttpServletRequest;
-
 import fr.paris.lutece.plugins.mylutece.business.attribute.AttributeHome;
 import fr.paris.lutece.plugins.mylutece.business.attribute.IAttribute;
 import fr.paris.lutece.plugins.mylutece.business.attribute.MyLuteceUserField;
@@ -49,83 +44,83 @@ import fr.paris.lutece.portal.business.user.AdminUser;
 import fr.paris.lutece.portal.service.plugin.Plugin;
 import fr.paris.lutece.portal.service.plugin.PluginService;
 
+import org.apache.commons.lang.StringUtils;
+
+import java.util.List;
+import java.util.Locale;
+
+import javax.servlet.http.HttpServletRequest;
+
+
 /**
- * 
+ *
  * MyLuteceDirectoryUserFieldListener
  *
  */
 public class MyluteceDirectoryUserFieldListener implements MyLuteceUserFieldListener
 {
-	// Constantes
-	private static final String EMPTY_STRING = "";
-	
-	// Properties
-		
-	/**
-	 * Create user fields
-	 * @param user AdminUser
-	 * @param request HttpServletRequest
-	 * @param locale Locale
-	 */
-	public void doCreateUserFields( int nIdUser, HttpServletRequest request, Locale locale )
-	{
-		Plugin myLutecePlugin = PluginService.getPlugin( MyLutecePlugin.PLUGIN_NAME );
-		List<IAttribute> listAttributes = AttributeHome.findPluginAttributes( MyluteceDirectoryPlugin.PLUGIN_NAME, locale, myLutecePlugin );
-		
-		for ( IAttribute attribute : listAttributes )
-		{
-			List<MyLuteceUserField> userFields = attribute.getUserFieldsData( request, nIdUser );
-			for ( MyLuteceUserField userField : userFields )
-			{
-				if ( userField != null && !userField.getValue(  ).equals( EMPTY_STRING ) )
-	        	{
-	        		// Change the value of the user field
-	        		// Instead of having the ID of the attribute field, we put the attribute field title
-	        		// which represents the locale
-	        		userField.setValue( userField.getAttributeField(  ).getTitle(  ) );
-	        		MyLuteceUserFieldHome.create( userField, myLutecePlugin );
-	        	}
-			}
-		}
-	}
-	
-	/**
-	 * Modify user fields
-	 * @param user AdminUser
-	 * @param request HttpServletRequest
-	 * @param locale Locale
-	 * @param currentUser current user
-	 */
-	public void doModifyUserFields( int nIdUser, HttpServletRequest request, Locale locale, AdminUser currentUser )
-	{
-		Plugin myLutecePlugin = PluginService.getPlugin( MyLutecePlugin.PLUGIN_NAME );
-		List<IAttribute> listAttributes = AttributeHome.findPluginAttributes( MyluteceDirectoryPlugin.PLUGIN_NAME, locale, myLutecePlugin );
-		
-		for ( IAttribute attribute : listAttributes )
-		{
-			List<MyLuteceUserField> userFields = attribute.getUserFieldsData( request, nIdUser );
-			for ( MyLuteceUserField userField : userFields )
-			{
-				if ( userField != null && !userField.getValue(  ).equals( EMPTY_STRING ) )
-	        	{
-	        		// Change the value of the user field
-	        		// Instead of having the ID of the attribute field, we put the attribute field title
-	        		// which represents the locale
-	        		userField.setValue( userField.getAttributeField(  ).getTitle(  ) );
-	        		MyLuteceUserFieldHome.create( userField, myLutecePlugin );
-	        	}
-			}
-		}
-	}
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void doCreateUserFields( int nIdUser, HttpServletRequest request, Locale locale )
+    {
+        Plugin myLutecePlugin = PluginService.getPlugin( MyLutecePlugin.PLUGIN_NAME );
+        List<IAttribute> listAttributes = AttributeHome.findPluginAttributes( MyluteceDirectoryPlugin.PLUGIN_NAME,
+                locale, myLutecePlugin );
 
-	/**
-	 * Remove user fields
-	 * @param user Adminuser
-	 * @param request HttpServletRequest
-	 * @param locale locale
-	 */
-	public void doRemoveUserFields( int nIdUser, HttpServletRequest request, Locale locale )
-	{
-		// No action
-	}
+        for ( IAttribute attribute : listAttributes )
+        {
+            List<MyLuteceUserField> userFields = attribute.getUserFieldsData( request, nIdUser );
+
+            for ( MyLuteceUserField userField : userFields )
+            {
+                if ( ( userField != null ) && StringUtils.isNotBlank( userField.getValue(  ) ) )
+                {
+                    // Change the value of the user field
+                    // Instead of having the ID of the attribute field, we put the attribute field title
+                    // which represents the locale
+                    userField.setValue( userField.getAttributeField(  ).getTitle(  ) );
+                    MyLuteceUserFieldHome.create( userField, myLutecePlugin );
+                }
+            }
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void doModifyUserFields( int nIdUser, HttpServletRequest request, Locale locale, AdminUser currentUser )
+    {
+        Plugin myLutecePlugin = PluginService.getPlugin( MyLutecePlugin.PLUGIN_NAME );
+        List<IAttribute> listAttributes = AttributeHome.findPluginAttributes( MyluteceDirectoryPlugin.PLUGIN_NAME,
+                locale, myLutecePlugin );
+
+        for ( IAttribute attribute : listAttributes )
+        {
+            List<MyLuteceUserField> userFields = attribute.getUserFieldsData( request, nIdUser );
+
+            for ( MyLuteceUserField userField : userFields )
+            {
+                if ( ( userField != null ) && StringUtils.isNotBlank( userField.getValue(  ) ) )
+                {
+                    // Change the value of the user field
+                    // Instead of having the ID of the attribute field, we put the attribute field title
+                    // which represents the locale
+                    userField.setValue( userField.getAttributeField(  ).getTitle(  ) );
+                    MyLuteceUserFieldHome.create( userField, myLutecePlugin );
+                }
+            }
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void doRemoveUserFields( int nIdUser, HttpServletRequest request, Locale locale )
+    {
+        // No action
+    }
 }

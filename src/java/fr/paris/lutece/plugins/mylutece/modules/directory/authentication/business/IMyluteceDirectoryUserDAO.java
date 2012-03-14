@@ -106,8 +106,7 @@ public interface IMyluteceDirectoryUserDAO
      * @param plugin The Plugin using this data access service
      * @return The Collection of the DirectoryUsers
      */
-    Collection<MyluteceDirectoryUser> selectDirectoryUserListForLogin( String strLogin, Plugin plugin );    
-   
+    Collection<MyluteceDirectoryUser> selectDirectoryUserListForLogin( String strLogin, Plugin plugin );
 
     /**
      * Check the password for a DirectoryUser
@@ -122,9 +121,9 @@ public interface IMyluteceDirectoryUserDAO
     /**
      * Check if user is activated
      *
-     * @param strLogin The user login of DirectoryUser     
+     * @param strLogin The user login of DirectoryUser
      * @param plugin The Plugin using this data access service
      * @return true if user is activated
      */
-	boolean checkActivated(String strLogin, Plugin plugin);
+    boolean checkActivated( String strLogin, Plugin plugin );
 }

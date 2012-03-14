@@ -31,59 +31,65 @@
  *
  * License 1.0
  */
-package fr.paris.lutece.plugins.mylutece.modules.directory.authentication.business.parameter;
+package fr.paris.lutece.plugins.mylutece.modules.directory.authentication.service;
 
+import fr.paris.lutece.plugins.mylutece.modules.directory.authentication.business.AttributeMapping;
 import fr.paris.lutece.portal.service.plugin.Plugin;
-import fr.paris.lutece.util.ReferenceItem;
-import fr.paris.lutece.util.sql.DAOUtil;
+
+import java.util.Collection;
 
 
 /**
  *
- * MyluteceDirectoryParameterDAO
+ * AttributeMappingService
  *
  */
-public class MyluteceDirectoryParameterDAO implements IMyluteceDirectoryParameterDAO
+public interface IAttributeMappingService
 {
-    private static final String SQL_QUERY_SELECT_PARAMETERS_VALUE = " SELECT parameter_value FROM mylutece_directory_parameter WHERE parameter_key = ? ";
-    private static final String SQL_QUERY_UPDATE_PARAMETERS = " UPDATE mylutece_directory_parameter SET parameter_value = ? WHERE parameter_key = ? ";
+    // GET
 
     /**
-     * {@inheritDoc}
+     * Find All mappings
+     * @param plugin The {@link Plugin}
+     * @return The {@link Collection} of {@link AttributeMapping}
      */
-    @Override
-    public ReferenceItem load( String strParameterKey, Plugin plugin )
-    {
-        ReferenceItem userParam = null;
-        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECT_PARAMETERS_VALUE, plugin );
-        daoUtil.setString( 1, strParameterKey );
-        daoUtil.executeQuery(  );
-
-        if ( daoUtil.next(  ) )
-        {
-            userParam = new ReferenceItem(  );
-            userParam.setCode( strParameterKey );
-            userParam.setName( daoUtil.getString( 1 ) );
-            userParam.setChecked( Boolean.valueOf( userParam.getName(  ) ) );
-        }
-
-        daoUtil.free(  );
-
-        return userParam;
-    }
+    Collection<AttributeMapping> getAllAttributeMappings( Plugin plugin );
 
     /**
-     * {@inheritDoc}
+     * Find the {@link AttributeMapping} list for the specified entry id
+     * @param nIdEntry The id of entry
+     * @param plugin The {@link Plugin}
+     * @return The {@link AttributeMapping} or null
      */
-    @Override
-    public void store( ReferenceItem param, Plugin plugin )
-    {
-        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_UPDATE_PARAMETERS, plugin );
+    AttributeMapping getAttributeMapping( int nIdEntry, Plugin plugin );
 
-        daoUtil.setString( 1, param.getName(  ) );
-        daoUtil.setString( 2, param.getCode(  ) );
+    /**
+     * Find the {@link AttributeMapping} list for the specified attributeCode
+     * @param strAttributeKey The attribute code
+     * @param plugin The {@link Plugin}
+     * @return The {@link AttributeMapping} or null
+     */
+    AttributeMapping getAttributeMappingByAttributeKey( String strAttributeKey, Plugin plugin );
 
-        daoUtil.executeUpdate(  );
-        daoUtil.free(  );
-    }
+    // DO
+
+    /**
+     * Delete the record
+     * @param nIdEntry The id of the entry
+     * @param plugin The plugin
+     */
+    void doRemove( int nIdEntry, Plugin plugin );
+
+    /**
+     * Delete all records
+     * @param plugin The plugin
+     */
+    void doRemoveAll( Plugin plugin );
+
+    /**
+     * Insert a new {@link AttributeMapping}
+     * @param attributeMapping The new {@link AttributeMapping}
+     * @param plugin The {@link Plugin}
+     */
+    void doCreate( AttributeMapping attributeMapping, Plugin plugin );
 }
