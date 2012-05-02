@@ -34,12 +34,15 @@
 package fr.paris.lutece.plugins.mylutece.modules.directory.authentication;
 
 import fr.paris.lutece.plugins.mylutece.authentication.PortalAuthentication;
+import fr.paris.lutece.plugins.mylutece.modules.directory.authentication.service.IMyluteceDirectoryService;
 import fr.paris.lutece.plugins.mylutece.modules.directory.authentication.service.MyluteceDirectoryPlugin;
 import fr.paris.lutece.plugins.mylutece.modules.directory.authentication.service.MyluteceDirectoryService;
 import fr.paris.lutece.plugins.mylutece.modules.directory.authentication.service.security.IMyluteceDirectorySecurityService;
+import fr.paris.lutece.plugins.mylutece.modules.directory.authentication.service.security.MyluteceDirectorySecurityService;
 import fr.paris.lutece.plugins.mylutece.modules.directory.authentication.web.MyLuteceDirectoryApp;
 import fr.paris.lutece.portal.service.i18n.I18nService;
 import fr.paris.lutece.portal.service.security.LuteceUser;
+import fr.paris.lutece.portal.service.spring.SpringContextService;
 import fr.paris.lutece.portal.service.util.AppLogService;
 import fr.paris.lutece.portal.service.util.AppPropertiesService;
 
@@ -47,8 +50,6 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;
-
-import javax.inject.Inject;
 
 import javax.security.auth.login.LoginException;
 
@@ -68,17 +69,13 @@ public class BaseAuthentication extends PortalAuthentication
 {
     ////////////////////////////////////////////////////////////////////////////////////////////////
     // Constants
-    public static final String AUTHENTICATION_BEAN_NAME = "myluteceDirectory.authentication";
+    public static final String AUTHENTICATION_BEAN_NAME = "mylutece-directory.authentication";
     private static final String AUTH_SERVICE_NAME = AppPropertiesService.getProperty( "mylutece-directory.service.name" );
     private static final String CONSTANT_PATH_ICON = "images/local/skin/plugins/mylutece/modules/directory/mylutece-directory.png";
 
     // Messages properties
     private static final String PROPERTY_MESSAGE_USER_NOT_FOUND_DATABASE = "module.mylutece.directory.message.userNotFoundDirectory";
     private static final String PROPERTY_MESSAGE_USER_NOT_ACTIVATED = "module.mylutece.directory.message.userNotActivated";
-    @Inject
-    private MyluteceDirectoryService _myluteceDirectoryService;
-    @Inject
-    private IMyluteceDirectorySecurityService _securityService;
 
     /**
      * {@inheritDoc}
@@ -106,8 +103,8 @@ public class BaseAuthentication extends PortalAuthentication
         throws LoginException
     {
         Locale locale = request.getLocale(  );
-
-        BaseUser user = _myluteceDirectoryService.getUserByLogin( strUserName, this, true );
+        IMyluteceDirectoryService myluteceDirectoryService = SpringContextService.getBean( MyluteceDirectoryService.BEAN_SERVICE );
+        BaseUser user = myluteceDirectoryService.getUserByLogin( strUserName, this, true );
 
         // Unable to find the user
         if ( user == null )
@@ -116,15 +113,17 @@ public class BaseAuthentication extends PortalAuthentication
             throw new LoginException( I18nService.getLocalizedString( PROPERTY_MESSAGE_USER_NOT_FOUND_DATABASE, locale ) );
         }
 
+        IMyluteceDirectorySecurityService securityService = SpringContextService.getBean( MyluteceDirectorySecurityService.BEAN_SERVICE );
+
         // Check password
-        if ( !_securityService.checkPassword( strUserName, strUserPassword ) )
+        if ( !securityService.checkPassword( strUserName, strUserPassword ) )
         {
             AppLogService.info( "User login : Incorrect login or password" + strUserName );
             throw new LoginException( I18nService.getLocalizedString( PROPERTY_MESSAGE_USER_NOT_FOUND_DATABASE, locale ) );
         }
 
         // Check if user is activated
-        if ( !_securityService.checkActivated( strUserName ) )
+        if ( !securityService.checkActivated( strUserName ) )
         {
             AppLogService.info( "User login : User is not activated" + strUserName );
             throw new LoginException( I18nService.getLocalizedString( PROPERTY_MESSAGE_USER_NOT_ACTIVATED, locale ) );
@@ -214,7 +213,9 @@ public class BaseAuthentication extends PortalAuthentication
     @Override
     public Collection<LuteceUser> getUsers(  )
     {
-        return _myluteceDirectoryService.getUsers( this );
+        IMyluteceDirectoryService myluteceDirectoryService = SpringContextService.getBean( MyluteceDirectoryService.BEAN_SERVICE );
+
+        return myluteceDirectoryService.getUsers( this );
     }
 
     /**
@@ -223,7 +224,9 @@ public class BaseAuthentication extends PortalAuthentication
     @Override
     public LuteceUser getUser( String userLogin )
     {
-        return _myluteceDirectoryService.getUserByLogin( userLogin, this, false );
+        IMyluteceDirectoryService myluteceDirectoryService = SpringContextService.getBean( MyluteceDirectoryService.BEAN_SERVICE );
+
+        return myluteceDirectoryService.getUserByLogin( userLogin, this, false );
     }
 
     /**

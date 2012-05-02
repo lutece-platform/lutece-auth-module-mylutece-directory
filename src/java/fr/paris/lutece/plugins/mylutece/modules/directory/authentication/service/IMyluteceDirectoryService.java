@@ -48,6 +48,8 @@ import fr.paris.lutece.portal.service.security.LuteceAuthentication;
 import fr.paris.lutece.portal.service.security.LuteceUser;
 import fr.paris.lutece.util.url.UrlItem;
 
+import org.springframework.transaction.annotation.Transactional;
+
 import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
@@ -237,6 +239,7 @@ public interface IMyluteceDirectoryService
      * @param strUserPassword the password
      * @param plugin the plugin
      */
+    @Transactional( "mylutece-directory.transactionManager" )
     void doCreateMyluteceDirectoryUser( MyluteceDirectoryUser myluteceDirectoryUser, String strUserPassword,
         Plugin plugin );
 
@@ -245,6 +248,7 @@ public interface IMyluteceDirectoryService
      * @param myluteceDirectoryUser the user
      * @param plugin the plugin
      */
+    @Transactional( "mylutece-directory.transactionManager" )
     void doModifyMyluteceDirectoryUser( MyluteceDirectoryUser myluteceDirectoryUser, Plugin plugin );
 
     /**
@@ -253,6 +257,7 @@ public interface IMyluteceDirectoryService
      * @param strUserPassword the password
      * @param plugin the plugin
      */
+    @Transactional( "mylutece-directory.transactionManager" )
     void doModifyPassword( MyluteceDirectoryUser myluteceDirectoryUser, String strUserPassword, Plugin plugin );
 
     /**
@@ -261,6 +266,7 @@ public interface IMyluteceDirectoryService
      * @param roleArray the roles
      * @param plugin the plugin
      */
+    @Transactional( "mylutece-directory.transactionManager" )
     void doAssignRoleUser( MyluteceDirectoryUser user, String[] roleArray, Plugin plugin );
 
     /**
@@ -269,6 +275,7 @@ public interface IMyluteceDirectoryService
      * @param plugin the plugin
      * @param bRemoveAdditionnalInfo true if it must remove the additionnal info of the user
      */
+    @Transactional( "mylutece-directory.transactionManager" )
     void doRemoveMyluteceDirectoryUser( MyluteceDirectoryUser directoryUser, Plugin plugin,
         boolean bRemoveAdditionnalInfo );
 
@@ -277,12 +284,14 @@ public interface IMyluteceDirectoryService
      * @param nIdDirectory the id directory
      * @param plugin the plugin
      */
+    @Transactional( "mylutece-directory.transactionManager" )
     void doUnassignDirectory( int nIdDirectory, Plugin plugin );
 
     /**
      * Do unassign all directories from mylutece
      * @param plugin the plugin
      */
+    @Transactional( "mylutece-directory.transactionManager" )
     void doUnassignDirectories( Plugin plugin );
 
     /**
@@ -290,5 +299,6 @@ public interface IMyluteceDirectoryService
      * @param nIdDirectory the id directory
      * @param plugin the plugin
      */
+    @Transactional( "mylutece-directory.transactionManager" )
     void doAssignDirectory( int nIdDirectory, Plugin plugin );
 }

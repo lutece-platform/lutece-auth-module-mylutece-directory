@@ -189,8 +189,8 @@ public class MyluteceDirectoryUserJspBean extends PluginAdminPageJspBean
     private String _strCurrentPageIndexDirectoryRecord;
     private int _nItemsPerPageDirectoryRecord;
     private HashMap<String, List<RecordField>> _mapQuery;
-    private IMyluteceDirectoryService _myluteceDirectoryService = (IMyluteceDirectoryService) SpringContextService.getBean( MyluteceDirectoryService.BEAN_SERVICE );
-    private IMyluteceDirectoryParameterService _parameterService = (IMyluteceDirectoryParameterService) SpringContextService.getBean( MyluteceDirectoryParameterService.BEAN_SERVICE );
+    private IMyluteceDirectoryService _myluteceDirectoryService = SpringContextService.getBean( MyluteceDirectoryService.BEAN_SERVICE );
+    private IMyluteceDirectoryParameterService _parameterService = SpringContextService.getBean( MyluteceDirectoryParameterService.BEAN_SERVICE );
 
     /**
      * Creates a new DirectoryJspBean object.

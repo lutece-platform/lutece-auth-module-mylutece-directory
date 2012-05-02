@@ -39,13 +39,12 @@ import fr.paris.lutece.portal.service.spring.SpringContextService;
 
 /**
  *
- * DatabaseMyLuteceUserFieldListenerService
+ * MyluteceDirectoryUserFieldListenerService
  *
  */
 public class MyluteceDirectoryUserFieldListenerService
 {
-    private static final String SPRING_CONTEXT_NAME = "mylutece-directory";
-    private static final String BEAN_DATABASE_MYLUTECE_USER_FIELD_SERVICE = "myluteceDirectoryUserFieldListenerService";
+    private static final String BEAN_DATABASE_MYLUTECE_USER_FIELD_SERVICE = "mylutece-directory.userFieldListenerService";
 
     /**
      * Private constructor
@@ -60,7 +59,6 @@ public class MyluteceDirectoryUserFieldListenerService
      */
     public static MyLuteceUserFieldListenerService getService(  )
     {
-        return (MyLuteceUserFieldListenerService) SpringContextService.getPluginBean( SPRING_CONTEXT_NAME,
-            BEAN_DATABASE_MYLUTECE_USER_FIELD_SERVICE );
+        return SpringContextService.getBean( BEAN_DATABASE_MYLUTECE_USER_FIELD_SERVICE );
     }
 }

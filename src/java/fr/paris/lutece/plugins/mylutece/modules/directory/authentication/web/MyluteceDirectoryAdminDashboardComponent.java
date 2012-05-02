@@ -72,7 +72,7 @@ public class MyluteceDirectoryAdminDashboardComponent extends AdminDashboardComp
         if ( RBACService.isAuthorized( MyluteceDirectoryResourceIdService.RESOURCE_TYPE, RBAC.WILDCARD_RESOURCES_ID,
                     MyluteceDirectoryResourceIdService.PERMISSION_MANAGE, user ) )
         {
-            IMyluteceDirectoryService service = (IMyluteceDirectoryService) SpringContextService.getBean( MyluteceDirectoryService.BEAN_SERVICE );
+            IMyluteceDirectoryService service = SpringContextService.getBean( MyluteceDirectoryService.BEAN_SERVICE );
             Map<String, Object> model = service.getManageAdvancedParameters( user );
             HtmlTemplate template = AppTemplateService.getTemplate( TEMPLATE_ADMIN_DASHBOARD, user.getLocale(  ), model );
 

@@ -37,8 +37,9 @@ import fr.paris.lutece.plugins.directory.business.Directory;
 import fr.paris.lutece.plugins.directory.business.EntryFilter;
 import fr.paris.lutece.plugins.directory.business.IEntry;
 import fr.paris.lutece.plugins.directory.business.Record;
-import fr.paris.lutece.plugins.directory.business.RecordHome;
 import fr.paris.lutece.plugins.directory.service.DirectoryPlugin;
+import fr.paris.lutece.plugins.directory.service.record.IRecordService;
+import fr.paris.lutece.plugins.directory.service.record.RecordService;
 import fr.paris.lutece.plugins.directory.utils.DirectoryErrorException;
 import fr.paris.lutece.plugins.directory.utils.DirectoryUtils;
 import fr.paris.lutece.plugins.mylutece.modules.directory.authentication.business.MyluteceDirectoryUser;
@@ -68,6 +69,7 @@ import fr.paris.lutece.portal.service.security.SecurityService;
 import fr.paris.lutece.portal.service.security.UserNotSignedException;
 import fr.paris.lutece.portal.service.spring.SpringContextService;
 import fr.paris.lutece.portal.service.template.AppTemplateService;
+import fr.paris.lutece.portal.service.util.AppLogService;
 import fr.paris.lutece.portal.service.util.AppPathService;
 import fr.paris.lutece.portal.service.util.AppPropertiesService;
 import fr.paris.lutece.portal.service.workflow.WorkflowService;
@@ -161,6 +163,7 @@ public class MyLuteceDirectoryApp implements XPageApplication
     private static final String ERROR_DIRECTORY_FIELD = "error_directory_field";
     private static final String ERROR_DIRECTORY_MESSAGE = "error_directory_message";
     private static final String ERROR_DIRECTORY_UNDEFINED = "error_directory_undefined";
+    private static final String ERROR_UNKNOWN = "error_unknown";
 
     // Templates
     private static final String TEMPLATE_LOST_PASSWORD_PAGE = "skin/plugins/mylutece/modules/directory/lost_password.html";
@@ -210,6 +213,7 @@ public class MyLuteceDirectoryApp implements XPageApplication
     private static final String PROPERTY_ERROR_LOGIN = "module.mylutece.directory.message.create_account.errorLogin";
     private static final String PROPERTY_REINIT_PASSWORD_LABEL = "module.mylutece.directory.xpage.reinit_password.label";
     private static final String PROPERTY_REINIT_PASSWORD_TITLE = "module.mylutece.directory.xpage.reinit_password.title";
+    private static final String PROPERTY_ERROR_GENERIC_MESSAGE = "module.mylutece.directory.message.error.genericMessage";
 
     // MESSAGES
     private static final String MESSAGE_REINIT_PASSWORD_SUCCESS = "module.mylutece.directory.message.reinit_password.success";
@@ -219,11 +223,12 @@ public class MyLuteceDirectoryApp implements XPageApplication
     private static final String REGEX_LOGIN = "[^a-zA-Z_0-9]";
 
     // Sessions
-    private IMyluteceDirectoryService _myluteceDirectoryService = (IMyluteceDirectoryService) SpringContextService.getBean( MyluteceDirectoryService.BEAN_SERVICE );
-    private IMyluteceDirectorySecurityService _securityService = (IMyluteceDirectorySecurityService) SpringContextService.getBean( MyluteceDirectorySecurityService.BEAN_SERVICE );
-    private IAttributeMappingService _attributeMappingService = (IAttributeMappingService) SpringContextService.getBean( AttributeMappingService.BEAN_SERVICE );
-    private IMyluteceDirectoryUserKeyService _userKeyService = (IMyluteceDirectoryUserKeyService) SpringContextService.getBean( MyluteceDirectoryUserKeyService.BEAN_SERVICE );
-    private IMyluteceDirectoryParameterService _parameterService = (IMyluteceDirectoryParameterService) SpringContextService.getBean( MyluteceDirectoryParameterService.BEAN_SERVICE );
+    private IMyluteceDirectoryService _myluteceDirectoryService = SpringContextService.getBean( MyluteceDirectoryService.BEAN_SERVICE );
+    private IMyluteceDirectorySecurityService _securityService = SpringContextService.getBean( MyluteceDirectorySecurityService.BEAN_SERVICE );
+    private IAttributeMappingService _attributeMappingService = SpringContextService.getBean( AttributeMappingService.BEAN_SERVICE );
+    private IMyluteceDirectoryUserKeyService _userKeyService = SpringContextService.getBean( MyluteceDirectoryUserKeyService.BEAN_SERVICE );
+    private IMyluteceDirectoryParameterService _parameterService = SpringContextService.getBean( MyluteceDirectoryParameterService.BEAN_SERVICE );
+    private IRecordService _recordService = SpringContextService.getBean( RecordService.BEAN_SERVICE );
     private Plugin _plugin;
     private Locale _locale;
 
@@ -617,7 +622,26 @@ public class MyLuteceDirectoryApp implements XPageApplication
             // Autopublication
             record.setEnabled( true );
 
-            int nIdRecord = RecordHome.create( record, directoryPlugin );
+            int nIdRecord = DirectoryUtils.CONSTANT_ID_NULL;
+
+            try
+            {
+                nIdRecord = _recordService.create( record, directoryPlugin );
+            }
+            catch ( Exception ex )
+            {
+                // something very wrong happened... a database check might be needed
+                AppLogService.error( ex.getMessage(  ) + " for Record " + record.getIdRecord(  ), ex );
+                // revert
+                // we clear the DB form the given record
+                _recordService.remove( record.getIdRecord(  ), directoryPlugin );
+
+                // throw a message to the user
+                formErrors.addError( ERROR_UNKNOWN,
+                    I18nService.getLocalizedString( PROPERTY_ERROR_GENERIC_MESSAGE, _locale ) );
+
+                return formErrors;
+            }
 
             if ( WorkflowService.getInstance(  ).isAvailable(  ) &&
                     ( directory.getIdWorkflow(  ) != DirectoryUtils.CONSTANT_ID_NULL ) )
@@ -638,7 +662,26 @@ public class MyLuteceDirectoryApp implements XPageApplication
             directoryUser.setLogin( strLogin );
             directoryUser.setIdRecord( nIdRecord );
             directoryUser.setActivated( !bNeedActivation );
-            _myluteceDirectoryService.doCreateMyluteceDirectoryUser( directoryUser, strPassword, directoryPlugin );
+
+            try
+            {
+                _myluteceDirectoryService.doCreateMyluteceDirectoryUser( directoryUser, strPassword, directoryPlugin );
+            }
+            catch ( Exception ex )
+            {
+                // something very wrong happened... a database check might be needed
+                AppLogService.error( ex.getMessage(  ) + " for MyLutece Directory User " + strLogin, ex );
+                // revert
+                // we clear the DB form the given record
+                _myluteceDirectoryService.doRemoveMyluteceDirectoryUser( directoryUser, directoryPlugin, true );
+                _recordService.remove( record.getIdRecord(  ), directoryPlugin );
+
+                // throw a message to the user
+                formErrors.addError( ERROR_UNKNOWN,
+                    I18nService.getLocalizedString( PROPERTY_ERROR_GENERIC_MESSAGE, _locale ) );
+
+                return formErrors;
+            }
         }
 
         return formErrors;
@@ -812,7 +855,9 @@ public class MyLuteceDirectoryApp implements XPageApplication
                 return url.getUrl(  );
             }
 
-            RecordHome.updateWidthRecordField( record, directoryPlugin );
+            IRecordService recordService = SpringContextService.getBean( RecordService.BEAN_SERVICE );
+            recordService.updateWidthRecordField( record, directoryPlugin );
+
             url.addParameter( PARAMETER_ACTION_SUCCESSFUL, getDefaultRedirectUrl(  ) );
         }
 

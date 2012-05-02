@@ -54,8 +54,8 @@ import java.util.Locale;
 public final class MyluteceDirectoryUserHome
 {
     // Static variable pointed at the DAO instance
-    private static IMyluteceDirectoryUserDAO _dao = (IMyluteceDirectoryUserDAO) SpringContextService.getPluginBean( "mylutece-directory",
-            "myluteceDirectoryUserDAO" );
+    private static IMyluteceDirectoryUserDAO _dao = SpringContextService.getBean( 
+            "mylutece-directory.myluteceDirectoryUserDAO" );
 
     //Properties
     private static final String PROPERTY_MYLUTECE_LUTECE_USER_ATTRIBUTE_KEY_EMAIL = "mylutece-directory.luteceUser.attribute.email";

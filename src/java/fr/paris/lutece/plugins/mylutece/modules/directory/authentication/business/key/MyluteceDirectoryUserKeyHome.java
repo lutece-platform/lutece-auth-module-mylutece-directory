@@ -48,7 +48,7 @@ public final class MyluteceDirectoryUserKeyHome
 {
     private static final String BEAN_DAO = "mylutece-directory.myluteceDirectoryUserKeyDAO";
     private static Plugin _plugin = PluginService.getPlugin( MyluteceDirectoryPlugin.PLUGIN_NAME );
-    private static IMyluteceDirectoryUserKeyDAO _dao = (IMyluteceDirectoryUserKeyDAO) SpringContextService.getBean( BEAN_DAO );
+    private static IMyluteceDirectoryUserKeyDAO _dao = SpringContextService.getBean( BEAN_DAO );
 
     /**
      * Private constructor - this class need not be instantiated

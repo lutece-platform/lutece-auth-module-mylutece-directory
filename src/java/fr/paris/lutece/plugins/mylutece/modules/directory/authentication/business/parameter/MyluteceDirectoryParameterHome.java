@@ -46,8 +46,8 @@ import fr.paris.lutece.util.ReferenceItem;
 public final class MyluteceDirectoryParameterHome
 {
     // Static variable pointed at the DAO instance
-    private static IMyluteceDirectoryParameterDAO _dao = (IMyluteceDirectoryParameterDAO) SpringContextService.getPluginBean( "mylutece-directory",
-            "myluteceDirectory.myluteceDirectoryParameterDAO" );
+    private static IMyluteceDirectoryParameterDAO _dao = SpringContextService.getBean( 
+            "mylutece-directory.myluteceDirectoryParameterDAO" );
 
     /**
      * Private constructor

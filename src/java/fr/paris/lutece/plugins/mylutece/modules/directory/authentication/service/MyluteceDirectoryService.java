@@ -43,8 +43,9 @@ import fr.paris.lutece.plugins.directory.business.Record;
 import fr.paris.lutece.plugins.directory.business.RecordField;
 import fr.paris.lutece.plugins.directory.business.RecordFieldFilter;
 import fr.paris.lutece.plugins.directory.business.RecordFieldHome;
-import fr.paris.lutece.plugins.directory.business.RecordHome;
 import fr.paris.lutece.plugins.directory.service.DirectoryPlugin;
+import fr.paris.lutece.plugins.directory.service.record.IRecordService;
+import fr.paris.lutece.plugins.directory.service.record.RecordService;
 import fr.paris.lutece.plugins.directory.utils.DirectoryErrorException;
 import fr.paris.lutece.plugins.directory.utils.DirectoryUtils;
 import fr.paris.lutece.plugins.mylutece.business.attribute.AttributeField;
@@ -69,11 +70,14 @@ import fr.paris.lutece.portal.service.plugin.PluginService;
 import fr.paris.lutece.portal.service.rbac.RBACService;
 import fr.paris.lutece.portal.service.security.LuteceAuthentication;
 import fr.paris.lutece.portal.service.security.LuteceUser;
+import fr.paris.lutece.portal.service.spring.SpringContextService;
 import fr.paris.lutece.portal.service.util.AppPropertiesService;
 import fr.paris.lutece.portal.service.workgroup.AdminWorkgroupService;
 import fr.paris.lutece.util.url.UrlItem;
 
 import org.apache.commons.lang.StringUtils;
+
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -89,7 +93,7 @@ import javax.servlet.http.HttpServletRequest;
 
 /**
  *
- * DatabaseService
+ * MyluteceDirectoryService
  *
  */
 public class MyluteceDirectoryService implements IMyluteceDirectoryService
@@ -239,7 +243,8 @@ public class MyluteceDirectoryService implements IMyluteceDirectoryService
     public Record getRecord( int nIdRecord, boolean bGetRecordFields )
     {
         Plugin directoryPlugin = PluginService.getPlugin( DirectoryPlugin.PLUGIN_NAME );
-        Record record = RecordHome.findByPrimaryKey( nIdRecord, directoryPlugin );
+        IRecordService recordService = SpringContextService.getBean( RecordService.BEAN_SERVICE );
+        Record record = recordService.findByPrimaryKey( nIdRecord, directoryPlugin );
 
         if ( ( record != null ) && bGetRecordFields )
         {
@@ -324,8 +329,9 @@ public class MyluteceDirectoryService implements IMyluteceDirectoryService
     public int getIdDirectoryByIdRecord( int nIdRecord )
     {
         Plugin directoryPlugin = PluginService.getPlugin( DirectoryPlugin.PLUGIN_NAME );
+        IRecordService recordService = SpringContextService.getBean( RecordService.BEAN_SERVICE );
 
-        return RecordHome.getDirectoryIdByRecordId( nIdRecord, directoryPlugin );
+        return recordService.getDirectoryIdByRecordId( nIdRecord, directoryPlugin );
     }
 
     /**
@@ -489,6 +495,7 @@ public class MyluteceDirectoryService implements IMyluteceDirectoryService
      * {@inheritDoc}
      */
     @Override
+    @Transactional( "mylutece-directory.transactionManager" )
     public void doCreateMyluteceDirectoryUser( MyluteceDirectoryUser myluteceDirectoryUser, String strUserPassword,
         Plugin plugin )
     {
@@ -500,6 +507,7 @@ public class MyluteceDirectoryService implements IMyluteceDirectoryService
      * {@inheritDoc}
      */
     @Override
+    @Transactional( "mylutece-directory.transactionManager" )
     public void doModifyMyluteceDirectoryUser( MyluteceDirectoryUser myluteceDirectoryUser, Plugin plugin )
     {
         MyluteceDirectoryUserHome.update( myluteceDirectoryUser, plugin );
@@ -509,6 +517,7 @@ public class MyluteceDirectoryService implements IMyluteceDirectoryService
      * {@inheritDoc}
      */
     @Override
+    @Transactional( "mylutece-directory.transactionManager" )
     public void doModifyPassword( MyluteceDirectoryUser myluteceDirectoryUser, String strUserPassword, Plugin plugin )
     {
         String strPassword = _securityService.buildPassword( strUserPassword );
@@ -519,6 +528,7 @@ public class MyluteceDirectoryService implements IMyluteceDirectoryService
      * {@inheritDoc}
      */
     @Override
+    @Transactional( "mylutece-directory.transactionManager" )
     public void doAssignRoleUser( MyluteceDirectoryUser user, String[] roleArray, Plugin plugin )
     {
         if ( user != null )
@@ -539,6 +549,7 @@ public class MyluteceDirectoryService implements IMyluteceDirectoryService
      * {@inheritDoc}
      */
     @Override
+    @Transactional( "mylutece-directory.transactionManager" )
     public void doRemoveMyluteceDirectoryUser( MyluteceDirectoryUser directoryUser, Plugin plugin,
         boolean bRemoveAdditionnalInfo )
     {
@@ -555,6 +566,7 @@ public class MyluteceDirectoryService implements IMyluteceDirectoryService
      * {@inheritDoc}
      */
     @Override
+    @Transactional( "mylutece-directory.transactionManager" )
     public void doUnassignDirectory( int nIdDirectory, Plugin plugin )
     {
         MyluteceDirectoryHome.unAssignDirectory( nIdDirectory, plugin );
@@ -564,6 +576,7 @@ public class MyluteceDirectoryService implements IMyluteceDirectoryService
      * {@inheritDoc}
      */
     @Override
+    @Transactional( "mylutece-directory.transactionManager" )
     public void doUnassignDirectories( Plugin plugin )
     {
         MyluteceDirectoryHome.unAssignDirectories( plugin );
@@ -573,6 +586,7 @@ public class MyluteceDirectoryService implements IMyluteceDirectoryService
      * {@inheritDoc}
      */
     @Override
+    @Transactional( "mylutece-directory.transactionManager" )
     public void doAssignDirectory( int nIdDirectory, Plugin plugin )
     {
         MyluteceDirectoryHome.assignDirectory( nIdDirectory, plugin );

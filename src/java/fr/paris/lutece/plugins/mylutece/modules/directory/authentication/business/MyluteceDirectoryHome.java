@@ -37,8 +37,9 @@ import fr.paris.lutece.plugins.directory.business.Record;
 import fr.paris.lutece.plugins.directory.business.RecordField;
 import fr.paris.lutece.plugins.directory.business.RecordFieldFilter;
 import fr.paris.lutece.plugins.directory.business.RecordFieldHome;
-import fr.paris.lutece.plugins.directory.business.RecordHome;
 import fr.paris.lutece.plugins.directory.service.DirectoryPlugin;
+import fr.paris.lutece.plugins.directory.service.record.IRecordService;
+import fr.paris.lutece.plugins.directory.service.record.RecordService;
 import fr.paris.lutece.plugins.mylutece.modules.directory.authentication.BaseUser;
 import fr.paris.lutece.portal.service.plugin.Plugin;
 import fr.paris.lutece.portal.service.plugin.PluginService;
@@ -58,8 +59,7 @@ import java.util.Locale;
 public final class MyluteceDirectoryHome
 {
     // Static variable pointed at the DAO instance
-    private static IMyluteceDirectoryDAO _dao = (IMyluteceDirectoryDAO) SpringContextService.getPluginBean( "mylutece-directory",
-            "myluteceDirectoryDAO" );
+    private static IMyluteceDirectoryDAO _dao = SpringContextService.getBean( "mylutece-directory.myluteceDirectoryDAO" );
 
     /**
      * Private constructor - this class need not be instantiated
@@ -97,7 +97,8 @@ public final class MyluteceDirectoryHome
         filter.setIdRecord( directoryUser.getIdRecord(  ) );
 
         Plugin directoryPlugin = PluginService.getPlugin( DirectoryPlugin.PLUGIN_NAME );
-        Record record = RecordHome.findByPrimaryKey( directoryUser.getIdRecord(  ), directoryPlugin );
+        IRecordService recordService = SpringContextService.getBean( RecordService.BEAN_SERVICE );
+        Record record = recordService.findByPrimaryKey( directoryUser.getIdRecord(  ), directoryPlugin );
 
         if ( record == null )
         {
@@ -152,7 +153,8 @@ public final class MyluteceDirectoryHome
             filter.setIdRecord( directoryUser.getIdRecord(  ) );
 
             Plugin directoryPlugin = PluginService.getPlugin( DirectoryPlugin.PLUGIN_NAME );
-            Record record = RecordHome.findByPrimaryKey( directoryUser.getIdRecord(  ), directoryPlugin );
+            IRecordService recordService = SpringContextService.getBean( RecordService.BEAN_SERVICE );
+            Record record = recordService.findByPrimaryKey( directoryUser.getIdRecord(  ), directoryPlugin );
             record.setListRecordField( RecordFieldHome.getRecordFieldList( filter, directoryPlugin ) );
 
             // Create the BaseUser

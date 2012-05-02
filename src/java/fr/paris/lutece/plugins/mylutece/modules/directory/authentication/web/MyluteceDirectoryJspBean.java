@@ -137,8 +137,8 @@ public class MyluteceDirectoryJspBean extends PluginAdminPageJspBean
     private String _strCurrentPageIndexDirectory;
     private int _nItemsPerPageDirectory;
     private String _strWorkGroup = AdminWorkgroupService.ALL_GROUPS;
-    private IMyluteceDirectoryService _myluteceDirectoryService = (IMyluteceDirectoryService) SpringContextService.getBean( MyluteceDirectoryService.BEAN_SERVICE );
-    private IAttributeMappingService _attributeMappingService = (IAttributeMappingService) SpringContextService.getBean( AttributeMappingService.BEAN_SERVICE );
+    private IMyluteceDirectoryService _myluteceDirectoryService = SpringContextService.getBean( MyluteceDirectoryService.BEAN_SERVICE );
+    private IAttributeMappingService _attributeMappingService = SpringContextService.getBean( AttributeMappingService.BEAN_SERVICE );
 
     /**
      * Creates a new DirectoryJspBean object.

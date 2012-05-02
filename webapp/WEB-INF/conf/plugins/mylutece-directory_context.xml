@@ -1,20 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:tx="http://www.springframework.org/schema/tx" xmlns:jdbc="http://www.springframework.org/schema/jdbc"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+       http://www.springframework.org/schema/context
+       http://www.springframework.org/schema/context/spring-context-3.0.xsd
+       http://www.springframework.org/schema/tx
+       http://www.springframework.org/schema/tx/spring-tx-3.0.xsd">
 
-<beans>
-  
-	<bean id="myluteceDirectoryUserDAO"  class="fr.paris.lutece.plugins.mylutece.modules.directory.authentication.business.MyluteceDirectoryUserDAO" />
-	<bean id="myluteceDirectoryDAO"  class="fr.paris.lutece.plugins.mylutece.modules.directory.authentication.business.MyluteceDirectoryDAO" />
-	<bean id="myluteceDirectoryAttributeMappingDAO"  class="fr.paris.lutece.plugins.mylutece.modules.directory.authentication.business.AttributeMappingDAO" />
-	<bean id="myluteceDirectory.myluteceDirectoryParameterDAO" class="fr.paris.lutece.plugins.mylutece.modules.directory.authentication.business.parameter.MyluteceDirectoryParameterDAO" />
+	<!-- DAO -->
+	<bean id="mylutece-directory.myluteceDirectoryUserDAO" class="fr.paris.lutece.plugins.mylutece.modules.directory.authentication.business.MyluteceDirectoryUserDAO" />
+	<bean id="mylutece-directory.myluteceDirectoryDAO" class="fr.paris.lutece.plugins.mylutece.modules.directory.authentication.business.MyluteceDirectoryDAO" />
+	<bean id="mylutece-directory.attributeMappingDAO" class="fr.paris.lutece.plugins.mylutece.modules.directory.authentication.business.AttributeMappingDAO" />
+	<bean id="mylutece-directory.myluteceDirectoryParameterDAO" class="fr.paris.lutece.plugins.mylutece.modules.directory.authentication.business.parameter.MyluteceDirectoryParameterDAO" />
 	<bean id="mylutece-directory.myluteceDirectoryUserKeyDAO" class="fr.paris.lutece.plugins.mylutece.modules.directory.authentication.business.key.MyluteceDirectoryUserKeyDAO" />
-	<bean id="myluteceDirectory.authentication" class="fr.paris.lutece.plugins.mylutece.modules.directory.authentication.BaseAuthentication" />
 
+	<!-- Transaction manager -->
+	<bean id="mylutece-directory.transactionManager" class="fr.paris.lutece.portal.service.database.DAOUtilTransactionManager">
+		<property name="pluginName" value="mylutece-directory" />
+	</bean>
+	
 	<!-- SERVICES -->
-	<bean id="myluteceDirectoryUserFieldListenerService" class="fr.paris.lutece.plugins.mylutece.service.attribute.MyLuteceUserFieldListenerService" />
+	<bean id="mylutece-directory.userFieldListenerService" class="fr.paris.lutece.plugins.mylutece.service.attribute.MyLuteceUserFieldListenerService" />
 	<bean id="mylutece-directory.myluteceDirectoryService" class="fr.paris.lutece.plugins.mylutece.modules.directory.authentication.service.MyluteceDirectoryService" />
 	<bean id="mylutece-directory.myluteceDirectoryParameterService" class="fr.paris.lutece.plugins.mylutece.modules.directory.authentication.service.parameter.MyluteceDirectoryParameterService" />
 	<bean id="mylutece-directory.securityService" class="fr.paris.lutece.plugins.mylutece.modules.directory.authentication.service.security.MyluteceDirectorySecurityService" />
 	<bean id="mylutece-directory.attributeMappingService" class="fr.paris.lutece.plugins.mylutece.modules.directory.authentication.service.AttributeMappingService" />
 	<bean id="mylutece-directory.myluteceDirectoryUserKeyService" class="fr.paris.lutece.plugins.mylutece.modules.directory.authentication.service.key.MyluteceDirectoryUserKeyService" />
+	<bean id="mylutece-directory.authentication" class="fr.paris.lutece.plugins.mylutece.modules.directory.authentication.BaseAuthentication" />
 </beans>
