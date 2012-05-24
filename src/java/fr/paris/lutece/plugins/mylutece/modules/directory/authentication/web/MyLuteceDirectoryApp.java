@@ -648,7 +648,7 @@ public class MyLuteceDirectoryApp implements XPageApplication
             {
                 WorkflowService.getInstance(  )
                                .getState( record.getIdRecord(  ), Record.WORKFLOW_RESOURCE_TYPE,
-                    directory.getIdWorkflow(  ), Integer.valueOf( directory.getIdDirectory(  ) ), null );
+                    directory.getIdWorkflow(  ), Integer.valueOf( directory.getIdDirectory(  ) ) );
                 WorkflowService.getInstance(  )
                                .executeActionAutomatic( record.getIdRecord(  ), Record.WORKFLOW_RESOURCE_TYPE,
                     directory.getIdWorkflow(  ), Integer.valueOf( directory.getIdDirectory(  ) ) );
