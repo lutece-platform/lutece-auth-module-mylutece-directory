@@ -59,26 +59,32 @@ import fr.paris.lutece.plugins.mylutece.modules.directory.authentication.busines
 import fr.paris.lutece.plugins.mylutece.modules.directory.authentication.business.MyluteceDirectoryUser;
 import fr.paris.lutece.plugins.mylutece.modules.directory.authentication.business.MyluteceDirectoryUserHome;
 import fr.paris.lutece.plugins.mylutece.modules.directory.authentication.business.parameter.MyluteceDirectoryParameterHome;
-import fr.paris.lutece.plugins.mylutece.modules.directory.authentication.service.security.IMyluteceDirectorySecurityService;
+import fr.paris.lutece.plugins.mylutece.modules.directory.authentication.service.parameter.IMyluteceDirectoryParameterService;
+import fr.paris.lutece.plugins.mylutece.modules.directory.authentication.service.parameter.MyluteceDirectoryParameterService;
 import fr.paris.lutece.plugins.mylutece.modules.directory.authentication.web.FormErrors;
 import fr.paris.lutece.plugins.mylutece.service.MyLutecePlugin;
+import fr.paris.lutece.plugins.mylutece.util.SecurityUtils;
 import fr.paris.lutece.portal.business.rbac.RBAC;
 import fr.paris.lutece.portal.business.user.AdminUser;
+import fr.paris.lutece.portal.service.admin.AdminAuthenticationService;
 import fr.paris.lutece.portal.service.i18n.I18nService;
+import fr.paris.lutece.portal.service.mail.MailService;
 import fr.paris.lutece.portal.service.plugin.Plugin;
 import fr.paris.lutece.portal.service.plugin.PluginService;
 import fr.paris.lutece.portal.service.rbac.RBACService;
 import fr.paris.lutece.portal.service.security.LuteceAuthentication;
 import fr.paris.lutece.portal.service.security.LuteceUser;
 import fr.paris.lutece.portal.service.spring.SpringContextService;
+import fr.paris.lutece.portal.service.template.AppTemplateService;
+import fr.paris.lutece.portal.service.template.DatabaseTemplateService;
 import fr.paris.lutece.portal.service.util.AppPropertiesService;
 import fr.paris.lutece.portal.service.workgroup.AdminWorkgroupService;
+import fr.paris.lutece.util.ReferenceItem;
+import fr.paris.lutece.util.html.HtmlTemplate;
+import fr.paris.lutece.util.password.PasswordUtil;
 import fr.paris.lutece.util.url.UrlItem;
 
-import org.apache.commons.lang.StringUtils;
-
-import org.springframework.transaction.annotation.Transactional;
-
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -87,8 +93,10 @@ import java.util.Locale;
 import java.util.Map;
 
 import javax.inject.Inject;
-
 import javax.servlet.http.HttpServletRequest;
+
+import org.apache.commons.lang.StringUtils;
+import org.springframework.transaction.annotation.Transactional;
 
 
 /**
@@ -110,6 +118,9 @@ public class MyluteceDirectoryService implements IMyluteceDirectoryService
     private static final String PARAMETER_SEARCH_IS_SEARCH = "search_is_search";
     private static final String PARAMETER_ENABLE_PASSWORD_ENCRYPTION = "enable_password_encryption";
     private static final String PARAMETER_ENCRYPTION_ALGORITHM = "encryption_algorithm";
+    private static final String PARAMETER_ACCOUNT_REACTIVATED_MAIL_SENDER = "account_reactivated_mail_sender";
+    private static final String PARAMETER_ACCOUNT_REACTIVATED_MAIL_SUBJECT = "account_reactivated_mail_subject";
+    private static final String PARAMETER_ACCOUNT_REACTIVATED_MAIL_BODY = "mylutece_directory_account_reactivated_mail";
 
     // MARKS
     private static final String MARK_SEARCH_IS_SEARCH = "search_is_search";
@@ -120,6 +131,8 @@ public class MyluteceDirectoryService implements IMyluteceDirectoryService
     private static final String MARK_ENABLE_PASSWORD_ENCRYPTION = "enable_password_encryption";
     private static final String MARK_ENCRYPTION_ALGORITHM = "encryption_algorithm";
     private static final String MARK_ENCRYPTION_ALGORITHMS_LIST = "encryption_algorithms_list";
+    private static final String MARK_LOGIN_URL = "login_url";
+    private static final String MARK_NEW_PASSWORD = "new_password";
 
     // ERRORS
     private static final String ERROR_DIRECTORY_FIELD = "error_directory_field";
@@ -127,10 +140,25 @@ public class MyluteceDirectoryService implements IMyluteceDirectoryService
     // PROPERTIES
     private static final String PROPERTY_ERROR_FIELD = "module.mylutece.directory.message.error.field";
     private static final String PROPERTY_ERROR_MANDATORY_FIELDS = "module.mylutece.directory.message.account.errorMandatoryFields";
+    private static final String PROPERTY_NO_REPLY_EMAIL = "mail.noreply.email";
+    private static final String PROPERTY_MESSAGE_EMAIL_SUBJECT = "module.mylutece.directory.forgot_password.email.subject";
+
+    // TEMPLATES
+    private static final String TEMPLATE_EMAIL_FORGOT_PASSWORD = "admin/plugins/mylutece/modules/directory/email_forgot_password.html";
+
     @Inject
-    private IMyluteceDirectorySecurityService _securityService;
+    private IMyluteceDirectoryParameterService _parameterService;
 
     // GET
+
+    /**
+     * Get the plugin
+     * @return The plugin
+     */
+    public Plugin getPlugin( )
+    {
+        return PluginService.getPlugin( MyluteceDirectoryPlugin.PLUGIN_NAME );
+    }
 
     /**
      * {@inheritDoc}
@@ -162,6 +190,22 @@ public class MyluteceDirectoryService implements IMyluteceDirectoryService
         }
 
         return user;
+    }
+
+    /**
+     * Do modify the password
+     * @param user the DatabaseUser
+     * @param bNewValue the new password
+     * @param plugin the plugin
+     */
+    public void doModifyResetPassword( MyluteceDirectoryUser user, boolean bNewValue, Plugin plugin )
+    {
+        MyluteceDirectoryUser userStored = MyluteceDirectoryUserHome.findByPrimaryKey( user.getIdRecord( ), plugin );
+
+        if ( userStored != null )
+        {
+            MyluteceDirectoryUserHome.updateResetPassword( userStored, bNewValue, plugin );
+        }
     }
 
     /**
@@ -484,12 +528,12 @@ public class MyluteceDirectoryService implements IMyluteceDirectoryService
             model.put( MARK_ENCRYPTION_ALGORITHM,
                 MyluteceDirectoryParameterHome.findByKey( PARAMETER_ENCRYPTION_ALGORITHM, plugin ).getName(  ) );
             model.put( MARK_ENCRYPTION_ALGORITHMS_LIST, listAlgorithms );
+
+            model = SecurityUtils.checkSecurityParameters( new MyluteceDirectoryParameterService( ), model, plugin );
         }
 
         return model;
     }
-
-    // DO
 
     /**
      * {@inheritDoc}
@@ -499,7 +543,11 @@ public class MyluteceDirectoryService implements IMyluteceDirectoryService
     public void doCreateMyluteceDirectoryUser( MyluteceDirectoryUser myluteceDirectoryUser, String strUserPassword,
         Plugin plugin )
     {
-        String strPassword = _securityService.buildPassword( strUserPassword );
+        String strPassword = SecurityUtils.buildPassword( _parameterService, plugin, strUserPassword );
+        myluteceDirectoryUser.setPasswordMaxValidDate( SecurityUtils
+                .getPasswordMaxValidDate( _parameterService, plugin ) );
+        myluteceDirectoryUser
+                .setAccountMaxValidDate( SecurityUtils.getAccountMaxValidDate( _parameterService, plugin ) );
         MyluteceDirectoryUserHome.create( myluteceDirectoryUser, strPassword, plugin );
     }
 
@@ -520,7 +568,9 @@ public class MyluteceDirectoryService implements IMyluteceDirectoryService
     @Transactional( "mylutece-directory.transactionManager" )
     public void doModifyPassword( MyluteceDirectoryUser myluteceDirectoryUser, String strUserPassword, Plugin plugin )
     {
-        String strPassword = _securityService.buildPassword( strUserPassword );
+        String strPassword = SecurityUtils.buildPassword( _parameterService, plugin, strUserPassword );
+        myluteceDirectoryUser.setPasswordMaxValidDate( SecurityUtils
+                .getPasswordMaxValidDate( _parameterService, plugin ) );
         MyluteceDirectoryUserHome.updatePassword( myluteceDirectoryUser, strPassword, plugin );
     }
 
@@ -637,6 +687,101 @@ public class MyluteceDirectoryService implements IMyluteceDirectoryService
                 String strErrorMessage = I18nService.getLocalizedString( PROPERTY_ERROR_FIELD, params, locale );
                 formErrors.addError( ERROR_DIRECTORY_FIELD, strErrorMessage );
             }
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void changeUserPasswordAndNotify( String strBaseURL, Plugin plugin, Locale locale )
+    {
+        // Alert all users their password have been reinitialized.
+        Collection<MyluteceDirectoryUser> listUsers = getMyluteceDirectoryUsers( plugin );
+
+        for ( MyluteceDirectoryUser user : listUsers )
+        {
+            // make password
+            String strPassword = PasswordUtil.makePassword( );
+
+            MyluteceDirectoryUser userStored = getMyluteceDirectoryUser( user.getIdRecord( ), plugin );
+            userStored.setPasswordMaxValidDate( SecurityUtils.getPasswordMaxValidDate( _parameterService, plugin ) );
+            strPassword = SecurityUtils.buildPassword( _parameterService, plugin, strPassword );
+            MyluteceDirectoryUserHome.updatePassword( userStored, strPassword, plugin );
+
+            List<String> listEmails = getListEmails( userStored, plugin, locale );
+
+            if ( ( listEmails != null ) && !listEmails.isEmpty( ) )
+            {
+                //send password by e-mail
+                String strSenderEmail = AppPropertiesService.getProperty( PROPERTY_NO_REPLY_EMAIL );
+                String strEmailSubject = I18nService.getLocalizedString( PROPERTY_MESSAGE_EMAIL_SUBJECT, locale );
+                Map<String, Object> model = new HashMap<String, Object>( );
+                model.put( MARK_NEW_PASSWORD, strPassword );
+                model.put( MARK_LOGIN_URL, strBaseURL + AdminAuthenticationService.getInstance( ).getLoginPageUrl( ) );
+
+                HtmlTemplate template = AppTemplateService.getTemplate( TEMPLATE_EMAIL_FORGOT_PASSWORD, locale, model );
+
+                for ( String email : listEmails )
+                {
+                    MailService.sendMailHtml( email, strSenderEmail, strSenderEmail, strEmailSubject,
+                            template.getHtml( ) );
+                }
+            }
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean mustUserChangePassword( LuteceUser databaseUser, Plugin plugin )
+    {
+        return MyluteceDirectoryHome.findResetPasswordFromLogin( databaseUser.getName( ), plugin );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void doInsertNewPasswordInHistory( String strPassword, int nUserId, Plugin plugin )
+    {
+        strPassword = SecurityUtils.buildPassword( _parameterService, plugin, strPassword );
+        MyluteceDirectoryUserHome.insertNewPasswordInHistory( strPassword, nUserId, getPlugin( ) );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @SuppressWarnings( "deprecation" )
+    @Override
+    public void updateUserExpirationDate( int nIdUser, Plugin plugin )
+    {
+        // We update the user account
+        int nbMailSend = MyluteceDirectoryUserHome.getNbAccountLifeTimeNotification( nIdUser, plugin );
+        Timestamp newExpirationDate = SecurityUtils.getAccountMaxValidDate( _parameterService, plugin );
+        MyluteceDirectoryUserHome.updateUserExpirationDate( nIdUser, newExpirationDate, getPlugin( ) );
+
+        // We notify the user
+        MyluteceDirectoryAccountLifeTimeService accountLifeTimeService = new MyluteceDirectoryAccountLifeTimeService( );
+
+        String strUserMail = accountLifeTimeService.getUserMainEmail( nIdUser );
+
+        if ( nbMailSend > 0 && StringUtils.isNotBlank( strUserMail ) )
+        {
+            String strBody = DatabaseTemplateService.getTemplateFromKey( PARAMETER_ACCOUNT_REACTIVATED_MAIL_BODY );
+
+            ReferenceItem referenceItem = _parameterService.findByKey( PARAMETER_ACCOUNT_REACTIVATED_MAIL_SENDER,
+                    plugin );
+            String strSender = referenceItem == null ? StringUtils.EMPTY : referenceItem.getName( );
+
+            referenceItem = _parameterService.findByKey( PARAMETER_ACCOUNT_REACTIVATED_MAIL_SUBJECT, plugin );
+            String strSubject = referenceItem == null ? StringUtils.EMPTY : referenceItem.getName( );
+
+            Map<String, String> model = new HashMap<String, String>( );
+            accountLifeTimeService.addParametersToModel( model, nIdUser );
+            HtmlTemplate template = AppTemplateService.getTemplateFromStringFtl( strBody, Locale.getDefault( ), model );
+            MailService.sendMailHtml( strUserMail, strSender, strSender, strSubject, template.getHtml( ) );
         }
     }
 }

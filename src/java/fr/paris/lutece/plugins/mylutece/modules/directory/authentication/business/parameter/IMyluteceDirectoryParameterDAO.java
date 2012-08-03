@@ -35,6 +35,7 @@ package fr.paris.lutece.plugins.mylutece.modules.directory.authentication.busine
 
 import fr.paris.lutece.portal.service.plugin.Plugin;
 import fr.paris.lutece.util.ReferenceItem;
+import fr.paris.lutece.util.ReferenceList;
 
 
 /**
@@ -58,4 +59,11 @@ public interface IMyluteceDirectoryParameterDAO
      * @param plugin the plugin
      */
     void store( ReferenceItem param, Plugin plugin );
+
+    /**
+     * Select all user parameters
+     * @param plugin the plugin
+     * @return a {@link ReferenceList}
+     */
+    ReferenceList selectAll( Plugin plugin );
 }

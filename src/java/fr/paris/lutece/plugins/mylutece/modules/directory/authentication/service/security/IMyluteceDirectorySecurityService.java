@@ -58,13 +58,4 @@ public interface IMyluteceDirectorySecurityService
      * @return true if the account is activated, false otherwise
      */
     boolean checkActivated( String strUserName );
-
-    /**
-     * Build the password depending of the encryption.
-     * If the encryption is enable, then it returns the password encrypted,
-     * otherwise it just returns the password given in parameter.
-     * @param strUserPassword the password
-     * @return the password encrypted or not
-     */
-    String buildPassword( String strUserPassword );
 }

@@ -5,6 +5,7 @@ DROP TABLE IF EXISTS mylutece_directory_user_group;
 DROP TABLE IF EXISTS mylutece_directory_mapping;
 DROP TABLE IF EXISTS mylutece_directory_parameter;
 DROP TABLE IF EXISTS mylutece_directory_key;
+DROP TABLE IF EXISTS mylutece_directory_user_password_history;
 
 --
 -- Table struture for mylutece_directory_directory
@@ -22,6 +23,10 @@ CREATE TABLE mylutece_directory_user (
 	user_login varchar(100) default '' NOT NULL,
 	user_password varchar(100) default '' NOT NULL,
 	activated SMALLINT DEFAULT '0',
+	reset_password SMALLINT DEFAULT 0 NOT NULL,
+	password_max_valid_date TIMESTAMP NULL,
+	account_max_valid_date BIGINT NULL,
+	nb_alerts_sent INTEGER DEFAULT 0 NOT NULL,
 	PRIMARY KEY (id_record)
 );
 
@@ -69,3 +74,11 @@ CREATE TABLE mylutece_directory_key(
 	id_record int NOT NULL,
 	PRIMARY KEY (mylutece_directory_user_key)
 );
+
+CREATE  TABLE mylutece_directory_user_password_history (
+  id_record INT NOT NULL ,
+  password VARCHAR(100) NOT NULL ,
+  date_password_change TIMESTAMP NOT NULL DEFAULT NOW() ,
+  PRIMARY KEY (id_record, date_password_change)
+  );
+

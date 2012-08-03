@@ -43,12 +43,9 @@ import fr.paris.lutece.plugins.mylutece.modules.directory.authentication.busines
 import fr.paris.lutece.plugins.mylutece.modules.directory.authentication.service.AttributeMappingService;
 import fr.paris.lutece.plugins.mylutece.modules.directory.authentication.service.IAttributeMappingService;
 import fr.paris.lutece.plugins.mylutece.modules.directory.authentication.service.IMyluteceDirectoryService;
-import fr.paris.lutece.plugins.mylutece.modules.directory.authentication.service.MyluteceDirectoryResourceIdService;
 import fr.paris.lutece.plugins.mylutece.modules.directory.authentication.service.MyluteceDirectoryService;
-import fr.paris.lutece.portal.business.rbac.RBAC;
 import fr.paris.lutece.portal.service.message.AdminMessage;
 import fr.paris.lutece.portal.service.message.AdminMessageService;
-import fr.paris.lutece.portal.service.rbac.RBACService;
 import fr.paris.lutece.portal.service.security.LuteceUser;
 import fr.paris.lutece.portal.service.spring.SpringContextService;
 import fr.paris.lutece.portal.service.template.AppTemplateService;
@@ -64,10 +61,7 @@ import fr.paris.lutece.util.html.HtmlTemplate;
 import fr.paris.lutece.util.html.Paginator;
 import fr.paris.lutece.util.url.UrlItem;
 
-import org.apache.commons.lang.StringUtils;
-
 import java.lang.reflect.Field;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -75,6 +69,8 @@ import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
+
+import org.apache.commons.lang.StringUtils;
 
 
 /**
@@ -101,6 +97,7 @@ public class MyluteceDirectoryJspBean extends PluginAdminPageJspBean
     private static final String PROPERTY_ITEM_PER_PAGE = "module.mylutece.directory.items_per_page";
     private static final String PROPERTY_PAGE_TITLE_MANAGE_MAPPINGS = "module.mylutece.directory.manage_mappings.page_title";
     private static final String PROPERTY_PAGE_TITLE_CREATE_MAPPING = "module.mylutece.directory.create_mapping.page_title";
+
     private static final String MESSAGE_CANNOT_UNASSIGN_DIRECTORY = "module.mylutece.directory.message.cannot_unassign_directory";
     private static final String MESSAGE_CONFIRMATION_REMOVE_DIRECTORY = "module.mylutece.directory.message.confirm_remove_directory";
     private static final String MESSAGE_MAPPING_EXIST = "module.mylutece.directory.message.mapping_exist";
@@ -129,8 +126,9 @@ public class MyluteceDirectoryJspBean extends PluginAdminPageJspBean
     private static final String MARK_MAPPINGS_DISPLAY_LIST = "mapping_display_list";
     private static final String MARK_MAPPING = "mapping";
     private static final String MARK_EMPTY_LIST = "empty_list";
-    private static final String MARK_PERMISSION_ADVANCED_PARAMETER = "permission_advanced_parameter";
+
     private static final String PREFIX_LUTECE_USER = "user.";
+
 
     // Session fields
     private int _nDefaultItemsPerPage = AppPropertiesService.getPropertyInt( PROPERTY_ITEM_PER_PAGE, 50 );
@@ -139,6 +137,7 @@ public class MyluteceDirectoryJspBean extends PluginAdminPageJspBean
     private String _strWorkGroup = AdminWorkgroupService.ALL_GROUPS;
     private IMyluteceDirectoryService _myluteceDirectoryService = SpringContextService.getBean( MyluteceDirectoryService.BEAN_SERVICE );
     private IAttributeMappingService _attributeMappingService = SpringContextService.getBean( AttributeMappingService.BEAN_SERVICE );
+
 
     /**
      * Creates a new DirectoryJspBean object.
@@ -192,11 +191,6 @@ public class MyluteceDirectoryJspBean extends PluginAdminPageJspBean
         model.put( MARK_USER_WORKGROUP_REF_LIST, AdminWorkgroupService.getUserWorkgroups( getUser(  ), getLocale(  ) ) );
         model.put( MARK_USER_WORKGROUP_SELECTED, _strWorkGroup );
         model.put( MARK_DIRECTORY_DISPLAY_LIST, paginator.getPageItems(  ) );
-
-        boolean bPermissionAdvancedParameter = RBACService.isAuthorized( MyluteceDirectoryResourceIdService.RESOURCE_TYPE,
-                RBAC.WILDCARD_RESOURCES_ID, MyluteceDirectoryResourceIdService.PERMISSION_MANAGE, getUser(  ) );
-
-        model.put( MARK_PERMISSION_ADVANCED_PARAMETER, bPermissionAdvancedParameter );
 
         setPageTitleProperty( DirectoryUtils.EMPTY_STRING );
 

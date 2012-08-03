@@ -71,4 +71,12 @@ public interface IMyluteceDirectoryUserKeyDAO
      * @param plugin the plugin
      */
     void deleteByIdRecord( int nIdRecord, Plugin plugin );
+
+    /**
+     * Find a key from a given login
+     * @param login the user's login
+     * @param plugin the plugin
+     * @return a {@link MyluteceDirectoryUserKey}
+     */
+    public MyluteceDirectoryUserKey selectKeyByLogin( String login, Plugin plugin );
 }

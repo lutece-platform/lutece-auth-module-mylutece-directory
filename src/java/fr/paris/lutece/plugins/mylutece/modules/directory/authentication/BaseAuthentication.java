@@ -34,25 +34,34 @@
 package fr.paris.lutece.plugins.mylutece.modules.directory.authentication;
 
 import fr.paris.lutece.plugins.mylutece.authentication.PortalAuthentication;
+import fr.paris.lutece.plugins.mylutece.authentication.logs.ConnectionLog;
+import fr.paris.lutece.plugins.mylutece.authentication.logs.ConnectionLogHome;
+import fr.paris.lutece.plugins.mylutece.modules.directory.authentication.business.MyluteceDirectoryHome;
+import fr.paris.lutece.plugins.mylutece.modules.directory.authentication.business.parameter.MyluteceDirectoryParameterHome;
 import fr.paris.lutece.plugins.mylutece.modules.directory.authentication.service.IMyluteceDirectoryService;
 import fr.paris.lutece.plugins.mylutece.modules.directory.authentication.service.MyluteceDirectoryPlugin;
 import fr.paris.lutece.plugins.mylutece.modules.directory.authentication.service.MyluteceDirectoryService;
 import fr.paris.lutece.plugins.mylutece.modules.directory.authentication.service.security.IMyluteceDirectorySecurityService;
 import fr.paris.lutece.plugins.mylutece.modules.directory.authentication.service.security.MyluteceDirectorySecurityService;
 import fr.paris.lutece.plugins.mylutece.modules.directory.authentication.web.MyLuteceDirectoryApp;
+import fr.paris.lutece.plugins.mylutece.service.MyLutecePlugin;
 import fr.paris.lutece.portal.service.i18n.I18nService;
+import fr.paris.lutece.portal.service.plugin.Plugin;
+import fr.paris.lutece.portal.service.plugin.PluginService;
 import fr.paris.lutece.portal.service.security.LuteceUser;
 import fr.paris.lutece.portal.service.spring.SpringContextService;
 import fr.paris.lutece.portal.service.util.AppLogService;
+import fr.paris.lutece.portal.service.util.AppPathService;
 import fr.paris.lutece.portal.service.util.AppPropertiesService;
 
+import java.sql.Timestamp;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;
 
+import javax.security.auth.login.FailedLoginException;
 import javax.security.auth.login.LoginException;
-
 import javax.servlet.http.HttpServletRequest;
 
 
@@ -73,9 +82,15 @@ public class BaseAuthentication extends PortalAuthentication
     private static final String AUTH_SERVICE_NAME = AppPropertiesService.getProperty( "mylutece-directory.service.name" );
     private static final String CONSTANT_PATH_ICON = "images/local/skin/plugins/mylutece/modules/directory/mylutece-directory.png";
 
+    // PROPERTIES
+    private static final String PROPERTY_MAX_ACCESS_FAILED = "access_failures_max";
+    private static final String PROPERTY_INTERVAL_MINUTES = "access_failures_interval";
+
     // Messages properties
-    private static final String PROPERTY_MESSAGE_USER_NOT_FOUND_DATABASE = "module.mylutece.directory.message.userNotFoundDirectory";
+    private static final String PROPERTY_MESSAGE_USER_NOT_FOUND_DIRECTORY = "module.mylutece.directory.message.userNotFoundDirectory";
     private static final String PROPERTY_MESSAGE_USER_NOT_ACTIVATED = "module.mylutece.directory.message.userNotActivated";
+
+    private static IMyluteceDirectoryService _myluteceDirectoryService;
 
     /**
      * {@inheritDoc}
@@ -100,17 +115,41 @@ public class BaseAuthentication extends PortalAuthentication
      */
     @Override
     public LuteceUser login( String strUserName, String strUserPassword, HttpServletRequest request )
-        throws LoginException
+            throws LoginException
     {
+
+        // Creating a record of connections log
+        Plugin pluginMyLutece = PluginService.getPlugin( MyLutecePlugin.PLUGIN_NAME );
+        Plugin plugin = PluginService.getPlugin( MyluteceDirectoryPlugin.PLUGIN_NAME );
+        ConnectionLog connectionLog = new ConnectionLog( );
+        connectionLog.setIpAddress( request.getRemoteAddr( ) );
+        connectionLog.setDateLogin( new java.sql.Timestamp( new java.util.Date( ).getTime( ) ) );
+
+        // Test the number of errors during an interval of minutes
+        int nMaxFailed = MyluteceDirectoryParameterHome
+                .getIntegerSecurityParameter( PROPERTY_MAX_ACCESS_FAILED, plugin );
+        int nIntervalMinutes = MyluteceDirectoryParameterHome.getIntegerSecurityParameter( PROPERTY_INTERVAL_MINUTES,
+                plugin );
+
+        if ( nMaxFailed > 0 && nIntervalMinutes > 0 )
+        {
+            int nNbFailed = ConnectionLogHome.getLoginErrors( connectionLog, nIntervalMinutes, pluginMyLutece );
+
+            if ( nNbFailed > nMaxFailed )
+            {
+                throw new FailedLoginException( );
+            }
+        }
+
         Locale locale = request.getLocale(  );
-        IMyluteceDirectoryService myluteceDirectoryService = SpringContextService.getBean( MyluteceDirectoryService.BEAN_SERVICE );
-        BaseUser user = myluteceDirectoryService.getUserByLogin( strUserName, this, true );
+        BaseUser user = getMyluteceDirectoryService( ).getUserByLogin( strUserName, this, true );
 
         // Unable to find the user
         if ( user == null )
         {
             AppLogService.info( "Unable to find user in the directory : " + strUserName );
-            throw new LoginException( I18nService.getLocalizedString( PROPERTY_MESSAGE_USER_NOT_FOUND_DATABASE, locale ) );
+            throw new FailedLoginException(
+                    I18nService.getLocalizedString( PROPERTY_MESSAGE_USER_NOT_FOUND_DIRECTORY, locale ) );
         }
 
         IMyluteceDirectorySecurityService securityService = SpringContextService.getBean( MyluteceDirectorySecurityService.BEAN_SERVICE );
@@ -118,8 +157,9 @@ public class BaseAuthentication extends PortalAuthentication
         // Check password
         if ( !securityService.checkPassword( strUserName, strUserPassword ) )
         {
-            AppLogService.info( "User login : Incorrect login or password" + strUserName );
-            throw new LoginException( I18nService.getLocalizedString( PROPERTY_MESSAGE_USER_NOT_FOUND_DATABASE, locale ) );
+            AppLogService.info( "User login : Incorrect login or password " + strUserName );
+            throw new FailedLoginException(
+                    I18nService.getLocalizedString( PROPERTY_MESSAGE_USER_NOT_FOUND_DIRECTORY, locale ) );
         }
 
         // Check if user is activated
@@ -128,6 +168,15 @@ public class BaseAuthentication extends PortalAuthentication
             AppLogService.info( "User login : User is not activated" + strUserName );
             throw new LoginException( I18nService.getLocalizedString( PROPERTY_MESSAGE_USER_NOT_ACTIVATED, locale ) );
         }
+
+        // We update the status of the user if his password has become obsolete
+        Timestamp passwordMaxValidDate = MyluteceDirectoryHome.findPasswordMaxValideDateFromLogin( strUserName, plugin );
+        if ( passwordMaxValidDate != null && passwordMaxValidDate.getTime( ) < new java.util.Date( ).getTime( ) )
+        {
+            MyluteceDirectoryHome.updateResetPasswordFromLogin( strUserName, Boolean.TRUE, plugin );
+        }
+        int nUserId = MyluteceDirectoryHome.findUserIdFromLogin( strUserName, plugin );
+        getMyluteceDirectoryService( ).updateUserExpirationDate( nUserId, plugin );
 
         return user;
     }
@@ -139,6 +188,20 @@ public class BaseAuthentication extends PortalAuthentication
     public void logout( LuteceUser user )
     {
     }
+
+    /**
+     * Find a user's reset password property by login
+     * @param request The request
+     * @param strLogin the login
+     * @return DatabaseUser the user corresponding to the login
+     */
+    @Override
+    public boolean findResetPassword( HttpServletRequest request, String strLogin )
+    {
+        Plugin plugin = PluginService.getPlugin( MyluteceDirectoryPlugin.PLUGIN_NAME );
+        return MyluteceDirectoryHome.findResetPasswordFromLogin( strLogin, plugin );
+    }
+
 
     /**
      * {@inheritDoc}
@@ -213,9 +276,7 @@ public class BaseAuthentication extends PortalAuthentication
     @Override
     public Collection<LuteceUser> getUsers(  )
     {
-        IMyluteceDirectoryService myluteceDirectoryService = SpringContextService.getBean( MyluteceDirectoryService.BEAN_SERVICE );
-
-        return myluteceDirectoryService.getUsers( this );
+        return getMyluteceDirectoryService( ).getUsers( this );
     }
 
     /**
@@ -224,9 +285,7 @@ public class BaseAuthentication extends PortalAuthentication
     @Override
     public LuteceUser getUser( String userLogin )
     {
-        IMyluteceDirectoryService myluteceDirectoryService = SpringContextService.getBean( MyluteceDirectoryService.BEAN_SERVICE );
-
-        return myluteceDirectoryService.getUserByLogin( userLogin, this, false );
+        return getMyluteceDirectoryService( ).getUserByLogin( userLogin, this, false );
     }
 
     /**
@@ -278,4 +337,23 @@ public class BaseAuthentication extends PortalAuthentication
     {
         return MyluteceDirectoryPlugin.PLUGIN_NAME;
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getResetPasswordPageUrl( HttpServletRequest request )
+    {
+        return AppPathService.getBaseUrl( request ) + MyLuteceDirectoryApp.getResetPasswordUrl( );
+    }
+
+    private static IMyluteceDirectoryService getMyluteceDirectoryService( )
+    {
+        if ( _myluteceDirectoryService == null )
+        {
+            _myluteceDirectoryService = SpringContextService.getBean( MyluteceDirectoryService.BEAN_SERVICE );
+        }
+        return _myluteceDirectoryService;
+    }
+
 }

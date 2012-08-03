@@ -35,6 +35,7 @@ package fr.paris.lutece.plugins.mylutece.modules.directory.authentication.web;
 
 import fr.paris.lutece.plugins.directory.business.Directory;
 import fr.paris.lutece.plugins.directory.business.EntryFilter;
+import fr.paris.lutece.plugins.directory.business.EntryHome;
 import fr.paris.lutece.plugins.directory.business.IEntry;
 import fr.paris.lutece.plugins.directory.business.Record;
 import fr.paris.lutece.plugins.directory.business.RecordField;
@@ -51,6 +52,7 @@ import fr.paris.lutece.plugins.mylutece.business.attribute.MyLuteceUserField;
 import fr.paris.lutece.plugins.mylutece.business.attribute.MyLuteceUserFieldHome;
 import fr.paris.lutece.plugins.mylutece.modules.directory.authentication.business.MyluteceDirectoryUser;
 import fr.paris.lutece.plugins.mylutece.modules.directory.authentication.service.IMyluteceDirectoryService;
+import fr.paris.lutece.plugins.mylutece.modules.directory.authentication.service.MyluteceDirectoryAnonymizationService;
 import fr.paris.lutece.plugins.mylutece.modules.directory.authentication.service.MyluteceDirectoryPlugin;
 import fr.paris.lutece.plugins.mylutece.modules.directory.authentication.service.MyluteceDirectoryResourceIdService;
 import fr.paris.lutece.plugins.mylutece.modules.directory.authentication.service.MyluteceDirectoryService;
@@ -59,14 +61,13 @@ import fr.paris.lutece.plugins.mylutece.modules.directory.authentication.service
 import fr.paris.lutece.plugins.mylutece.service.MyLutecePlugin;
 import fr.paris.lutece.plugins.mylutece.service.RoleResourceIdService;
 import fr.paris.lutece.plugins.mylutece.service.attribute.MyLuteceUserFieldService;
+import fr.paris.lutece.plugins.mylutece.util.SecurityUtils;
 import fr.paris.lutece.portal.business.rbac.RBAC;
 import fr.paris.lutece.portal.business.role.Role;
 import fr.paris.lutece.portal.business.role.RoleHome;
 import fr.paris.lutece.portal.business.user.AdminUser;
 import fr.paris.lutece.portal.service.admin.AccessDeniedException;
-import fr.paris.lutece.portal.service.admin.AdminAuthenticationService;
 import fr.paris.lutece.portal.service.i18n.I18nService;
-import fr.paris.lutece.portal.service.mail.MailService;
 import fr.paris.lutece.portal.service.message.AdminMessage;
 import fr.paris.lutece.portal.service.message.AdminMessageService;
 import fr.paris.lutece.portal.service.plugin.Plugin;
@@ -74,6 +75,7 @@ import fr.paris.lutece.portal.service.plugin.PluginService;
 import fr.paris.lutece.portal.service.rbac.RBACService;
 import fr.paris.lutece.portal.service.spring.SpringContextService;
 import fr.paris.lutece.portal.service.template.AppTemplateService;
+import fr.paris.lutece.portal.service.template.DatabaseTemplateService;
 import fr.paris.lutece.portal.service.util.AppLogService;
 import fr.paris.lutece.portal.service.util.AppPathService;
 import fr.paris.lutece.portal.service.util.AppPropertiesService;
@@ -83,10 +85,7 @@ import fr.paris.lutece.portal.web.util.LocalizedPaginator;
 import fr.paris.lutece.util.ReferenceItem;
 import fr.paris.lutece.util.html.HtmlTemplate;
 import fr.paris.lutece.util.html.Paginator;
-import fr.paris.lutece.util.password.PasswordUtil;
 import fr.paris.lutece.util.url.UrlItem;
-
-import org.apache.commons.lang.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -95,6 +94,8 @@ import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
+
+import org.apache.commons.lang.StringUtils;
 
 
 /**
@@ -111,7 +112,8 @@ public class MyluteceDirectoryUserJspBean extends PluginAdminPageJspBean
     private static final String TEMPLATE_CREATE_USER = "admin/plugins/mylutece/modules/directory/create_user.html";
     private static final String TEMPLATE_MANAGE_ROLES_USER = "admin/plugins/mylutece/modules/directory/manage_roles_user.html";
     private static final String TEMPLATE_MANAGE_ADVANCED_PARAMETERS = "admin/plugins/mylutece/modules/directory/manage_advanced_parameters.html";
-    private static final String TEMPLATE_EMAIL_FORGOT_PASSWORD = "admin/plugins/mylutece/modules/directory/email_forgot_password.html";
+    private static final String TEMPLATE_FIELD_ANONYMIZE_USER = "admin/plugins/mylutece/modules/directory/field_anonymize_user.html";
+    private static final String TEMPLATE_ACCOUNT_LIFE_TIME_EMAIL = "admin/plugins/mylutece/modules/directory/account_life_time_email.html";
 
     // Jsp
     private static final String JSP_URL_PREFIX = "jsp/admin/plugins/mylutece/modules/directory/";
@@ -120,6 +122,9 @@ public class MyluteceDirectoryUserJspBean extends PluginAdminPageJspBean
     private static final String JSP_MANAGE_ADVANCED_PARAMETERS = "ManageAdvancedParameters.jsp";
     private static final String JSP_URL_MANAGE_ADVANCED_PARAMETERS = "jsp/admin/plugins/mylutece/modules/directory/ManageAdvancedParameters.jsp";
     private static final String JSP_URL_MODIFY_PASSWORD_ENCRYPTION = "jsp/admin/plugins/mylutece/modules/directory/DoModifyPasswordEncryption.jsp";
+    private static final String JSP_URL_USE_ADVANCED_SECUR_PARAM = "jsp/admin/plugins/mylutece/modules/directory/DoUseAdvancedSecurityParameters.jsp";
+    private static final String JSP_URL_REMOVE_ADVANCED_SECUR_PARAM = "jsp/admin/plugins/mylutece/modules/directory/DoRemoveAdvancedSecurityParameters.jsp";
+    private static final String JSP_URL_ANONYMIZE_USER = "jsp/admin/plugins/mylutece/modules/directory/DoAnonymizeUser.jsp";
 
     // properties
     private static final String PROPERTY_ITEM_PER_PAGE = "module.mylutece.directory.items_per_page";
@@ -132,10 +137,17 @@ public class MyluteceDirectoryUserJspBean extends PluginAdminPageJspBean
     private static final String PROPERTY_MESSAGE_CONFIRM_MODIFY_PASSWORD_ENCRYPTION = "module.mylutece.directory.manage_advanced_parameters.message.confirmModifyPasswordEncryption";
     private static final String PROPERTY_MESSAGE_NO_CHANGE_PASSWORD_ENCRYPTION = "module.mylutece.directory.manage_advanced_parameters.message.noChangePasswordEncryption";
     private static final String PROPERTY_MESSAGE_INVALID_ENCRYPTION_ALGORITHM = "module.mylutece.directory.manage_advanced_parameters.message.invalidEncryptionAlgorithm";
-    private static final String PROPERTY_NO_REPLY_EMAIL = "mail.noreply.email";
-    private static final String PROPERTY_MESSAGE_EMAIL_SUBJECT = "module.mylutece.directory.forgot_password.email.subject";
     private static final String MESSAGE_ERROR_DIRECTORY_NOT_FOUND = "module.mylutece.directory.message.error.directory_not_found";
     private static final String MESSAGE_ERROR_USER_NOT_FOUND = "module.mylutece.directory.message.error.user_not_found";
+    private static final String PROPERTY_MESSAGE_CONFIRM_USE_ASP = "mylutece.manage_advanced_parameters.message.confirmUseAdvancedSecurityParameters";
+    private static final String PROPERTY_MESSAGE_CONFIRM_REMOVE_ASP = "mylutece.manage_advanced_parameters.message.confirmRemoveAdvancedSecurityParameters";
+    private static final String PROPERTY_MESSAGE_TITLE_CHANGE_ANONYMIZE_USER = "mylutece.anonymize_user.titleAnonymizeUser";
+    private static final String PROPERTY_MESSAGE_NO_USER_SELECTED = "mylutece.message.noUserSelected";
+    private static final String PROPERTY_MESSAGE_CONFIRM_ANONYMIZE_USER = "mylutece.message.confirmAnonymizeUser";
+    private static final String PROPERTY_FIRST_EMAIL = "mylutece.accountLifeTime.labelFirstEmail";
+    private static final String PROPERTY_OTHER_EMAIL = "mylutece.accountLifeTime.labelOtherEmail";
+    private static final String PROPERTY_ACCOUNT_DEACTIVATES_EMAIL = "mylutece.accountLifeTime.labelAccountDeactivatedEmail";
+    private static final String PROPERTY_ACCOUNT_UPDATED_EMAIL = "mylutece.accountLifeTime.labelAccountUpdatedEmail";
 
     // Parameters
     private static final String PARAMETER_ID_DIRECTORY = "id_directory";
@@ -150,6 +162,22 @@ public class MyluteceDirectoryUserJspBean extends PluginAdminPageJspBean
     private static final String PARAMETER_ID_ROLE = "id_role";
     private static final String PARAMETER_ENABLE_PASSWORD_ENCRYPTION = "enable_password_encryption";
     private static final String PARAMETER_ENCRYPTION_ALGORITHM = "encryption_algorithm";
+    private static final String PARAMETER_ATTRIBUTE = "attribute_";
+    private static final String PARAMETER_DIRECTORY = "directory_";
+    private static final String PARAMETER_USER_LOGIN = "user_login";
+    private static final String PARAMETER_EMAIL_TYPE = "email_type";
+    private static final String PARAMETER_FIRST_ALERT_MAIL_SENDER = "first_alert_mail_sender";
+    private static final String PARAMETER_OTHER_ALERT_MAIL_SENDER = "other_alert_mail_sender";
+    private static final String PARAMETER_EXPIRED_ALERT_MAIL_SENDER = "expired_alert_mail_sender";
+    private static final String PARAMETER_REACTIVATED_ALERT_MAIL_SENDER = "account_reactivated_mail_sender";
+    private static final String PARAMETER_FIRST_ALERT_MAIL_SUBJECT = "first_alert_mail_subject";
+    private static final String PARAMETER_OTHER_ALERT_MAIL_SUBJECT = "other_alert_mail_subject";
+    private static final String PARAMETER_EXPIRED_ALERT_MAIL_SUBJECT = "expired_alert_mail_subject";
+    private static final String PARAMETER_REACTIVATED_ALERT_MAIL_SUBJECT = "account_reactivated_mail_subject";
+    private static final String PARAMETER_FIRST_ALERT_MAIL = "mylutece_directory_first_alert_mail";
+    private static final String PARAMETER_OTHER_ALERT_MAIL = "mylutece_directory_other_alert_mail";
+    private static final String PARAMETER_EXPIRATION_MAIL = "mylutece_directory_expiration_mail";
+    private static final String PARAMETER_ACCOUNT_REACTIVATED = "mylutece_directory_account_reactivated_mail";
 
     // Markers
     private static final String MARK_LOCALE = "locale";
@@ -175,14 +203,23 @@ public class MyluteceDirectoryUserJspBean extends PluginAdminPageJspBean
     private static final String MARK_ACTIVATE = "activate";
     private static final String MARK_ATTRIBUTES_LIST = "attributes_list";
     private static final String MARK_MAP_LIST_ATTRIBUTE_DEFAULT_VALUES = "map_list_attribute_default_values";
-    private static final String MARK_LOGIN_URL = "login_url";
-    private static final String MARK_NEW_PASSWORD = "new_password";
+    private static final String MARK_PERMISSION_ADVANCED_PARAMETER = "permission_advanced_parameter";
+    private static final String MARK_DIRECTORY_ATTRIBUTES = "directory_attributes";
+    private static final String MARK_EMAIL_SENDER = "email_sender";
+    private static final String MARK_EMAIL_SUBJECT = "email_subject";
+    private static final String MARK_EMAIL_BODY = "email_body";
+    private static final String MARK_EMAIL_LABEL = "emailLabel";
+    private static final String MARK_WEBAPP_URL = "webapp_url";
 
     // CONSTANTS
     private static final String CONSTANT_DEFAULT_ALGORITHM = "noValue";
     private static final String QUESTION_MARK = "?";
     private static final String AMPERSAND = "&";
     private static final String EQUAL = "=";
+    private static final String CONSTANT_EMAIL_TYPE_FIRST = "first";
+    private static final String CONSTANT_EMAIL_TYPE_OTHER = "other";
+    private static final String CONSTANT_EMAIL_TYPE_EXPIRED = "expired";
+    private static final String CONSTANT_EMAIL_TYPE_REACTIVATED = "reactivated";
 
     // Session fields
     private int _nDefaultItemsPerPage = AppPropertiesService.getPropertyInt( PROPERTY_ITEM_PER_PAGE, 50 );
@@ -191,6 +228,8 @@ public class MyluteceDirectoryUserJspBean extends PluginAdminPageJspBean
     private HashMap<String, List<RecordField>> _mapQuery;
     private IMyluteceDirectoryService _myluteceDirectoryService = SpringContextService.getBean( MyluteceDirectoryService.BEAN_SERVICE );
     private IMyluteceDirectoryParameterService _parameterService = SpringContextService.getBean( MyluteceDirectoryParameterService.BEAN_SERVICE );
+    private MyluteceDirectoryAnonymizationService _anonymizationService = SpringContextService
+            .getBean( MyluteceDirectoryAnonymizationService.BEAN_SERVICE );
 
     /**
      * Creates a new DirectoryJspBean object.
@@ -335,6 +374,12 @@ public class MyluteceDirectoryUserJspBean extends PluginAdminPageJspBean
             model.put( MARK_DIRECTORY, directory );
             model.put( MARK_DIRECTORY_RECORD_LIST, listRecords );
             model.put( MARK_NUMBER_RECORD, paginator.getItemsCount(  ) );
+
+            boolean bPermissionAdvancedParameter = RBACService.isAuthorized(
+                    MyluteceDirectoryResourceIdService.RESOURCE_TYPE, RBAC.WILDCARD_RESOURCES_ID,
+                    MyluteceDirectoryResourceIdService.PERMISSION_MANAGE, getUser( ) );
+
+            model.put( MARK_PERMISSION_ADVANCED_PARAMETER, bPermissionAdvancedParameter );
 
             setPageTitleProperty( StringUtils.EMPTY );
         }
@@ -481,6 +526,14 @@ public class MyluteceDirectoryUserJspBean extends PluginAdminPageJspBean
             return AdminMessageService.getMessageUrl( request, Messages.MANDATORY_FIELDS, AdminMessage.TYPE_STOP );
         }
 
+        String retUrl = SecurityUtils
+                .checkPasswordForBackOffice( _parameterService, getPlugin( ), strPassword, request );
+
+        if ( retUrl != null )
+        {
+            return retUrl;
+        }
+        
         int nIdRecord = Integer.parseInt( strIdRecord );
 
         Collection<MyluteceDirectoryUser> listDirectoryUsers = _myluteceDirectoryService.getMyluteceDirectoryUsersForLogin( strLogin,
@@ -494,7 +547,9 @@ public class MyluteceDirectoryUserJspBean extends PluginAdminPageJspBean
         MyluteceDirectoryUser myluteceDirectoryUser = new MyluteceDirectoryUser(  );
         myluteceDirectoryUser.setLogin( strLogin );
         myluteceDirectoryUser.setIdRecord( nIdRecord );
-        myluteceDirectoryUser.setActivated( StringUtils.isNotBlank( strActivate ) );
+        int nStatus = StringUtils.isNotBlank( strActivate ) ? MyluteceDirectoryUser.STATUS_ACTIVATED
+                : MyluteceDirectoryUser.STATUS_NOT_ACTIVATED;
+        myluteceDirectoryUser.setStatus( nStatus );
 
         String strError = MyLuteceUserFieldService.checkUserFields( request, getLocale(  ) );
 
@@ -504,6 +559,7 @@ public class MyluteceDirectoryUserJspBean extends PluginAdminPageJspBean
         }
 
         _myluteceDirectoryService.doCreateMyluteceDirectoryUser( myluteceDirectoryUser, strPassword, getPlugin(  ) );
+        _myluteceDirectoryService.doModifyResetPassword( myluteceDirectoryUser, true, getPlugin( ) );
         MyLuteceUserFieldService.doCreateUserFields( myluteceDirectoryUser.getIdRecord(  ), request, getLocale(  ) );
 
         Record record = _myluteceDirectoryService.getRecord( nIdRecord, false );
@@ -530,12 +586,23 @@ public class MyluteceDirectoryUserJspBean extends PluginAdminPageJspBean
         String strPassword = request.getParameter( PARAMETER_PASSWORD );
         String strActivate = request.getParameter( PARAMETER_ACTIVATE );
         String strModifyPassword = request.getParameter( PARAMETER_MODIFY_PASSWORD );
+        boolean bModifyPassword = StringUtils.isNotBlank( strModifyPassword );
 
-        if ( StringUtils.isBlank( strLogin ) || StringUtils.isBlank( strIdRecord ) ||
-                !StringUtils.isNumeric( strIdRecord ) ||
-                ( StringUtils.isNotBlank( strModifyPassword ) && StringUtils.isBlank( strPassword ) ) )
+        if ( StringUtils.isBlank( strLogin ) || StringUtils.isBlank( strIdRecord )
+                || !StringUtils.isNumeric( strIdRecord ) || ( bModifyPassword && StringUtils.isBlank( strPassword ) ) )
         {
             return AdminMessageService.getMessageUrl( request, Messages.MANDATORY_FIELDS, AdminMessage.TYPE_STOP );
+        }
+
+        int nStatus = StringUtils.isNotBlank( strActivate ) ? MyluteceDirectoryUser.STATUS_ACTIVATED
+                : MyluteceDirectoryUser.STATUS_NOT_ACTIVATED;
+
+        String retUrl = SecurityUtils
+                .checkPasswordForBackOffice( _parameterService, getPlugin( ), strPassword, request );
+
+        if ( retUrl != null )
+        {
+            return retUrl;
         }
 
         int nIdRecord = Integer.parseInt( strIdRecord );
@@ -556,7 +623,7 @@ public class MyluteceDirectoryUserJspBean extends PluginAdminPageJspBean
             myluteceDirectoryUser = new MyluteceDirectoryUser(  );
             myluteceDirectoryUser.setLogin( strLogin );
             myluteceDirectoryUser.setIdRecord( nIdRecord );
-            myluteceDirectoryUser.setActivated( StringUtils.isNotBlank( strActivate ) );
+            myluteceDirectoryUser.setStatus( nStatus );
 
             String strError = MyLuteceUserFieldService.checkUserFields( request, getLocale(  ) );
 
@@ -566,6 +633,7 @@ public class MyluteceDirectoryUserJspBean extends PluginAdminPageJspBean
             }
 
             _myluteceDirectoryService.doCreateMyluteceDirectoryUser( myluteceDirectoryUser, strPassword, getPlugin(  ) );
+            _myluteceDirectoryService.doModifyResetPassword( myluteceDirectoryUser, Boolean.TRUE, getPlugin( ) );
             MyLuteceUserFieldService.doCreateUserFields( myluteceDirectoryUser.getIdRecord(  ), request, getLocale(  ) );
         }
         else
@@ -578,7 +646,7 @@ public class MyluteceDirectoryUserJspBean extends PluginAdminPageJspBean
 
             myluteceDirectoryUser.setLogin( strLogin );
             myluteceDirectoryUser.setIdRecord( nIdRecord );
-            myluteceDirectoryUser.setActivated( StringUtils.isNotBlank( strActivate ) );
+            myluteceDirectoryUser.setStatus( nStatus );
 
             String strError = MyLuteceUserFieldService.checkUserFields( request, getLocale(  ) );
 
@@ -589,9 +657,10 @@ public class MyluteceDirectoryUserJspBean extends PluginAdminPageJspBean
 
             _myluteceDirectoryService.doModifyMyluteceDirectoryUser( myluteceDirectoryUser, getPlugin(  ) );
 
-            if ( StringUtils.isNotBlank( strModifyPassword ) )
+            if ( bModifyPassword )
             {
                 _myluteceDirectoryService.doModifyPassword( myluteceDirectoryUser, strPassword, getPlugin(  ) );
+                _myluteceDirectoryService.doModifyResetPassword( myluteceDirectoryUser, Boolean.FALSE, getPlugin( ) );
             }
 
             MyLuteceUserFieldService.doModifyUserFields( myluteceDirectoryUser.getIdRecord(  ), request, getLocale(  ),
@@ -809,9 +878,29 @@ public class MyluteceDirectoryUserJspBean extends PluginAdminPageJspBean
     }
 
     /**
+     * Do modify the directory user parameters
+     * @param request the HTTP request
+     * @return the JSP return
+     * @throws AccessDeniedException access denied if the user does have the
+     *             right
+     */
+    public String doModifyDatabaseUserParameters( HttpServletRequest request ) throws AccessDeniedException
+    {
+        if ( !RBACService.isAuthorized( MyluteceDirectoryResourceIdService.RESOURCE_TYPE, RBAC.WILDCARD_RESOURCES_ID,
+                MyluteceDirectoryResourceIdService.PERMISSION_MANAGE, getUser( ) ) )
+        {
+            throw new AccessDeniedException( );
+        }
+
+        SecurityUtils.updateSecurityParameters( _parameterService, request, getPlugin( ) );
+
+        return JSP_MANAGE_ADVANCED_PARAMETERS;
+    }
+
+    /**
      * Returns the page of confirmation for modifying the password
      * encryption
-     *
+     * 
      * @param request The Http Request
      * @return the confirmation url
      */
@@ -903,42 +992,293 @@ public class MyluteceDirectoryUserJspBean extends PluginAdminPageJspBean
         _parameterService.update( userParamEnablePwdEncryption, getPlugin(  ) );
         _parameterService.update( userParamEncryptionAlgorithm, getPlugin(  ) );
 
-        // Alert all users their password have been reinitialized.
-        Collection<MyluteceDirectoryUser> listUsers = _myluteceDirectoryService.getMyluteceDirectoryUsers( getPlugin(  ) );
+        _myluteceDirectoryService.changeUserPasswordAndNotify( AppPathService.getBaseUrl( request ), getPlugin( ),
+                request.getLocale( ) );
 
-        for ( MyluteceDirectoryUser user : listUsers )
+        return JSP_MANAGE_ADVANCED_PARAMETERS;
+    }
+
+    /**
+     * Get the admin message to confirm the enabling or the disabling of the
+     * advanced security parameters
+     * @param request The request
+     * @return The url of the admin message
+     */
+    public String getChangeUseAdvancedSecurityParameters( HttpServletRequest request )
+    {
+        if ( SecurityUtils.isAdvancedSecurityParametersUsed( _parameterService, getPlugin( ) ) )
         {
-            // make password
-            String strPassword = PasswordUtil.makePassword(  );
+            return AdminMessageService.getMessageUrl( request, PROPERTY_MESSAGE_CONFIRM_REMOVE_ASP,
+                    JSP_URL_REMOVE_ADVANCED_SECUR_PARAM, AdminMessage.TYPE_CONFIRMATION );
+        }
+        else
+        {
+            return AdminMessageService.getMessageUrl( request, PROPERTY_MESSAGE_CONFIRM_USE_ASP,
+                    JSP_URL_USE_ADVANCED_SECUR_PARAM, AdminMessage.TYPE_CONFIRMATION );
+        }
+    }
 
-            MyluteceDirectoryUser userStored = _myluteceDirectoryService.getMyluteceDirectoryUser( user.getIdRecord(  ),
-                    getPlugin(  ) );
-            _myluteceDirectoryService.doRemoveMyluteceDirectoryUser( userStored, getPlugin(  ), false );
-            _myluteceDirectoryService.doCreateMyluteceDirectoryUser( userStored, strPassword, getPlugin(  ) );
+    /**
+     * Enable advanced security parameters, and change users password if
+     * password encryption change
+     * @param request The request
+     * @return The Jsp URL of the process result
+     */
+    public String doUseAdvancedSecurityParameters( HttpServletRequest request )
+    {
+        boolean isPwdEncryptionEnabled = _parameterService.isPasswordEncrypted( getPlugin( ) );
+        String strEncryptionAlgorithm = _parameterService.getEncryptionAlgorithm( getPlugin( ) );
 
-            List<String> listEmails = _myluteceDirectoryService.getListEmails( userStored, getPlugin(  ), getLocale(  ) );
+        SecurityUtils.useAdvancedSecurityParameters( _parameterService, getPlugin( ) );
+        
+        if ( !isPwdEncryptionEnabled
+                || !StringUtils
+                        .equals( strEncryptionAlgorithm, _parameterService.getEncryptionAlgorithm( getPlugin( ) ) ) )
+        {
+            _myluteceDirectoryService.changeUserPasswordAndNotify( AppPathService.getBaseUrl( request ), getPlugin( ),
+                    request.getLocale( ) );
+        }
+        return JSP_MANAGE_ADVANCED_PARAMETERS;
+    }
 
-            if ( ( listEmails != null ) && !listEmails.isEmpty(  ) )
+    /**
+     * Disable advanced security parameters
+     * @param request The request
+     * @return The Jsp URL of the process result
+     */
+    public String doRemoveAdvancedSecurityParameters( HttpServletRequest request )
+    {
+        SecurityUtils.removeAdvancedSecurityParameters( _parameterService, getPlugin( ) );
+        return JSP_MANAGE_ADVANCED_PARAMETERS;
+    }
+
+    /**
+     * Get the page with the list of every anonymizable attribute
+     * @param request The request
+     * @return The admin page
+     */
+    public String getChangeFieldAnonymizeAdminUsers( HttpServletRequest request )
+    {
+        Map<String, Object> model = new HashMap<String, Object>( );
+        Plugin pluginMyLutece = PluginService.getPlugin( MyLutecePlugin.PLUGIN_NAME );
+        List<IAttribute> listAllAttributes = AttributeHome.findAll( getLocale( ), pluginMyLutece );
+        List<IAttribute> listAttributesText = new ArrayList<IAttribute>( );
+        for ( IAttribute attribut : listAllAttributes )
+        {
+            if ( attribut.isAnonymizable( ) )
             {
-                //send password by e-mail
-                String strSenderEmail = AppPropertiesService.getProperty( PROPERTY_NO_REPLY_EMAIL );
-                String strEmailSubject = I18nService.getLocalizedString( PROPERTY_MESSAGE_EMAIL_SUBJECT, getLocale(  ) );
-                Map<String, Object> model = new HashMap<String, Object>(  );
-                model.put( MARK_NEW_PASSWORD, strPassword );
-                model.put( MARK_LOGIN_URL,
-                    AppPathService.getBaseUrl( request ) +
-                    AdminAuthenticationService.getInstance(  ).getLoginPageUrl(  ) );
-
-                HtmlTemplate template = AppTemplateService.getTemplate( TEMPLATE_EMAIL_FORGOT_PASSWORD, getLocale(  ),
-                        model );
-
-                for ( String email : listEmails )
-                {
-                    MailService.sendMailHtml( email, strSenderEmail, strSenderEmail, strEmailSubject,
-                        template.getHtml(  ) );
-                }
+                listAttributesText.add( attribut );
             }
         }
+        model.put( MARK_ATTRIBUTES_LIST, listAttributesText );
+
+        Map<String, Boolean> staticFields = AttributeHome.getAnonymizationStatusUserStaticField( pluginMyLutece );
+
+        Plugin directoryPlugin = PluginService.getPlugin( DirectoryPlugin.PLUGIN_NAME );
+        List<IEntry> entryList = EntryHome.getEntryListAnonymizeStatus( directoryPlugin );
+
+        model.putAll( staticFields );
+        model.put( MARK_DIRECTORY_ATTRIBUTES, entryList );
+        
+
+        setPageTitleProperty( PROPERTY_MESSAGE_TITLE_CHANGE_ANONYMIZE_USER );
+
+        HtmlTemplate template = AppTemplateService.getTemplate( TEMPLATE_FIELD_ANONYMIZE_USER, getLocale( ),
+                model );
+
+        return getAdminPage( template.getHtml( ) );
+    }
+
+    /**
+     * Change the anonymization status of user parameters.
+     * @param request The request
+     * @return the Jsp URL of the process result
+     */
+    public String doChangeFieldAnonymizeUsers( HttpServletRequest request )
+    {
+        Plugin pluginMyLutece = PluginService.getPlugin( MyLutecePlugin.PLUGIN_NAME );
+        AttributeHome.updateAnonymizationStatusUserStaticField( PARAMETER_USER_LOGIN,
+                Boolean.valueOf( request.getParameter( PARAMETER_USER_LOGIN ) ), pluginMyLutece );
+
+        List<IAttribute> listAllAttributes = AttributeHome.findAll( getLocale( ), pluginMyLutece );
+        List<IAttribute> listAttributesText = new ArrayList<IAttribute>( );
+        for ( IAttribute attribut : listAllAttributes )
+        {
+            if ( attribut.isAnonymizable( ) )
+            {
+                listAttributesText.add( attribut );
+            }
+        }
+
+        for ( IAttribute attribute : listAttributesText )
+        {
+            Boolean bNewValue = Boolean.valueOf( request.getParameter( PARAMETER_ATTRIBUTE
+                    + Integer.toString( attribute.getIdAttribute( ) ) ) );
+            AttributeHome.updateAttributeAnonymization( attribute.getIdAttribute( ), bNewValue, pluginMyLutece );
+        }
+
+        Plugin directoryPlugin = PluginService.getPlugin( DirectoryPlugin.PLUGIN_NAME );
+        List<IEntry> entryList = EntryHome.getEntryListAnonymizeStatus( directoryPlugin );
+
+        for ( IEntry entry : entryList )
+        {
+            Boolean bNewValue = Boolean.valueOf( request.getParameter( PARAMETER_DIRECTORY
+                    + Integer.toString( entry.getIdEntry( ) ) ) );
+            if ( bNewValue.booleanValue( ) != entry.getAnonymize( ) )
+            {
+                EntryHome.updateEntryAnonymizeStatus( entry.getIdEntry( ), bNewValue, directoryPlugin );
+            }
+        }
+        return JSP_MANAGE_ADVANCED_PARAMETERS;
+    }
+
+    /**
+     * Get the confirmation page before anonymizing a user.
+     * @param request The request
+     * @return The URL of the confirmation page
+     */
+    public String getAnonymizeUser( HttpServletRequest request )
+    {
+        UrlItem url = new UrlItem( JSP_URL_ANONYMIZE_USER );
+
+        String strUserId = request.getParameter( PARAMETER_ID_RECORD );
+        if ( strUserId == null || strUserId.isEmpty( ) )
+        {
+            return AdminMessageService.getMessageUrl( request, PROPERTY_MESSAGE_NO_USER_SELECTED,
+                    AdminMessage.TYPE_STOP );
+        }
+
+        url.addParameter( PARAMETER_ID_RECORD, strUserId );
+
+        return AdminMessageService.getMessageUrl( request, PROPERTY_MESSAGE_CONFIRM_ANONYMIZE_USER, url.getUrl( ),
+                AdminMessage.TYPE_CONFIRMATION );
+    }
+
+    /**
+     * Anonymize a user
+     * @param request The request
+     * @return The Jsp URL of the process result
+     */
+    public String doAnonymizeUser( HttpServletRequest request )
+    {
+        String strUserId = request.getParameter( PARAMETER_ID_RECORD );
+        if ( strUserId == null || strUserId.isEmpty( ) )
+        {
+            return AdminMessageService.getMessageUrl( request, PROPERTY_MESSAGE_NO_USER_SELECTED,
+                    AdminMessage.TYPE_STOP );
+        }
+
+        _anonymizationService.anonymizeUser( Integer.parseInt( strUserId ), getLocale( ) );
+
+        return JSP_URL_MANAGE_DIRECTORY_RECORD;
+    }
+
+    /**
+     * Get the modify account life time emails page
+     * @param request The request
+     * @return The html to display
+     */
+    public String getModifyAccountLifeTimeEmails( HttpServletRequest request )
+    {
+        String strEmailType = request.getParameter( PARAMETER_EMAIL_TYPE );
+
+        Map<String, Object> model = new HashMap<String, Object>( );
+        String strSenderKey = StringUtils.EMPTY;
+        String strSubjectKey = StringUtils.EMPTY;
+        String strBodyKey = StringUtils.EMPTY;
+        String strTitle = StringUtils.EMPTY;
+
+        if ( CONSTANT_EMAIL_TYPE_FIRST.equalsIgnoreCase( strEmailType ) )
+        {
+            strSenderKey = PARAMETER_FIRST_ALERT_MAIL_SENDER;
+            strSubjectKey = PARAMETER_FIRST_ALERT_MAIL_SUBJECT;
+            strBodyKey = PARAMETER_FIRST_ALERT_MAIL;
+            strTitle = PROPERTY_FIRST_EMAIL;
+        }
+        else if ( CONSTANT_EMAIL_TYPE_OTHER.equalsIgnoreCase( strEmailType ) )
+        {
+            strSenderKey = PARAMETER_OTHER_ALERT_MAIL_SENDER;
+            strSubjectKey = PARAMETER_OTHER_ALERT_MAIL_SUBJECT;
+            strBodyKey = PARAMETER_OTHER_ALERT_MAIL;
+            strTitle = PROPERTY_OTHER_EMAIL;
+        }
+        else if ( CONSTANT_EMAIL_TYPE_EXPIRED.equalsIgnoreCase( strEmailType ) )
+        {
+            strSenderKey = PARAMETER_EXPIRED_ALERT_MAIL_SENDER;
+            strSubjectKey = PARAMETER_EXPIRED_ALERT_MAIL_SUBJECT;
+            strBodyKey = PARAMETER_EXPIRATION_MAIL;
+            strTitle = PROPERTY_ACCOUNT_DEACTIVATES_EMAIL;
+        }
+        else if ( CONSTANT_EMAIL_TYPE_REACTIVATED.equalsIgnoreCase( strEmailType ) )
+        {
+            strSenderKey = PARAMETER_REACTIVATED_ALERT_MAIL_SENDER;
+            strSubjectKey = PARAMETER_REACTIVATED_ALERT_MAIL_SUBJECT;
+            strBodyKey = PARAMETER_ACCOUNT_REACTIVATED;
+            strTitle = PROPERTY_ACCOUNT_UPDATED_EMAIL;
+        }
+
+        ReferenceItem referenceItem = _parameterService.findByKey( strSenderKey, getPlugin( ) );
+        String strSender = referenceItem == null ? StringUtils.EMPTY : referenceItem.getName( );
+
+        referenceItem = _parameterService.findByKey( strSubjectKey, getPlugin( ) );
+        String strSubject = referenceItem == null ? StringUtils.EMPTY : referenceItem.getName( );
+
+        model.put( PARAMETER_EMAIL_TYPE, strEmailType );
+        model.put( MARK_EMAIL_SENDER, strSender );
+        model.put( MARK_EMAIL_SUBJECT, strSubject );
+        model.put( MARK_EMAIL_BODY, DatabaseTemplateService.getTemplateFromKey( strBodyKey ) );
+        model.put( MARK_EMAIL_LABEL, strTitle );
+        model.put( MARK_WEBAPP_URL, AppPathService.getBaseUrl( request ) );
+        model.put( MARK_LOCALE, request.getLocale( ) );
+
+        HtmlTemplate template = AppTemplateService.getTemplate( TEMPLATE_ACCOUNT_LIFE_TIME_EMAIL, getLocale( ), model );
+
+        return getAdminPage( template.getHtml( ) );
+    }
+
+    /**
+     * Update an account life time email
+     * @param request The request
+     * @return The Jsp URL of the process result
+     */
+    public String doModifyAccountLifeTimeEmails( HttpServletRequest request )
+    {
+        String strEmailType = request.getParameter( PARAMETER_EMAIL_TYPE );
+
+        String strSenderKey = StringUtils.EMPTY;
+        String strSubjectKey = StringUtils.EMPTY;
+        String strBodyKey = StringUtils.EMPTY;
+
+        if ( CONSTANT_EMAIL_TYPE_FIRST.equalsIgnoreCase( strEmailType ) )
+        {
+            strSenderKey = PARAMETER_FIRST_ALERT_MAIL_SENDER;
+            strSubjectKey = PARAMETER_FIRST_ALERT_MAIL_SUBJECT;
+            strBodyKey = PARAMETER_FIRST_ALERT_MAIL;
+        }
+        else if ( CONSTANT_EMAIL_TYPE_OTHER.equalsIgnoreCase( strEmailType ) )
+        {
+            strSenderKey = PARAMETER_OTHER_ALERT_MAIL_SENDER;
+            strSubjectKey = PARAMETER_OTHER_ALERT_MAIL_SUBJECT;
+            strBodyKey = PARAMETER_OTHER_ALERT_MAIL;
+        }
+        else if ( CONSTANT_EMAIL_TYPE_EXPIRED.equalsIgnoreCase( strEmailType ) )
+        {
+            strSenderKey = PARAMETER_EXPIRED_ALERT_MAIL_SENDER;
+            strSubjectKey = PARAMETER_EXPIRED_ALERT_MAIL_SUBJECT;
+            strBodyKey = PARAMETER_EXPIRATION_MAIL;
+        }
+        else if ( CONSTANT_EMAIL_TYPE_REACTIVATED.equalsIgnoreCase( strEmailType ) )
+        {
+            strSenderKey = PARAMETER_REACTIVATED_ALERT_MAIL_SENDER;
+            strSubjectKey = PARAMETER_REACTIVATED_ALERT_MAIL_SUBJECT;
+            strBodyKey = PARAMETER_ACCOUNT_REACTIVATED;
+        }
+
+        SecurityUtils.updateParameterValue( _parameterService, getPlugin( ), strSenderKey,
+                request.getParameter( MARK_EMAIL_SENDER ) );
+        SecurityUtils.updateParameterValue( _parameterService, getPlugin( ), strSubjectKey,
+                request.getParameter( MARK_EMAIL_SUBJECT ) );
+        DatabaseTemplateService.updateTemplate( strBodyKey, request.getParameter( MARK_EMAIL_BODY ) );
 
         return JSP_MANAGE_ADVANCED_PARAMETERS;
     }

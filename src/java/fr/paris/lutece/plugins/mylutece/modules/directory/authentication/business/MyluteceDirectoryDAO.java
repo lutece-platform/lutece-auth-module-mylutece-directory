@@ -36,6 +36,7 @@ package fr.paris.lutece.plugins.mylutece.modules.directory.authentication.busine
 import fr.paris.lutece.portal.service.plugin.Plugin;
 import fr.paris.lutece.util.sql.DAOUtil;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -54,6 +55,7 @@ public class MyluteceDirectoryDAO implements IMyluteceDirectoryDAO
     private static final String SQL_QUERY_UNASSIGN_DIRECTORIES = "DELETE FROM mylutece_directory_directory ";
     private static final String SQL_QUERY_FIND_ROLES_FROM_LOGIN = "SELECT b.role_key FROM mylutece_directory_user a, mylutece_directory_user_role b" +
         " WHERE a.id_record = b.id_record AND a.user_login like ? ";
+    private static final String SQL_QUERY_FIND_RESET_PASSWORD = "SELECT reset_password FROM mylutece_directory_user WHERE user_login like ? ";
     private static final String SQL_QUERY_FIND_LOGINS_FROM_ROLE = "SELECT a.user_login FROM mylutece_directory_user a, mylutece_directory_user_role b" +
         " WHERE a.id_record = b.id_record AND b.role_key = ? ";
     private static final String SQL_QUERY_DELETE_ROLES_FOR_USER = "DELETE FROM mylutece_directory_user_role WHERE id_record = ?";
@@ -62,7 +64,10 @@ public class MyluteceDirectoryDAO implements IMyluteceDirectoryDAO
         " WHERE a.id_record = b.id_record AND a.user_login like ? ";
     private static final String SQL_QUERY_DELETE_GROUPS_FOR_USER = "DELETE FROM mylutece_directory_user_group WHERE id_record = ?";
     private static final String SQL_QUERY_INSERT_GROUP_FOR_USER = "INSERT INTO mylutece_directory_user_group ( id_record, group_key ) VALUES ( ?, ? ) ";
-
+    private static final String SQL_QUERY_FIND_PASSWORD_MAX_VALID_DATE = "SELECT password_max_valid_date FROM mylutece_directory_user WHERE user_login like ? ";
+    private static final String SQL_QUERY_UPDATE_RESET_PASSWORD_FROM_LOGIN = "UPDATE mylutece_directory_user SET reset_password = ? WHERE user_login like ? ";
+    private static final String SQL_QUERY_SELECT_USER_ID_FROM_LOGIN = "SELECT id_record FROM mylutece_directory_user WHERE user_login like ? ";
+    
     /**
      * {@inheritDoc}
      */
@@ -82,6 +87,48 @@ public class MyluteceDirectoryDAO implements IMyluteceDirectoryDAO
         daoUtil.free(  );
 
         return arrayRoles;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean selectResetPasswordFromLogin( String strLogin, Plugin plugin )
+    {
+        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_FIND_RESET_PASSWORD, plugin );
+        daoUtil.setString( 1, strLogin );
+        daoUtil.executeQuery( );
+
+        if ( !daoUtil.next( ) )
+        {
+            daoUtil.free( );
+
+            return false;
+        }
+
+        boolean bResetPassword = daoUtil.getBoolean( 1 );
+        daoUtil.free( );
+
+        return bResetPassword;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Timestamp selectPasswordMaxValideDateFromLogin( String strLogin, Plugin plugin )
+    {
+        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_FIND_PASSWORD_MAX_VALID_DATE, plugin );
+        daoUtil.setString( 1, strLogin );
+        daoUtil.executeQuery( );
+
+        Timestamp passwordMaxValideDate = null;
+        if ( daoUtil.next( ) )
+        {
+            passwordMaxValideDate = daoUtil.getTimestamp( 1 );
+        }
+        daoUtil.free( );
+        return passwordMaxValideDate;
     }
 
     /**
@@ -261,5 +308,38 @@ public class MyluteceDirectoryDAO implements IMyluteceDirectoryDAO
 
         daoUtil.executeUpdate(  );
         daoUtil.free(  );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void updateResetPasswordFromLogin( String strUserName, boolean bNewValue, Plugin plugin )
+    {
+        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_UPDATE_RESET_PASSWORD_FROM_LOGIN, plugin );
+
+        daoUtil.setBoolean( 1, bNewValue );
+        daoUtil.setString( 2, strUserName );
+        daoUtil.executeUpdate( );
+
+        daoUtil.free( );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int findUserIdFromLogin( String strLogin, Plugin plugin )
+    {
+        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECT_USER_ID_FROM_LOGIN, plugin );
+        daoUtil.setString( 1, strLogin );
+        daoUtil.executeQuery( );
+        int nRes = -1;
+        if ( daoUtil.next( ) )
+        {
+            nRes = daoUtil.getInt( 1 );
+        }
+        daoUtil.free( );
+        return nRes;
     }
 }

@@ -53,6 +53,33 @@
         </admin-feature>
     </admin-features>
 
+	<daemons>
+        <daemon>
+            <daemon-id>myluteceDirectoryAnonymizationDaemon</daemon-id>
+            <daemon-name>
+                mylutece.daemon.anonymizationDaemon.name
+			</daemon-name>
+            <daemon-description>
+                mylutece.daemon.anonymizationDaemon.description
+			</daemon-description>
+            <daemon-class>
+                fr.paris.lutece.plugins.mylutece.modules.directory.authentication.service.MyluteceDirectoryAnonymizationDaemon
+			</daemon-class>
+        </daemon>
+        <daemon>
+            <daemon-id>myluteceDirectoryAccountLifeTimeDaemon</daemon-id>
+            <daemon-name>
+                mylutece.daemon.accountLifeTimeDaemon.name
+			</daemon-name>
+            <daemon-description>
+                mylutece.daemon.accountLifeTimeDaemon.description
+			</daemon-description>
+            <daemon-class>
+                fr.paris.lutece.plugins.mylutece.modules.directory.authentication.service.MyluteceDirectoryAccountLifeTimeDaemon
+			</daemon-class>
+        </daemon>
+    </daemons>
+
     <!-- RBAC Resources -->
     <rbac-resource-types>
         <rbac-resource-type>

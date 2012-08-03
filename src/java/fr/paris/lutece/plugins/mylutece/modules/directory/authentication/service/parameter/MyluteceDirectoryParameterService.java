@@ -33,9 +33,14 @@
  */
 package fr.paris.lutece.plugins.mylutece.modules.directory.authentication.service.parameter;
 
+import fr.paris.lutece.plugins.mylutece.modules.directory.authentication.business.MyluteceDirectoryUserHome;
 import fr.paris.lutece.plugins.mylutece.modules.directory.authentication.business.parameter.MyluteceDirectoryParameterHome;
 import fr.paris.lutece.portal.service.plugin.Plugin;
 import fr.paris.lutece.util.ReferenceItem;
+import fr.paris.lutece.util.ReferenceList;
+
+import java.sql.Timestamp;
+import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -78,6 +83,15 @@ public class MyluteceDirectoryParameterService implements IMyluteceDirectoryPara
      * {@inheritDoc}
      */
     @Override
+    public ReferenceList findAll( Plugin plugin )
+    {
+        return MyluteceDirectoryParameterHome.findAll( plugin );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public boolean isPasswordEncrypted( Plugin plugin )
     {
         boolean bIsPasswordEncrypted = false;
@@ -106,5 +120,23 @@ public class MyluteceDirectoryParameterService implements IMyluteceDirectoryPara
         }
 
         return strAlgorithm;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int countUserPasswordHistoryFromDate( Timestamp minDate, int nUserId, Plugin plugin )
+    {
+        return MyluteceDirectoryUserHome.countUserPasswordHistoryFromDate( minDate, nUserId, plugin );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<String> selectUserPasswordHistory( int nUserID, Plugin plugin )
+    {
+        return MyluteceDirectoryUserHome.selectUserPasswordHistory( nUserID, plugin );
     }
 }

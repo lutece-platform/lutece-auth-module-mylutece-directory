@@ -36,9 +36,9 @@ package fr.paris.lutece.plugins.mylutece.modules.directory.authentication.servic
 import fr.paris.lutece.plugins.mylutece.modules.directory.authentication.business.MyluteceDirectoryUserHome;
 import fr.paris.lutece.plugins.mylutece.modules.directory.authentication.service.MyluteceDirectoryPlugin;
 import fr.paris.lutece.plugins.mylutece.modules.directory.authentication.service.parameter.IMyluteceDirectoryParameterService;
+import fr.paris.lutece.plugins.mylutece.util.SecurityUtils;
 import fr.paris.lutece.portal.service.plugin.Plugin;
 import fr.paris.lutece.portal.service.plugin.PluginService;
-import fr.paris.lutece.portal.service.util.CryptoService;
 
 import javax.inject.Inject;
 
@@ -62,7 +62,8 @@ public class MyluteceDirectorySecurityService implements IMyluteceDirectorySecur
     {
         Plugin plugin = PluginService.getPlugin( MyluteceDirectoryPlugin.PLUGIN_NAME );
 
-        return MyluteceDirectoryUserHome.checkPassword( strUserName, buildPassword( strUserPassword ), plugin );
+        return MyluteceDirectoryUserHome.checkPassword( strUserName,
+                SecurityUtils.buildPassword( _parameterService, plugin, strUserPassword ), plugin );
     }
 
     /**
@@ -74,25 +75,5 @@ public class MyluteceDirectorySecurityService implements IMyluteceDirectorySecur
         Plugin plugin = PluginService.getPlugin( MyluteceDirectoryPlugin.PLUGIN_NAME );
 
         return MyluteceDirectoryUserHome.checkActivated( strUserName, plugin );
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String buildPassword( String strUserPassword )
-    {
-        Plugin plugin = PluginService.getPlugin( MyluteceDirectoryPlugin.PLUGIN_NAME );
-
-        // Check if there is an encryption algorithm
-        String strPassword = strUserPassword;
-
-        if ( _parameterService.isPasswordEncrypted( plugin ) )
-        {
-            String strAlgorithm = _parameterService.getEncryptionAlgorithm( plugin );
-            strPassword = CryptoService.encrypt( strUserPassword, strAlgorithm );
-        }
-
-        return strPassword;
     }
 }

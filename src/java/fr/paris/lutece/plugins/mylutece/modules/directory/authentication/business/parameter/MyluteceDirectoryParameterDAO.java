@@ -35,6 +35,7 @@ package fr.paris.lutece.plugins.mylutece.modules.directory.authentication.busine
 
 import fr.paris.lutece.portal.service.plugin.Plugin;
 import fr.paris.lutece.util.ReferenceItem;
+import fr.paris.lutece.util.ReferenceList;
 import fr.paris.lutece.util.sql.DAOUtil;
 
 
@@ -47,7 +48,7 @@ public class MyluteceDirectoryParameterDAO implements IMyluteceDirectoryParamete
 {
     private static final String SQL_QUERY_SELECT_PARAMETERS_VALUE = " SELECT parameter_value FROM mylutece_directory_parameter WHERE parameter_key = ? ";
     private static final String SQL_QUERY_UPDATE_PARAMETERS = " UPDATE mylutece_directory_parameter SET parameter_value = ? WHERE parameter_key = ? ";
-
+    private static final String SQL_QUERY_SELECT_ALL = " SELECT parameter_key, parameter_value FROM mylutece_directory_parameter ";
     /**
      * {@inheritDoc}
      */
@@ -85,5 +86,29 @@ public class MyluteceDirectoryParameterDAO implements IMyluteceDirectoryParamete
 
         daoUtil.executeUpdate(  );
         daoUtil.free(  );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public ReferenceList selectAll( Plugin plugin )
+    {
+        ReferenceList listUserParams = new ReferenceList( );
+        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECT_ALL, plugin );
+        daoUtil.executeQuery( );
+
+        while ( daoUtil.next( ) )
+        {
+            int nIndex = 1;
+            ReferenceItem userParam = new ReferenceItem( );
+            userParam.setCode( daoUtil.getString( nIndex++ ) );
+            userParam.setName( daoUtil.getString( nIndex++ ) );
+            userParam.setChecked( Boolean.valueOf( userParam.getName( ) ) );
+            listUserParams.add( userParam );
+        }
+
+        daoUtil.free( );
+
+        return listUserParams;
     }
 }

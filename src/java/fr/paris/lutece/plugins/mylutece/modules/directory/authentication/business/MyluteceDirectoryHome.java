@@ -47,6 +47,7 @@ import fr.paris.lutece.portal.service.security.LuteceAuthentication;
 import fr.paris.lutece.portal.service.spring.SpringContextService;
 import fr.paris.lutece.portal.service.util.AppLogService;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -130,6 +131,28 @@ public final class MyluteceDirectoryHome
         }
 
         return user;
+    }
+
+    /**
+     * Gets the reset password attribute of the user from his login
+     * @param strLogin the login
+     * @param plugin The Plugin using this data access services
+     * @return True if the password has to be changed, false otherwise
+     */
+    public static boolean findResetPasswordFromLogin( String strLogin, Plugin plugin )
+    {
+        return _dao.selectResetPasswordFromLogin( strLogin, plugin );
+    }
+
+    /**
+     * Gets the expiration date of the user's password
+     * @param strLogin The login of the user
+     * @param plugin The plugin
+     * @return The expiration date of the user's password
+     */
+    public static Timestamp findPasswordMaxValideDateFromLogin( String strLogin, Plugin plugin )
+    {
+        return _dao.selectPasswordMaxValideDateFromLogin( strLogin, plugin );
     }
 
     /**
@@ -306,5 +329,26 @@ public final class MyluteceDirectoryHome
     public static Collection<String> findDirectoryUsersListForRoleKey( String strRoleKey, Plugin plugin )
     {
         return _dao.selectLoginListForRoleKey( strRoleKey, plugin );
+    }
+
+    /**
+     * Update the reset password attribut of a user from his login
+     * @param strUserName Login of the user to update
+     * @param bNewValue New value
+     */
+    public static void updateResetPasswordFromLogin( String strUserName, boolean bNewValue, Plugin plugin )
+    {
+        _dao.updateResetPasswordFromLogin( strUserName, bNewValue, plugin );
+    }
+
+    /**
+     * Get the id of a user from his login
+     * @param strLogin Login of the user
+     * @param plugin The plugin
+     * @return The id of the user
+     */
+    public static int findUserIdFromLogin( String strLogin, Plugin plugin )
+    {
+        return _dao.findUserIdFromLogin( strLogin, plugin );
     }
 }

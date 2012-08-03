@@ -91,6 +91,15 @@ public class MyluteceDirectoryUserKeyService implements IMyluteceDirectoryUserKe
      * {@inheritDoc}
      */
     @Override
+    public MyluteceDirectoryUserKey findKeyByLogin( String strLogin )
+    {
+        return MyluteceDirectoryUserKeyHome.findKeyByLogin( strLogin );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void remove( String strKey )
     {
         MyluteceDirectoryUserKeyHome.remove( strKey );

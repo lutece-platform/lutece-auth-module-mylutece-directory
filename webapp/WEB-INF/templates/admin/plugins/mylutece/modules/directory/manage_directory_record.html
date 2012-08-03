@@ -1,3 +1,10 @@
+<div id="content-box-actions">
+	<#if permission_advanced_parameter?? && permission_advanced_parameter >
+		<form method="post" action="jsp/admin/plugins/mylutece/modules/directory/ManageAdvancedParameters.jsp">
+			<input type="submit" value="#i18n{module.mylutece.directory.manage_directory_record.buttonLabelManageAdvancedParameters}" class="button bt-toolbar" />
+		</form>
+    </#if>
+</div>
 <#if no_directory?has_content>
 	<div class="content-box">
 		<p>
@@ -139,7 +146,7 @@
 		   	 	</#if>	
 		 		<#if record_field.entry.idEntry!=id_entry_store || id_entry_store=-1>
 		 			<td>
-		 			<#if record_field_index = 0>
+		 			<#if record_field_index = 0 && !((recordDisplay.mylutece_record)?? && recordDisplay.mylutece_record.status == 10)>
 						<a href="jsp/admin/plugins/directory/ModifyDirectoryRecord.jsp?id_directory_record=${record.idRecord}">
 							<img src="images/admin/skin/plugins/mylutece/modules/directory/actions/jump_to.png" alt="#i18n{module.mylutece.directory.manage_directory_record.title_modify_directory}" title="#i18n{module.mylutece.directory.manage_directory_record.title_modify_directory}" />
 						</a>
@@ -147,15 +154,19 @@
 		 		<#else>	
 		 			<br>	
 		 		</#if>
-		 			${record_field.entry.getHtmlRecordFieldValue( locale, record_field , false )}
+		 			<#if (recordDisplay.mylutece_record)?? && recordDisplay.mylutece_record.status = 10>
+		 				#i18n{mylutece.anonymize_user.statusLabelAnonymize}
+		 			<#else>
+		 				${record_field.entry.getHtmlRecordFieldValue( locale, record_field , false )}
+		 			</#if>
 		     	<#if  !record_field_has_next> 	
 		     	 	</td>
 		     	</#if>
 		 		<#assign id_entry_store=record_field.entry.idEntry>
 		   </#list>
-		   	<#if recordDisplay.mylutece_record?has_content >
+		   	<#if (recordDisplay.mylutece_record)?? && recordDisplay.mylutece_record?has_content >
 			<td>
-				${recordDisplay.mylutece_record.login}
+				<#if recordDisplay.mylutece_record.status = 10>#i18n{mylutece.anonymize_user.statusLabelAnonymize}<#else>${recordDisplay.mylutece_record.login}</#if>
 			</td>
 		   <td>
 				<a href="jsp/admin/plugins/mylutece/modules/directory/ModifyUser.jsp?id_record=${record.idRecord}">
@@ -167,6 +178,11 @@
 				<a href="jsp/admin/plugins/mylutece/modules/directory/ConfirmRemoveUser.jsp?id_record=${record.idRecord}">
 					<img src="images/admin/skin/actions/delete.png" alt="#i18n{module.mylutece.directory.manage_directory_record.title_delete}" title="#i18n{module.mylutece.directory.manage_directory_record.title_delete}" />
 				</a>
+				<#if recordDisplay.mylutece_record.status != 10>
+		            <a href="jsp/admin/plugins/mylutece/modules/directory/GetAnonymizeUser.jsp?id_record=${record.idRecord}">
+		            	<img src="images/admin/skin/actions/anonymize.png" class="icon" alt="#i18n{mylutece.anonymize_user.labelAnonymizeUser}" title="#i18n{mylutece.anonymize_user.labelAnonymizeUser}" />
+		            </a>
+		        </#if>
 			</td>
 			<#else>
 			<td>

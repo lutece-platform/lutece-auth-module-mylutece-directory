@@ -66,17 +66,21 @@
 			      						</#list>
 			      					</#if>
 				      			<#else>
-				      				<#assign has_value = false>
-				      				<#if map_id_entry_list_record_field??>
-				      					<#assign entryKey= "" + children.idEntry>
-				      					<#if map_id_entry_list_record_field[entryKey]??>
-				      						${entry.getHtmlFormEntry( locale, map_id_entry_list_record_field[entryKey], true )}
-				      						<#assign has_value = true>
-				      					</#if>
-				      				</#if>
-				      				<#if !has_value>
-				      					${entry.getHtmlFormEntry( locale,true )}
-				      				</#if>
+				      				<#if entry.children?has_content>
+			      						<#list entry.children as children >
+						      				<#assign has_value = false>
+						      				<#if map_id_entry_list_record_field??>
+						      					<#assign entryKey= "" + children.idEntry>
+						      					<#if map_id_entry_list_record_field[entryKey]??>
+						      						${entry.getHtmlFormEntry( locale, map_id_entry_list_record_field[entryKey], true )}
+						      						<#assign has_value = true>
+						      					</#if>
+						      				</#if>
+						      				<#if !has_value>
+						      					${entry.getHtmlFormEntry( locale,true )}
+						      				</#if>
+										</#list>
+			      					</#if>
 				      			</#if>	
 				      			<br />	      			
 			      			</#list>

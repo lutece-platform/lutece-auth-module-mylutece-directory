@@ -1,4 +1,4 @@
-<%@ page errorPage="../../ErrorPage.jsp" %>
+<%@ page errorPage="../../../../ErrorPage.jsp" %>
 
 <jsp:useBean id="myluteceDirectoryUser" scope="session" class="fr.paris.lutece.plugins.mylutece.modules.directory.authentication.web.MyluteceDirectoryUserJspBean" />
 

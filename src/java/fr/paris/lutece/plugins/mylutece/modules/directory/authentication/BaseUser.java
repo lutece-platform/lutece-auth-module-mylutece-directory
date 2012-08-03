@@ -43,6 +43,7 @@ import fr.paris.lutece.portal.service.security.LuteceUser;
  */
 public class BaseUser extends LuteceUser
 {
+
     /**
      * Constructor
      * @param strUserName The user's name

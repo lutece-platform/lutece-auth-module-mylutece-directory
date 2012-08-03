@@ -50,6 +50,7 @@ public class MyluteceDirectoryUserKeyDAO implements IMyluteceDirectoryUserKeyDAO
     private static final String SQL_WHERE = " WHERE ";
     private static final String SQL_USER_KEY = " mylutece_directory_user_key = ? ";
     private static final String SQL_ID_RECORD = " id_record = ? ";
+    private static final String SQL_QUERY_SELECT_BY_LOGIN = " SELECT mdk.mylutece_directory_user_key, mdk.id_record FROM mylutece_directory_key mdk LEFT JOIN mylutece_directory_user mdu ON (mdu.id_record = mdk.id_record ) WHERE mdu.user_login = ? ";
 
     /**
      * {@inheritDoc}
@@ -116,5 +117,30 @@ public class MyluteceDirectoryUserKeyDAO implements IMyluteceDirectoryUserKeyDAO
 
         daoUtil.executeUpdate(  );
         daoUtil.free(  );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public MyluteceDirectoryUserKey selectKeyByLogin( String login, Plugin plugin )
+    {
+        MyluteceDirectoryUserKey userKey = null;
+
+        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECT_BY_LOGIN, plugin );
+        daoUtil.setString( 1, login );
+
+        daoUtil.executeQuery( );
+
+        if ( daoUtil.next( ) )
+        {
+            int nIndex = 1;
+            userKey = new MyluteceDirectoryUserKey( );
+            userKey.setKey( daoUtil.getString( nIndex++ ) );
+            userKey.setIdRecord( daoUtil.getInt( nIndex++ ) );
+        }
+
+        daoUtil.free( );
+
+        return userKey;
     }
 }

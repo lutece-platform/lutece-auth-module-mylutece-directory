@@ -1,8 +1,6 @@
 --
--- Init  table mylutece_directory_parameter
+-- Add security parameters to mylutece_directory_parameter
 --
-INSERT INTO mylutece_directory_parameter VALUES ('enable_password_encryption', 'false');
-INSERT INTO mylutece_directory_parameter VALUES ('encryption_algorithm', '');
 INSERT INTO mylutece_directory_parameter VALUES ('force_change_password_reinit', '');
 INSERT INTO mylutece_directory_parameter VALUES ('password_minimum_length', '8');
 INSERT INTO mylutece_directory_parameter VALUES ('password_format', 'false');
@@ -26,4 +24,18 @@ INSERT INTO mylutece_directory_parameter VALUES ('other_alert_mail_subject', 'Vo
 INSERT INTO mylutece_directory_parameter VALUES ('account_reactivated_mail_sender', 'lutece@nowhere.com');
 INSERT INTO mylutece_directory_parameter VALUES ('account_reactivated_mail_subject', 'Votre compte a bien été réactivé');
 
+ALTER TABLE mylutece_directory_user ADD COLUMN reset_password SMALLINT DEFAULT 0 NOT NULL;
+ALTER TABLE mylutece_directory_user ADD COLUMN password_max_valid_date TIMESTAMP NULL;
+ALTER TABLE mylutece_directory_user ADD COLUMN account_max_valid_date BIGINT NULL;
+ALTER TABLE mylutece_directory_user ADD COLUMN nb_alerts_sent INTEGER DEFAULT 0 NOT NULL;
+
+DROP TABLE IF EXISTS mylutece_directory_user_password_history;
+CREATE  TABLE mylutece_directory_user_password_history (
+  id_record INT NOT NULL ,
+  password VARCHAR(100) NOT NULL ,
+  date_password_change TIMESTAMP NOT NULL DEFAULT NOW() ,
+  PRIMARY KEY (id_record, date_password_change)
+  );
+
 INSERT INTO mylutece_user_anonymize_field (field_name, anonymize) VALUES ('user_login', 1);
+

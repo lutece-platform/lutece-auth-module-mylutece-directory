@@ -93,4 +93,14 @@ public final class MyluteceDirectoryUserKeyHome
     {
         return _dao.load( strKey, _plugin );
     }
+
+    /**
+     * Find a key from a given login
+     * @param login the user's login
+     * @return a {@link MyluteceDirectoryUserKey}
+     */
+    public static MyluteceDirectoryUserKey findKeyByLogin( String login )
+    {
+        return _dao.selectKeyByLogin( login, _plugin );
+    }
 }

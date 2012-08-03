@@ -33,8 +33,7 @@
  */
 package fr.paris.lutece.plugins.mylutece.modules.directory.authentication.service.parameter;
 
-import fr.paris.lutece.portal.service.plugin.Plugin;
-import fr.paris.lutece.util.ReferenceItem;
+import fr.paris.lutece.plugins.mylutece.service.IUserParameterService;
 
 
 /**
@@ -42,34 +41,6 @@ import fr.paris.lutece.util.ReferenceItem;
  * IMyluteceDirectoryParameterService
  *
  */
-public interface IMyluteceDirectoryParameterService
+public interface IMyluteceDirectoryParameterService extends IUserParameterService
 {
-    /**
-     * Get the parameter from a given key
-     * @param strParameterKey the key
-     * @param plugin the plugin
-     * @return the parameter
-     */
-    ReferenceItem findByKey( String strParameterKey, Plugin plugin );
-
-    /**
-     * Update a parameter
-     * @param userParam the parameter
-     * @param plugin the plugin
-     */
-    void update( ReferenceItem userParam, Plugin plugin );
-
-    /**
-     * Check if the passwords must be encrypted or not
-     * @param plugin the plugin
-     * @return true if they are encrypted, false otherwise
-     */
-    boolean isPasswordEncrypted( Plugin plugin );
-
-    /**
-     * Get the encryption algorithm
-     * @param plugin the plugin
-     * @return the encryption algorithm
-     */
-    String getEncryptionAlgorithm( Plugin plugin );
 }

@@ -1,0 +1,45 @@
+<div class="content-box">
+	<h2>#i18n{portal.users.anonymize_user.titleAnonymizeUser}</h2>
+	
+	<form method="post" name="anonymize_user" action="jsp/admin/plugins/mylutece/modules/directory/DoChangeFieldAnonymizeUsers.jsp" >
+		<div class="highlight-box">
+			<div class="highlight-box-content">
+				<p>
+					#i18n{module.mylutece.directory.create_user.labelIdentity}
+				</p>
+				<p>
+					<label for="user_login" >#i18n{module.mylutece.directory.create_user.login} </label>
+					<input type="checkbox" id="user_login" name="user_login" value="true" <#if user_login?? && user_login>checked="checked"</#if> />
+				</p>
+			</div>
+		</div>
+		<#if attributes_list?has_content || directory_attributes?has_content>
+			<div class="highlight-box">
+				<div class="highlight-box-content">
+					<p>
+						#i18n{module.mylutece.directory.create_user.labelComplementaryAttributes}
+					</p>
+					<#if attributes_list?has_content>
+						<#list attributes_list as attribute>
+						<p>
+							<label for="attribute_${attribute.idAttribute}">${attribute.title} :</label>
+							<input type="checkbox" value="true" name="attribute_${attribute.idAttribute}" id="attribute_${attribute.idAttribute}" <#if attribute.anonymize >checked="checked"</#if> />
+						</p>
+						</#list>
+					</#if>
+					<#if directory_attributes?has_content>
+						<#list directory_attributes as attribute>
+							<p>
+								<label for="directory_${attribute.idEntry}">${attribute.title} :</label>
+								<input type="checkbox" value="true" name="directory_${attribute.idEntry}" id="directory_${attribute.idEntry}" <#if attribute.anonymize >checked="checked"</#if> />
+							</p>
+						</#list>
+					</#if>
+				</div>
+			</div>
+		</#if>
+		<p>
+			<input type="submit" value="#i18n{portal.users.anonymize_user.buttonSave}" tabindex="6" class="button" />   
+		</p>
+	</form>
+</div>

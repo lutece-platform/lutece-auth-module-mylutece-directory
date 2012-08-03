@@ -30,4 +30,5 @@
 	<bean id="mylutece-directory.attributeMappingService" class="fr.paris.lutece.plugins.mylutece.modules.directory.authentication.service.AttributeMappingService" />
 	<bean id="mylutece-directory.myluteceDirectoryUserKeyService" class="fr.paris.lutece.plugins.mylutece.modules.directory.authentication.service.key.MyluteceDirectoryUserKeyService" />
 	<bean id="mylutece-directory.authentication" class="fr.paris.lutece.plugins.mylutece.modules.directory.authentication.BaseAuthentication" />
+	<bean id="mylutece-directory.anonymizationService" class="fr.paris.lutece.plugins.mylutece.modules.directory.authentication.service.MyluteceDirectoryAnonymizationService" />
 </beans>

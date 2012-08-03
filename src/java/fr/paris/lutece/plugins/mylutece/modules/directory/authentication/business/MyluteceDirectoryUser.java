@@ -33,6 +33,8 @@
  */
 package fr.paris.lutece.plugins.mylutece.modules.directory.authentication.business;
 
+import java.sql.Timestamp;
+
 
 /**
  * This class represents the business object DatabaseUser
@@ -40,9 +42,29 @@ package fr.paris.lutece.plugins.mylutece.modules.directory.authentication.busine
 public class MyluteceDirectoryUser
 {
     // Variables declarations
+    /**
+     * Status of not activated users.
+     */
+    public static final int STATUS_NOT_ACTIVATED = 0;
+    /**
+     * Status of activated users.
+     */
+    public static final int STATUS_ACTIVATED = 1;
+    /**
+     * Status of expired users. Expired users will be anonymized.
+     */
+    public static final int STATUS_EXPIRED = 5;
+    /**
+     * Status of anonymized users.
+     */
+    public static final int STATUS_ANONYMIZED = 10;
     private int _nIdRecord;
     private String _strLogin;
-    private boolean _bIsActivated;
+    private String _strPassword;
+    private boolean _bIsPasswordReset;
+    private int _nStatus;
+    private Timestamp _passwordMaxValidDate;
+    private Timestamp _accountMaxValidDate;
 
     /**
      * Returns the IdRecord
@@ -85,20 +107,104 @@ public class MyluteceDirectoryUser
     }
 
     /**
-     * Set if the user is activated or not
-     * @param isActivated the boolean
+     * Returns the user's password
+     * 
+     * @param The password
      */
-    public void setActivated( boolean isActivated )
+    public String getPassword( )
     {
-        _bIsActivated = isActivated;
+        return _strPassword;
     }
 
     /**
-     * Return true if the user is validated
+     * Sets the password
+     * 
+     * @param strPassword The password
+     */
+    public void setPassword( String strPassword )
+    {
+        this._strPassword = strPassword;
+    }
+
+    /**
+     * Check if the password has been reinitialized
+     * @return true if it has been reinitialized, false otherwise
+     */
+    public boolean isPasswordReset( )
+    {
+        return _bIsPasswordReset;
+    }
+
+    /**
+     * Set pwd reseted
+     * @param bIsPasswordReset true if it has been reinitialized, false
+     *            otherwise
+     */
+    public void setPasswordReset( boolean bIsPasswordReset )
+    {
+        _bIsPasswordReset = bIsPasswordReset;
+    }
+
+    /**
+     * Get the status of the user
+     * @return The status of the user
+     */
+    public int getStatus( )
+    {
+        return _nStatus;
+    }
+
+    /**
+     * Set the status of the user
+     * @param nStatus The status
+     */
+    public void setStatus( int nStatus )
+    {
+        this._nStatus = nStatus;
+    }
+    /**
+     * Return true if the user is activated
      * @return the boolean
      */
     public boolean isActivated(  )
     {
-        return _bIsActivated;
+        return ( _nStatus >= STATUS_ACTIVATED && _nStatus < STATUS_EXPIRED );
+    }
+
+
+    /**
+     * Get the maximum valid date of the password of the user
+     * @return The maximum valid date of the password of the user
+     */
+    public Timestamp getPasswordMaxValidDate( )
+    {
+        return _passwordMaxValidDate;
+    }
+
+    /**
+     * Set the maximum valid date of the password of the user
+     * @param passwordMaxValidDate The maximum valid date
+     */
+    public void setPasswordMaxValidDate( Timestamp passwordMaxValidDate )
+    {
+        this._passwordMaxValidDate = passwordMaxValidDate;
+    }
+
+    /**
+     * Get the maximum valid date of the account of the user
+     * @return The maximum valid date of the account of the user
+     */
+    public Timestamp getAccountMaxValidDate( )
+    {
+        return _accountMaxValidDate;
+    }
+
+    /**
+     * Set the maximum valid date of the account of the user
+     * @param accountMaxValidDate The maximum valid date
+     */
+    public void setAccountMaxValidDate( Timestamp accountMaxValidDate )
+    {
+        this._accountMaxValidDate = accountMaxValidDate;
     }
 }

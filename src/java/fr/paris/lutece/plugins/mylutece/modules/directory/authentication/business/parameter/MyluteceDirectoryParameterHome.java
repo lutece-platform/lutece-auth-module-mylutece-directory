@@ -36,6 +36,9 @@ package fr.paris.lutece.plugins.mylutece.modules.directory.authentication.busine
 import fr.paris.lutece.portal.service.plugin.Plugin;
 import fr.paris.lutece.portal.service.spring.SpringContextService;
 import fr.paris.lutece.util.ReferenceItem;
+import fr.paris.lutece.util.ReferenceList;
+
+import org.apache.commons.lang.StringUtils;
 
 
 /**
@@ -68,6 +71,16 @@ public final class MyluteceDirectoryParameterHome
     }
 
     /**
+     * Find all parameters
+     * @param plugin the plugin
+     * @return a ReferenceList
+     */
+    public static ReferenceList findAll( Plugin plugin )
+    {
+        return _dao.selectAll( plugin );
+    }
+
+    /**
      * Update the parameter value
      * @param param the parameter
      * @param plugin Plugin
@@ -75,5 +88,32 @@ public final class MyluteceDirectoryParameterHome
     public static void update( ReferenceItem param, Plugin plugin )
     {
         _dao.store( param, plugin );
+    }
+
+    /**
+     * Get the integer value of a security parameter
+     * @param strParameterkey Key of the parameter
+     * @param plugin Plugin
+     * @return The integer value of a security parameter
+     */
+    public static int getIntegerSecurityParameter( String strParameterkey, Plugin plugin )
+    {
+        ReferenceItem refItem = findByKey( strParameterkey, plugin );
+        if ( refItem == null || StringUtils.isEmpty( refItem.getName( ) ) )
+        {
+            return 0;
+        }
+        else
+        {
+            try
+            {
+                int nValue = Integer.parseInt( refItem.getName( ) );
+                return nValue;
+            }
+            catch ( NumberFormatException e )
+            {
+                return 0;
+            }
+        }
     }
 }

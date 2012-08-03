@@ -48,14 +48,14 @@ import fr.paris.lutece.portal.service.security.LuteceAuthentication;
 import fr.paris.lutece.portal.service.security.LuteceUser;
 import fr.paris.lutece.util.url.UrlItem;
 
-import org.springframework.transaction.annotation.Transactional;
-
 import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
+
+import org.springframework.transaction.annotation.Transactional;
 
 
 /**
@@ -73,6 +73,14 @@ public interface IMyluteceDirectoryService
      * @return an instance of {@link BaseUser}
      */
     BaseUser getUserByLogin( String strUserName, LuteceAuthentication authenticationService, boolean bGetAdditionnalInfo );
+
+    /**
+     * Do modify the password
+     * @param user the DatabaseUser
+     * @param strPassword the new password
+     * @param plugin the plugin
+     */
+    public void doModifyResetPassword( MyluteceDirectoryUser user, boolean bNewValue, Plugin plugin );
 
     /**
      * Get the list of users
@@ -301,4 +309,35 @@ public interface IMyluteceDirectoryService
      */
     @Transactional( "mylutece-directory.transactionManager" )
     void doAssignDirectory( int nIdDirectory, Plugin plugin );
+
+    /**
+     * Change the password of every user, and email them
+     * @param strBaseURL The base url of the application
+     * @param plugin The plugin
+     * @param locale The locale
+     */
+    void changeUserPasswordAndNotify( String strBaseURL, Plugin plugin, Locale locale );
+
+    /**
+     * Check whether a user must change his password
+     * @param databaseUser The user to check
+     * @param plugin The plugin
+     * @return True if a user must change his password, false otherwise.
+     */
+    boolean mustUserChangePassword( LuteceUser databaseUser, Plugin plugin );
+
+    /**
+     * Log a password change in the password history
+     * @param strPassword New password of the user
+     * @param nUserId Id of the user
+     * @param plugin The plugin
+     */
+    void doInsertNewPasswordInHistory( String strPassword, int nUserId, Plugin plugin );
+
+    /**
+     * Update the user expiration date with new values.
+     * @param nIdUser Id of the user to update
+     * @param plugin The plugin
+     */
+    void updateUserExpirationDate( int nIdUser, Plugin plugin );
 }
