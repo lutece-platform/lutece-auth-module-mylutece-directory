@@ -90,6 +90,9 @@ public class BaseAuthentication extends PortalAuthentication
     private static final String PROPERTY_MESSAGE_USER_NOT_FOUND_DIRECTORY = "module.mylutece.directory.message.userNotFoundDirectory";
     private static final String PROPERTY_MESSAGE_USER_NOT_ACTIVATED = "module.mylutece.directory.message.userNotActivated";
 
+    // JSP URL
+    private static final String JSP_URL_GET_REINIT_PASSWORD_PAGE = "jsp/site/Portal.jsp?page=mylutecedirectory&action=getReinitPassordPage";
+
     private static IMyluteceDirectoryService _myluteceDirectoryService;
 
     /**
@@ -344,7 +347,7 @@ public class BaseAuthentication extends PortalAuthentication
     @Override
     public String getResetPasswordPageUrl( HttpServletRequest request )
     {
-        return AppPathService.getBaseUrl( request ) + MyLuteceDirectoryApp.getResetPasswordUrl( );
+        return AppPathService.getBaseUrl( request ) + JSP_URL_GET_REINIT_PASSWORD_PAGE;
     }
 
     private static IMyluteceDirectoryService getMyluteceDirectoryService( )

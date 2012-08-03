@@ -158,6 +158,7 @@ public class MyLuteceDirectoryApp implements XPageApplication
     private static final String ACTION_DO_CREATE_ACCOUNT = "doCreateAccount";
     private static final String ACTION_REINIT_PASSWORD = "reinitPassword";
     private static final String ACTION_UPDATE_ACCOUNT = "updateAccount";
+    private static final String ACTION_GET_REINIT_PASSWORD = "getReinitPassordPage";
 
     // Errors
     private static final String ERROR_OLD_PASSWORD = "error_old_password";
@@ -203,6 +204,7 @@ public class MyLuteceDirectoryApp implements XPageApplication
     private static final String PROPERTY_USE_CAPTCHA = "mylutece-directory.account_creation.use_jcaptcha";
     private static final String PROPERTY_NEED_ACTIVATION = "mylutece-directory.account_creation.must_validate";
     private static final String PROPERTY_NO_REPLY_EMAIL = "mail.noreply.email";
+    private static final String PROPERTY_ACCOUNT_REF_ENCRYPT_ALGO = "mylutece-directory.account_life_time.refEncryptionAlgorythm";
 
     // i18n Properties
     private static final String PROPERTY_CHANGE_PASSWORD_LABEL = "module.mylutece.directory.xpage.changePassword.label";
@@ -232,7 +234,6 @@ public class MyLuteceDirectoryApp implements XPageApplication
     private static final String PROPERTY_ERROR_NO_ACCOUNT_TO_REACTIVATED = "mylutece.message.error.noAccountToReactivate";
     private static final String PROPERTY_ACCOUNT_REACTIVATED = "mylutece.user.messageAccountReactivated";
     private static final String PROPERTY_ACCOUNT_REACTIVATED_TITLE = "mylutece.user.messageAccountReactivatedTitle";
-    private static final String PROPERTY_ACCOUNT_REF_ENCRYPT_ALGO = "mylutece-directory.account_life_time.refEncryptionAlgorythm";
 
     // MESSAGES
     private static final String MESSAGE_REINIT_PASSWORD_SUCCESS = "module.mylutece.directory.message.reinit_password.success";
@@ -240,6 +241,8 @@ public class MyLuteceDirectoryApp implements XPageApplication
     private static final String MESSAGE_PASSWORD_FORMAT = "mylutece.message.password.format";
     private static final String MESSAGE_PASSWORD_ALREADY_USED = "mylutece.message.password.passwordAlreadyUsed";
     private static final String MESSAGE_MAX_PASSWORD_CHANGE = "mylutece.message.password.maxPasswordChange";
+    private static final String MESSAGE_PASSWORD_EXPIRED = "module.mylutece.directory.message.passwordExpired";
+    private static final String MESSAGE_MUST_CHANGE_PASSWORD = "module.mylutece.directory.message.userMustChangePassword";
 
     //Constants
     private static final String JCAPTCHA_PLUGIN = "jcaptcha";
@@ -317,10 +320,16 @@ public class MyLuteceDirectoryApp implements XPageApplication
         {
             updateAccount( request );
         }
+        else if ( ACTION_GET_REINIT_PASSWORD.equals( strAction ) )
+        {
+            getMessageReinitPassword( request );
+        }
 
         LuteceUser luteceUser = SecurityService.getInstance( ).getRegisteredUser( request );
 
-        if ( luteceUser != null && MyluteceDirectoryHome.findResetPasswordFromLogin( luteceUser.getName( ), plugin ) )
+        if ( !ACTION_GET_REINIT_PASSWORD.equals( strAction ) && ACTION_REINIT_PASSWORD.equals( strAction )
+                && luteceUser != null
+                && MyluteceDirectoryHome.findResetPasswordFromLogin( luteceUser.getName( ), plugin ) )
         {
             page = getReinitPasswordPage( page, request );
         }
@@ -1312,5 +1321,11 @@ public class MyLuteceDirectoryApp implements XPageApplication
         SiteMessageService.setMessage( request, PROPERTY_ERROR_NO_ACCOUNT_TO_REACTIVATED, null,
                 PROPERTY_MESSAGE_LABEL_ERROR, AppPropertiesService.getProperty( AppPathService.getBaseUrl( request ) ),
                 null, SiteMessage.TYPE_ERROR );
+    }
+
+    public void getMessageReinitPassword( HttpServletRequest request ) throws SiteMessageException
+    {
+        SiteMessageService.setMessage( request, MESSAGE_MUST_CHANGE_PASSWORD, null, MESSAGE_PASSWORD_EXPIRED,
+                getReinitPageUrl( ), null, SiteMessage.TYPE_INFO );
     }
 }
