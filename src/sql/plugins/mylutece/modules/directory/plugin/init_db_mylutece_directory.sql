@@ -25,5 +25,3 @@ INSERT INTO mylutece_directory_parameter VALUES ('other_alert_mail_sender', 'lut
 INSERT INTO mylutece_directory_parameter VALUES ('other_alert_mail_subject', 'Votre compte va bientot expirer');
 INSERT INTO mylutece_directory_parameter VALUES ('account_reactivated_mail_sender', 'lutece@nowhere.com');
 INSERT INTO mylutece_directory_parameter VALUES ('account_reactivated_mail_subject', 'Votre compte a bien été réactivé');
-
-INSERT INTO mylutece_user_anonymize_field (field_name, anonymize) VALUES ('user_login', 1);
