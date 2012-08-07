@@ -108,7 +108,7 @@ public class MyluteceDirectoryUser
 
     /**
      * Returns the user's password
-     * 
+     *
      * @param The password
      */
     public String getPassword( )
@@ -118,12 +118,12 @@ public class MyluteceDirectoryUser
 
     /**
      * Sets the password
-     * 
+     *
      * @param strPassword The password
      */
     public void setPassword( String strPassword )
     {
-        this._strPassword = strPassword;
+        _strPassword = strPassword;
     }
 
     /**
@@ -160,8 +160,9 @@ public class MyluteceDirectoryUser
      */
     public void setStatus( int nStatus )
     {
-        this._nStatus = nStatus;
+        _nStatus = nStatus;
     }
+
     /**
      * Return true if the user is activated
      * @return the boolean
@@ -171,6 +172,24 @@ public class MyluteceDirectoryUser
         return ( _nStatus >= STATUS_ACTIVATED && _nStatus < STATUS_EXPIRED );
     }
 
+    /**
+     * Sets the activated.
+     *
+     * @param bIsActivated the new activated
+     * @deprecated Use {@link #setStatus(int)} instead
+     */
+    @Deprecated
+	public void setActivated( boolean bIsActivated )
+    {
+    	if ( bIsActivated )
+    	{
+    		_nStatus = STATUS_ACTIVATED;
+    	}
+    	else
+    	{
+    		_nStatus = STATUS_NOT_ACTIVATED;
+    	}
+    }
 
     /**
      * Get the maximum valid date of the password of the user
@@ -187,7 +206,7 @@ public class MyluteceDirectoryUser
      */
     public void setPasswordMaxValidDate( Timestamp passwordMaxValidDate )
     {
-        this._passwordMaxValidDate = passwordMaxValidDate;
+        _passwordMaxValidDate = passwordMaxValidDate;
     }
 
     /**
@@ -205,6 +224,6 @@ public class MyluteceDirectoryUser
      */
     public void setAccountMaxValidDate( Timestamp accountMaxValidDate )
     {
-        this._accountMaxValidDate = accountMaxValidDate;
+        _accountMaxValidDate = accountMaxValidDate;
     }
 }
