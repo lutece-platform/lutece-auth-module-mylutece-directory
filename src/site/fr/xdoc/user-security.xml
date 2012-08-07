@@ -58,16 +58,16 @@
 			</OL>
 			<subsection name="1.1 Introduction">
 				<p>
-					Depuis la page de Gestion des utilisateurs du site (Database),
+					Depuis la page de Gestion des utilisateurs du site (Directory),
 					l'administrateur technique a la possibilité de définir un certain
 					nombre de paramètres de sécurité de l'application. Ces différents
-					paramètres s'appliquent uniquement aux utilisateurs Database du
+					paramètres s'appliquent uniquement aux utilisateurs Directory du
 					Front office.
 				</p>
 				<p>
 					Pour accéder à la gestion des paramètres de sécurité,
 					sélectionner dans le bandeau supérieur "Utilisateurs > Gestion des
-					utilisateurs du site (Database)", puis cliquer sur le bouton
+					utilisateurs du site (Directory)", puis cliquer sur le bouton
 					"Paramètres avancés" en haut à droite de l'écran. Les paramètres de
 					sécurité sont regroupés dans le cadre intitulé "Modification des
 					paramètres de sécurité"
@@ -127,7 +127,7 @@
 				<h4>1.3.1 Contraintes sur les mots de passe</h4>
 				<p>
 					Il est possible de définir deux contraintes sur les mots de
-					passes des utilisateurs Database du front office :
+					passes des utilisateurs Directory du front office :
 				</p>
 				<ul>
 					<li>Taille minimale d'un mot de passe</li>
@@ -283,17 +283,17 @@
 					données d'un compte anonymisé ne sont plus lisibles, et
 					l'utilisateur ne peut plus l'utiliser. L'écran de gestion des
 					attributs d'un utilisateur à anonymiser, accessible depuis l'écran
-					de Gestion des utilisateurs Database ("Utilisateurs > Gestion des
-					utilisateurs du site (Database)"), permet à un administrateur de
+					de Gestion des utilisateurs Directory ("Utilisateurs > Gestion des
+					utilisateurs du site (Directory)"), permet à un administrateur de
 					choisir les informations d'un compte qui doivent être supprimées
 					lors de l'anonymisation. Seuls les champs de type texte peuvent
 					être anonymisés.
 				</p>
 				<p>
 					Il est également possible d'anonymiser un utilisateur depuis
-					l'écran de Gestion des utilisateurs Database (accessible via le
+					l'écran de Gestion des utilisateurs Directory (accessible via le
 					menu
-					"Utilisateurs > Gestion des utilisateurs du site (Database)")
+					"Utilisateurs > Gestion des utilisateurs du site (Directory)")
 					en cliquant sur le
 					bouton "Anonymiser".
 				</p>

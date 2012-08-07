@@ -597,12 +597,15 @@ public class MyluteceDirectoryUserJspBean extends PluginAdminPageJspBean
         int nStatus = StringUtils.isNotBlank( strActivate ) ? MyluteceDirectoryUser.STATUS_ACTIVATED
                 : MyluteceDirectoryUser.STATUS_NOT_ACTIVATED;
 
-        String retUrl = SecurityUtils
-                .checkPasswordForBackOffice( _parameterService, getPlugin( ), strPassword, request );
-
-        if ( retUrl != null )
+        if ( bModifyPassword )
         {
-            return retUrl;
+            String retUrl = SecurityUtils.checkPasswordForBackOffice( _parameterService, getPlugin( ), strPassword,
+                    request );
+
+            if ( retUrl != null )
+            {
+                return retUrl;
+            }
         }
 
         int nIdRecord = Integer.parseInt( strIdRecord );
