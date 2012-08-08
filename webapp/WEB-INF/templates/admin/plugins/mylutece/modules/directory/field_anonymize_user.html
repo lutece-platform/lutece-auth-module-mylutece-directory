@@ -30,7 +30,7 @@
 					<#if directory_attributes?has_content>
 						<#list directory_attributes as attribute>
 							<p>
-								<label for="directory_${attribute.idEntry}">${attribute.title} :</label>
+								<label for="directory_${attribute.idEntry}"><#if attribute.title??>${attribute.title}<#else>#i18n{${attribute.entryType.titleI18nKey}}</#if> :</label>
 								<input type="checkbox" value="true" name="directory_${attribute.idEntry}" id="directory_${attribute.idEntry}" <#if attribute.anonymize >checked="checked"</#if> />
 							</p>
 						</#list>
