@@ -178,6 +178,7 @@ public class MyluteceDirectoryUserJspBean extends PluginAdminPageJspBean
     private static final String PARAMETER_OTHER_ALERT_MAIL = "mylutece_directory_other_alert_mail";
     private static final String PARAMETER_EXPIRATION_MAIL = "mylutece_directory_expiration_mail";
     private static final String PARAMETER_ACCOUNT_REACTIVATED = "mylutece_directory_account_reactivated_mail";
+    private static final String PARAMETER_CANCEL = "cancel";
 
     // Markers
     private static final String MARK_LOCALE = "locale";
@@ -1099,6 +1100,10 @@ public class MyluteceDirectoryUserJspBean extends PluginAdminPageJspBean
      */
     public String doChangeFieldAnonymizeUsers( HttpServletRequest request )
     {
+        if ( request.getParameter( PARAMETER_CANCEL ) != null )
+        {
+            return JSP_MANAGE_ADVANCED_PARAMETERS;
+        }
         Plugin pluginMyLutece = PluginService.getPlugin( MyLutecePlugin.PLUGIN_NAME );
         AttributeHome.updateAnonymizationStatusUserStaticField( PARAMETER_USER_LOGIN,
                 Boolean.valueOf( request.getParameter( PARAMETER_USER_LOGIN ) ), pluginMyLutece );
