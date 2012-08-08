@@ -903,7 +903,7 @@ public class MyLuteceDirectoryApp implements XPageApplication
             {
                 strError = ERROR_CONFIRMATION_PASSWORD;
             }
-            else if ( SecurityUtils.buildPassword( _parameterService, plugin, strNewPassword ).equals( strOldPassword ) )
+            else if ( StringUtils.equals( strOldPassword, strNewPassword ) )
             {
                 strError = ERROR_SAME_PASSWORD;
             }
@@ -923,6 +923,7 @@ public class MyLuteceDirectoryApp implements XPageApplication
             if ( bChangePassword )
             {
                 _myluteceDirectoryService.doModifyPassword( user, strNewPassword, _plugin );
+                _myluteceDirectoryService.doModifyResetPassword( user, Boolean.FALSE, _plugin );
                 _myluteceDirectoryService.doInsertNewPasswordInHistory( strNewPassword, user.getIdRecord( ), plugin );
             }
 

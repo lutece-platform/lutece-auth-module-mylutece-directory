@@ -599,9 +599,9 @@ public class MyluteceDirectoryUserJspBean extends PluginAdminPageJspBean
 
         if ( bModifyPassword )
         {
-            String retUrl = SecurityUtils.checkPasswordForBackOffice( _parameterService, getPlugin( ), strPassword,
-                    request );
-
+            String retUrl = SecurityUtils
+                    .checkPasswordForBackOffice( _parameterService, getPlugin( ), strPassword, request );
+    
             if ( retUrl != null )
             {
                 return retUrl;
