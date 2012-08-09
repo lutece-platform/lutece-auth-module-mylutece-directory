@@ -158,7 +158,7 @@ public class MyLuteceDirectoryApp implements XPageApplication
     private static final String ACTION_DO_CREATE_ACCOUNT = "doCreateAccount";
     private static final String ACTION_REINIT_PASSWORD = "reinitPassword";
     private static final String ACTION_UPDATE_ACCOUNT = "updateAccount";
-    private static final String ACTION_GET_REINIT_PASSWORD = "getReinitPassordPage";
+    private static final String ACTION_GET_RESET_PASSWORD = "getResetPassordPage";
 
     // Errors
     private static final String ERROR_OLD_PASSWORD = "error_old_password";
@@ -244,6 +244,8 @@ public class MyLuteceDirectoryApp implements XPageApplication
     private static final String MESSAGE_PASSWORD_EXPIRED = "module.mylutece.directory.message.passwordExpired";
     private static final String MESSAGE_MUST_CHANGE_PASSWORD = "module.mylutece.directory.message.userMustChangePassword";
 
+    private static final String JSP_URL_GET_RESET_PASSWORD_PAGE = "jsp/site/Portal.jsp?page=mylutecedirectory&action=getResetPassordPage";
+
     //Constants
     private static final String JCAPTCHA_PLUGIN = "jcaptcha";
     private static final String REGEX_LOGIN = "[^a-zA-Z_0-9]";
@@ -291,47 +293,48 @@ public class MyLuteceDirectoryApp implements XPageApplication
         String strAction = request.getParameter( PARAMETER_ACTION );
         init( request, plugin );
 
-        if ( ACTION_MODIFY_ACCOUNT.equals( strAction ) )
-        {
-            page = getModifyAccountPage( page, request );
-        }
-        else if ( ACTION_VIEW_ACCOUNT.equals( strAction ) )
-        {
-            page = getViewAccountPage( page, request );
-        }
-        else if ( ACTION_LOST_PASSWORD.equals( strAction ) )
-        {
-            page = getLostPasswordPage( page, request );
-        }
-        else if ( ACTION_CREATE_ACCOUNT.equals( strAction ) )
-        {
-            page = getCreateAccountPage( page );
-        }
-        else if ( ACTION_DO_CREATE_ACCOUNT.equals( strAction ) )
-        {
-            FormErrors formErrors = doCreateAccount( request );
-            page = getCreateAccountPage( page, formErrors );
-        }
-        else if ( ACTION_REINIT_PASSWORD.equals( strAction ) )
-        {
-            page = getReinitPasswordPage( page, request );
-        }
-        else if ( ACTION_UPDATE_ACCOUNT.equals( strAction ) )
-        {
-            updateAccount( request );
-        }
-        else if ( ACTION_GET_REINIT_PASSWORD.equals( strAction ) )
-        {
-            getMessageReinitPassword( request );
-        }
-
         LuteceUser luteceUser = SecurityService.getInstance( ).getRegisteredUser( request );
 
-        if ( !ACTION_GET_REINIT_PASSWORD.equals( strAction ) && ACTION_REINIT_PASSWORD.equals( strAction )
-                && luteceUser != null
-                && MyluteceDirectoryHome.findResetPasswordFromLogin( luteceUser.getName( ), plugin ) )
+        if ( luteceUser != null && MyluteceDirectoryHome.findResetPasswordFromLogin( luteceUser.getName( ), plugin )
+                && !ACTION_MODIFY_ACCOUNT.equals( strAction ) && !ACTION_UPDATE_ACCOUNT.equals( strAction ) )
         {
-            page = getReinitPasswordPage( page, request );
+            getMessageResetPassword( request );
+        }
+        else
+        {
+            if ( ACTION_MODIFY_ACCOUNT.equals( strAction ) )
+            {
+                page = getModifyAccountPage( page, request );
+            }
+            else if ( ACTION_VIEW_ACCOUNT.equals( strAction ) )
+            {
+                page = getViewAccountPage( page, request );
+            }
+            else if ( ACTION_LOST_PASSWORD.equals( strAction ) )
+            {
+                page = getLostPasswordPage( page, request );
+            }
+            else if ( ACTION_CREATE_ACCOUNT.equals( strAction ) )
+            {
+                page = getCreateAccountPage( page );
+            }
+            else if ( ACTION_DO_CREATE_ACCOUNT.equals( strAction ) )
+            {
+                FormErrors formErrors = doCreateAccount( request );
+                page = getCreateAccountPage( page, formErrors );
+            }
+            else if ( ACTION_REINIT_PASSWORD.equals( strAction ) )
+            {
+                page = getReinitPasswordPage( page, request );
+            }
+            else if ( ACTION_UPDATE_ACCOUNT.equals( strAction ) )
+            {
+                updateAccount( request );
+            }
+            else if ( ACTION_GET_RESET_PASSWORD.equals( strAction ) )
+            {
+                getMessageResetPassword( request );
+            }
         }
 
         if ( strAction.equals( ACTION_ACCESS_DENIED ) || ( page == null ) )
@@ -386,6 +389,11 @@ public class MyLuteceDirectoryApp implements XPageApplication
     public static String getResetPasswordUrl( )
     {
         return AppPropertiesService.getProperty( PROPERTY_MYLUTECE_RESET_PASSWORD_URL );
+    }
+
+    public static String getMessageResetPasswordUrl( )
+    {
+        return JSP_URL_GET_RESET_PASSWORD_PAGE;
     }
 
     /**
@@ -1324,9 +1332,9 @@ public class MyLuteceDirectoryApp implements XPageApplication
                 null, SiteMessage.TYPE_ERROR );
     }
 
-    public void getMessageReinitPassword( HttpServletRequest request ) throws SiteMessageException
+    public void getMessageResetPassword( HttpServletRequest request ) throws SiteMessageException
     {
         SiteMessageService.setMessage( request, MESSAGE_MUST_CHANGE_PASSWORD, null, MESSAGE_PASSWORD_EXPIRED,
-                getReinitPageUrl( ), null, SiteMessage.TYPE_INFO );
+                getResetPasswordUrl( ), null, SiteMessage.TYPE_INFO );
     }
 }

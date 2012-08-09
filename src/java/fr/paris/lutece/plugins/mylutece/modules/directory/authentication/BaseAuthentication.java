@@ -344,7 +344,7 @@ public class BaseAuthentication extends PortalAuthentication
     @Override
     public String getResetPasswordPageUrl( HttpServletRequest request )
     {
-        return AppPathService.getBaseUrl( request ) + MyLuteceDirectoryApp.getResetPasswordUrl( );
+        return AppPathService.getBaseUrl( request ) + MyLuteceDirectoryApp.getMessageResetPasswordUrl( );
     }
 
     private static IMyluteceDirectoryService getMyluteceDirectoryService( )
