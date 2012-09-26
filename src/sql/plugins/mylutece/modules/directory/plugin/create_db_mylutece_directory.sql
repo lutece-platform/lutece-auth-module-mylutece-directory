@@ -27,6 +27,7 @@ CREATE TABLE mylutece_directory_user (
 	password_max_valid_date TIMESTAMP NULL,
 	account_max_valid_date BIGINT NULL,
 	nb_alerts_sent INTEGER DEFAULT 0 NOT NULL,
+	last_login TIMESTAMP DEFAULT '1980-01-01',
 	PRIMARY KEY (id_record)
 );
 

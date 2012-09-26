@@ -44,10 +44,13 @@ import fr.paris.lutece.plugins.mylutece.modules.directory.authentication.BaseUse
 import fr.paris.lutece.portal.service.plugin.Plugin;
 import fr.paris.lutece.portal.service.plugin.PluginService;
 import fr.paris.lutece.portal.service.security.LuteceAuthentication;
+import fr.paris.lutece.portal.service.security.LuteceUser;
 import fr.paris.lutece.portal.service.spring.SpringContextService;
 import fr.paris.lutece.portal.service.util.AppLogService;
 
 import java.sql.Timestamp;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -59,296 +62,294 @@ import java.util.Locale;
  */
 public final class MyluteceDirectoryHome
 {
-    // Static variable pointed at the DAO instance
-    private static IMyluteceDirectoryDAO _dao = SpringContextService.getBean( "mylutece-directory.myluteceDirectoryDAO" );
+	// Static variable pointed at the DAO instance
+	private static IMyluteceDirectoryDAO _dao = SpringContextService.getBean( "mylutece-directory.myluteceDirectoryDAO" );
 
-    /**
-     * Private constructor - this class need not be instantiated
-     */
-    private MyluteceDirectoryHome(  )
-    {
-    }
+	/**
+	 * Private constructor - this class need not be instantiated
+	 */
+	private MyluteceDirectoryHome( )
+	{
+	}
 
-    /**
-     * Find users by login
-     *
-     * @param strLogin the login
-     * @param plugin The Plugin using this data access service
-     * @param authenticationService the LuteceAuthentication object
-     * @return DirectoryUser the user corresponding to the login
-     */
-    public static BaseUser findLuteceUserByLogin( String strLogin, Plugin plugin,
-        LuteceAuthentication authenticationService )
-    {
-        Locale locale = null;
+	/**
+	 * Find users by login
+	 * 
+	 * @param strLogin the login
+	 * @param plugin The Plugin using this data access service
+	 * @param authenticationService the LuteceAuthentication object
+	 * @return DirectoryUser the user corresponding to the login
+	 */
+	public static BaseUser findLuteceUserByLogin( String strLogin, Plugin plugin, LuteceAuthentication authenticationService )
+	{
+		Locale locale = null;
 
-        // Get the Mylutece Directory User
-        Collection<MyluteceDirectoryUser> directoryUsers = MyluteceDirectoryUserHome.findDirectoryUsersListForLogin( strLogin,
-                plugin );
+		// Get the Mylutece Directory User
+		Collection<MyluteceDirectoryUser> directoryUsers = MyluteceDirectoryUserHome.findDirectoryUsersListForLogin( strLogin, plugin );
 
-        if ( directoryUsers.size(  ) != 1 )
-        {
-            return null;
-        }
+		if ( directoryUsers.size( ) != 1 )
+		{
+			return null;
+		}
 
-        MyluteceDirectoryUser directoryUser = directoryUsers.iterator(  ).next(  );
+		MyluteceDirectoryUser directoryUser = directoryUsers.iterator( ).next( );
 
-        // Get the Directory record
-        RecordFieldFilter filter = new RecordFieldFilter(  );
-        filter.setIdRecord( directoryUser.getIdRecord(  ) );
+		// Get the Directory record
+		RecordFieldFilter filter = new RecordFieldFilter( );
+		filter.setIdRecord( directoryUser.getIdRecord( ) );
 
-        Plugin directoryPlugin = PluginService.getPlugin( DirectoryPlugin.PLUGIN_NAME );
-        IRecordService recordService = SpringContextService.getBean( RecordService.BEAN_SERVICE );
-        Record record = recordService.findByPrimaryKey( directoryUser.getIdRecord(  ), directoryPlugin );
+		Plugin directoryPlugin = PluginService.getPlugin( DirectoryPlugin.PLUGIN_NAME );
+		IRecordService recordService = SpringContextService.getBean( RecordService.BEAN_SERVICE );
+		Record record = recordService.findByPrimaryKey( directoryUser.getIdRecord( ), directoryPlugin );
 
-        if ( record == null )
-        {
-            AppLogService.error( 
-                "MyLuteceDirectory - Inconsistency between the MyLuteceDirectoryUser and the directory record : " +
-                "Record is null whereas MyLuteceDirectoryUser is not." );
+		if ( record == null )
+		{
+			AppLogService.error( "MyLuteceDirectory - Inconsistency between the MyLuteceDirectoryUser and the directory record : " + "Record is null whereas MyLuteceDirectoryUser is not." );
 
-            return null;
-        }
+			return null;
+		}
 
-        record.setListRecordField( RecordFieldHome.getRecordFieldList( filter, directoryPlugin ) );
+		record.setListRecordField( RecordFieldHome.getRecordFieldList( filter, directoryPlugin ) );
 
-        // Create the BaseUser
-        BaseUser user = new BaseUser( strLogin, authenticationService );
-        user.setLuteceAuthenticationService( authenticationService );
-        user.setGroups( MyluteceDirectoryHome.findUserGroupsFromLogin( strLogin, plugin ) );
-        user.setRoles( MyluteceDirectoryHome.findUserRolesFromLogin( strLogin, plugin ) );
+		// Create the BaseUser
+		BaseUser user = new BaseUser( strLogin, authenticationService );
+		user.setLuteceAuthenticationService( authenticationService );
+		user.setGroups( MyluteceDirectoryHome.findUserGroupsFromLogin( strLogin, plugin ) );
+		user.setRoles( MyluteceDirectoryHome.findUserRolesFromLogin( strLogin, plugin ) );
 
-        for ( RecordField rf : record.getListRecordField(  ) )
-        {
-            AttributeMapping attributeMapping = AttributeMappingHome.findByPrimaryKey( rf.getEntry(  ).getIdEntry(  ),
-                    plugin );
+		if ( directoryUser.getDateLastLogin( ) != null )
+		{
+			DateFormat dateFormat = new SimpleDateFormat( );
+			user.setUserInfo( LuteceUser.DATE_LAST_LOGIN, dateFormat.format( directoryUser.getDateLastLogin( ) ) );
+		}
 
-            if ( attributeMapping != null )
-            {
-                user.setUserInfo( attributeMapping.getAttributeKey(  ),
-                    rf.getEntry(  ).convertRecordFieldValueToString( rf, locale, false, false ) );
-            }
-        }
+		for ( RecordField rf : record.getListRecordField( ) )
+		{
+			AttributeMapping attributeMapping = AttributeMappingHome.findByPrimaryKey( rf.getEntry( ).getIdEntry( ), plugin );
 
-        return user;
-    }
+			if ( attributeMapping != null )
+			{
+				user.setUserInfo( attributeMapping.getAttributeKey( ), rf.getEntry( ).convertRecordFieldValueToString( rf, locale, false, false ) );
+			}
+		}
 
-    /**
-     * Gets the reset password attribute of the user from his login
-     * @param strLogin the login
-     * @param plugin The Plugin using this data access services
-     * @return True if the password has to be changed, false otherwise
-     */
-    public static boolean findResetPasswordFromLogin( String strLogin, Plugin plugin )
-    {
-        return _dao.selectResetPasswordFromLogin( strLogin, plugin );
-    }
+		return user;
+	}
 
-    /**
-     * Gets the expiration date of the user's password
-     * @param strLogin The login of the user
-     * @param plugin The plugin
-     * @return The expiration date of the user's password
-     */
-    public static Timestamp findPasswordMaxValideDateFromLogin( String strLogin, Plugin plugin )
-    {
-        return _dao.selectPasswordMaxValideDateFromLogin( strLogin, plugin );
-    }
+	/**
+	 * Gets the reset password attribute of the user from his login
+	 * @param strLogin the login
+	 * @param plugin The Plugin using this data access services
+	 * @return True if the password has to be changed, false otherwise
+	 */
+	public static boolean findResetPasswordFromLogin( String strLogin, Plugin plugin )
+	{
+		return _dao.selectResetPasswordFromLogin( strLogin, plugin );
+	}
 
-    /**
-     * Load the list of {@link BaseUser}
-     * @param plugin The Plugin using this data access service
-     * @param authenticationService the authentication service
-     * @return The Collection of the {@link BaseUser}
-     */
-    public static Collection<BaseUser> findDirectoryUsersList( Plugin plugin, LuteceAuthentication authenticationService )
-    {
-        Locale locale = null;
+	/**
+	 * Gets the expiration date of the user's password
+	 * @param strLogin The login of the user
+	 * @param plugin The plugin
+	 * @return The expiration date of the user's password
+	 */
+	public static Timestamp findPasswordMaxValideDateFromLogin( String strLogin, Plugin plugin )
+	{
+		return _dao.selectPasswordMaxValideDateFromLogin( strLogin, plugin );
+	}
 
-        // Get the Mylutece Directory User
-        Collection<MyluteceDirectoryUser> directoryUsers = MyluteceDirectoryUserHome.findDirectoryUsersList( plugin );
-        Collection<BaseUser> baseUserList = new ArrayList<BaseUser>(  );
+	/**
+	 * Load the list of {@link BaseUser}
+	 * @param plugin The Plugin using this data access service
+	 * @param authenticationService the authentication service
+	 * @return The Collection of the {@link BaseUser}
+	 */
+	public static Collection<BaseUser> findDirectoryUsersList( Plugin plugin, LuteceAuthentication authenticationService )
+	{
+		Locale locale = null;
 
-        for ( MyluteceDirectoryUser directoryUser : directoryUsers )
-        {
-            // Get the Directory record
-            RecordFieldFilter filter = new RecordFieldFilter(  );
-            filter.setIdRecord( directoryUser.getIdRecord(  ) );
+		// Get the Mylutece Directory User
+		Collection<MyluteceDirectoryUser> directoryUsers = MyluteceDirectoryUserHome.findDirectoryUsersList( plugin );
+		Collection<BaseUser> baseUserList = new ArrayList<BaseUser>( );
 
-            Plugin directoryPlugin = PluginService.getPlugin( DirectoryPlugin.PLUGIN_NAME );
-            IRecordService recordService = SpringContextService.getBean( RecordService.BEAN_SERVICE );
-            Record record = recordService.findByPrimaryKey( directoryUser.getIdRecord(  ), directoryPlugin );
-            record.setListRecordField( RecordFieldHome.getRecordFieldList( filter, directoryPlugin ) );
+		for ( MyluteceDirectoryUser directoryUser : directoryUsers )
+		{
+			// Get the Directory record
+			RecordFieldFilter filter = new RecordFieldFilter( );
+			filter.setIdRecord( directoryUser.getIdRecord( ) );
 
-            // Create the BaseUser
-            BaseUser user = new BaseUser( directoryUser.getLogin(  ), authenticationService );
-            user.setGroups( MyluteceDirectoryHome.findUserGroupsFromLogin( directoryUser.getLogin(  ), plugin ) );
-            user.setRoles( MyluteceDirectoryHome.findUserRolesFromLogin( directoryUser.getLogin(  ), plugin ) );
+			Plugin directoryPlugin = PluginService.getPlugin( DirectoryPlugin.PLUGIN_NAME );
+			IRecordService recordService = SpringContextService.getBean( RecordService.BEAN_SERVICE );
+			Record record = recordService.findByPrimaryKey( directoryUser.getIdRecord( ), directoryPlugin );
+			record.setListRecordField( RecordFieldHome.getRecordFieldList( filter, directoryPlugin ) );
 
-            for ( RecordField rf : record.getListRecordField(  ) )
-            {
-                AttributeMapping attributeMapping = AttributeMappingHome.findByPrimaryKey( rf.getEntry(  ).getIdEntry(  ),
-                        plugin );
+			// Create the BaseUser
+			BaseUser user = new BaseUser( directoryUser.getLogin( ), authenticationService );
+			user.setGroups( MyluteceDirectoryHome.findUserGroupsFromLogin( directoryUser.getLogin( ), plugin ) );
+			user.setRoles( MyluteceDirectoryHome.findUserRolesFromLogin( directoryUser.getLogin( ), plugin ) );
 
-                if ( attributeMapping != null )
-                {
-                    user.setUserInfo( attributeMapping.getAttributeKey(  ),
-                        rf.getEntry(  ).convertRecordFieldValueToString( rf, locale, false, false ) );
-                }
-            }
+			for ( RecordField rf : record.getListRecordField( ) )
+			{
+				AttributeMapping attributeMapping = AttributeMappingHome.findByPrimaryKey( rf.getEntry( ).getIdEntry( ), plugin );
 
-            baseUserList.add( user );
-        }
+				if ( attributeMapping != null )
+				{
+					user.setUserInfo( attributeMapping.getAttributeKey( ), rf.getEntry( ).convertRecordFieldValueToString( rf, locale, false, false ) );
+				}
+			}
 
-        return baseUserList;
-    }
+			baseUserList.add( user );
+		}
 
-    /**
-     * Assign a directory as a user directory
-     * @param nIdDirectory The directory identifier
-     * @param plugin The Plugin using this data access service
-     */
-    public static void assignDirectory( int nIdDirectory, Plugin plugin )
-    {
-        _dao.assignDirectory( nIdDirectory, plugin );
-    }
+		return baseUserList;
+	}
 
-    /**
-     * Unassign a directory
-     * @param nIdDirectory The directory identifier
-     * @param plugin The Plugin using this data access service
-     */
-    public static void unAssignDirectory( int nIdDirectory, Plugin plugin )
-    {
-        _dao.unAssignDirectory( nIdDirectory, plugin );
-    }
+	/**
+	 * Assign a directory as a user directory
+	 * @param nIdDirectory The directory identifier
+	 * @param plugin The Plugin using this data access service
+	 */
+	public static void assignDirectory( int nIdDirectory, Plugin plugin )
+	{
+		_dao.assignDirectory( nIdDirectory, plugin );
+	}
 
-    /**
-     * Unassign all directories
-     * @param plugin The Plugin using this data access service
-     */
-    public static void unAssignDirectories( Plugin plugin )
-    {
-        _dao.unAssignDirectories( plugin );
-    }
+	/**
+	 * Unassign a directory
+	 * @param nIdDirectory The directory identifier
+	 * @param plugin The Plugin using this data access service
+	 */
+	public static void unAssignDirectory( int nIdDirectory, Plugin plugin )
+	{
+		_dao.unAssignDirectory( nIdDirectory, plugin );
+	}
 
-    /**
-     * Find the mapped directories
-     * @param plugin The Plugin using this data access service
-     * @return a collection of directouy
-     */
-    public static Collection<Integer> findMappedDirectories( Plugin plugin )
-    {
-        return _dao.selectMappedDirectories( plugin );
-    }
+	/**
+	 * Unassign all directories
+	 * @param plugin The Plugin using this data access service
+	 */
+	public static void unAssignDirectories( Plugin plugin )
+	{
+		_dao.unAssignDirectories( plugin );
+	}
 
-    /**
-     * Check if the specified directory is mapped for managing users
-     * @param nIdDirectory The directory identifier
-     * @param plugin The Plugin using this data access service
-     * @return true if the directory is mapped, false else
-     */
-    public static boolean isMapped( int nIdDirectory, Plugin plugin )
-    {
-        return _dao.isMapped( nIdDirectory, plugin );
-    }
+	/**
+	 * Find the mapped directories
+	 * @param plugin The Plugin using this data access service
+	 * @return a collection of directouy
+	 */
+	public static Collection<Integer> findMappedDirectories( Plugin plugin )
+	{
+		return _dao.selectMappedDirectories( plugin );
+	}
 
-    /**
-     * Find user's roles by login
-     *
-     * @param strLogin the login
-     * @param plugin The Plugin using this data access service
-     * @return ArrayList the role key list corresponding to the login
-     */
-    public static List<String> findUserRolesFromLogin( String strLogin, Plugin plugin )
-    {
-        return _dao.selectUserRolesFromLogin( strLogin, plugin );
-    }
+	/**
+	 * Check if the specified directory is mapped for managing users
+	 * @param nIdDirectory The directory identifier
+	 * @param plugin The Plugin using this data access service
+	 * @return true if the directory is mapped, false else
+	 */
+	public static boolean isMapped( int nIdDirectory, Plugin plugin )
+	{
+		return _dao.isMapped( nIdDirectory, plugin );
+	}
 
-    /**
-     * Delete roles for a user
-         * @param nIdRecord The id of the user
-     * @param plugin The Plugin using this data access service
-     */
-    public static void removeRolesForUser( int nIdRecord, Plugin plugin )
-    {
-        _dao.deleteRolesForUser( nIdRecord, plugin );
-    }
+	/**
+	 * Find user's roles by login
+	 * 
+	 * @param strLogin the login
+	 * @param plugin The Plugin using this data access service
+	 * @return ArrayList the role key list corresponding to the login
+	 */
+	public static List<String> findUserRolesFromLogin( String strLogin, Plugin plugin )
+	{
+		return _dao.selectUserRolesFromLogin( strLogin, plugin );
+	}
 
-    /**
-     * Assign a role to user
-         * @param nIdRecord The id of the user
-     * @param strRoleKey The key of the role
-     * @param plugin The Plugin using this data access service
-     */
-    public static void addRoleForUser( int nIdRecord, String strRoleKey, Plugin plugin )
-    {
-        _dao.createRoleForUser( nIdRecord, strRoleKey, plugin );
-    }
+	/**
+	 * Delete roles for a user
+	 * @param nIdRecord The id of the user
+	 * @param plugin The Plugin using this data access service
+	 */
+	public static void removeRolesForUser( int nIdRecord, Plugin plugin )
+	{
+		_dao.deleteRolesForUser( nIdRecord, plugin );
+	}
 
-    /**
-     * Find user's groups by login
-     *
-     * @param strLogin the login
-     * @param plugin The Plugin using this data access service
-     * @return ArrayList the group key list corresponding to the login
-     */
-    public static List<String> findUserGroupsFromLogin( String strLogin, Plugin plugin )
-    {
-        return _dao.selectUserGroupsFromLogin( strLogin, plugin );
-    }
+	/**
+	 * Assign a role to user
+	 * @param nIdRecord The id of the user
+	 * @param strRoleKey The key of the role
+	 * @param plugin The Plugin using this data access service
+	 */
+	public static void addRoleForUser( int nIdRecord, String strRoleKey, Plugin plugin )
+	{
+		_dao.createRoleForUser( nIdRecord, strRoleKey, plugin );
+	}
 
-    /**
-     * Delete groups for a user
-     * @param nIdRecord The id of the user
-     * @param plugin The Plugin using this data access service
-     */
-    public static void removeGroupsForUser( int nIdRecord, Plugin plugin )
-    {
-        _dao.deleteGroupsForUser( nIdRecord, plugin );
-    }
+	/**
+	 * Find user's groups by login
+	 * 
+	 * @param strLogin the login
+	 * @param plugin The Plugin using this data access service
+	 * @return ArrayList the group key list corresponding to the login
+	 */
+	public static List<String> findUserGroupsFromLogin( String strLogin, Plugin plugin )
+	{
+		return _dao.selectUserGroupsFromLogin( strLogin, plugin );
+	}
 
-    /**
-     * Assign a group to user
-         * @param nIdRecord The id of the user
-     * @param strGroupKey The key of the group
-     * @param plugin The Plugin using this data access service
-     */
-    public static void addGroupForUser( int nIdRecord, String strGroupKey, Plugin plugin )
-    {
-        _dao.createGroupForUser( nIdRecord, strGroupKey, plugin );
-    }
+	/**
+	 * Delete groups for a user
+	 * @param nIdRecord The id of the user
+	 * @param plugin The Plugin using this data access service
+	 */
+	public static void removeGroupsForUser( int nIdRecord, Plugin plugin )
+	{
+		_dao.deleteGroupsForUser( nIdRecord, plugin );
+	}
 
-    /**
-     * Returns a collection of DirectoryUser objects for a Lutece role
-     *
-     * @param strRoleKey The role of the databseUser
-     * @param plugin The current plugin using this method
-     * @return A collection of logins
-     */
-    public static Collection<String> findDirectoryUsersListForRoleKey( String strRoleKey, Plugin plugin )
-    {
-        return _dao.selectLoginListForRoleKey( strRoleKey, plugin );
-    }
+	/**
+	 * Assign a group to user
+	 * @param nIdRecord The id of the user
+	 * @param strGroupKey The key of the group
+	 * @param plugin The Plugin using this data access service
+	 */
+	public static void addGroupForUser( int nIdRecord, String strGroupKey, Plugin plugin )
+	{
+		_dao.createGroupForUser( nIdRecord, strGroupKey, plugin );
+	}
 
-    /**
-     * Update the reset password attribut of a user from his login
-     * @param strUserName Login of the user to update
-     * @param bNewValue New value
-     */
-    public static void updateResetPasswordFromLogin( String strUserName, boolean bNewValue, Plugin plugin )
-    {
-        _dao.updateResetPasswordFromLogin( strUserName, bNewValue, plugin );
-    }
+	/**
+	 * Returns a collection of DirectoryUser objects for a Lutece role
+	 * 
+	 * @param strRoleKey The role of the databseUser
+	 * @param plugin The current plugin using this method
+	 * @return A collection of logins
+	 */
+	public static Collection<String> findDirectoryUsersListForRoleKey( String strRoleKey, Plugin plugin )
+	{
+		return _dao.selectLoginListForRoleKey( strRoleKey, plugin );
+	}
 
-    /**
-     * Get the id of a user from his login
-     * @param strLogin Login of the user
-     * @param plugin The plugin
-     * @return The id of the user
-     */
-    public static int findUserIdFromLogin( String strLogin, Plugin plugin )
-    {
-        return _dao.findUserIdFromLogin( strLogin, plugin );
-    }
+	/**
+	 * Update the reset password attribut of a user from his login
+	 * @param strUserName Login of the user to update
+	 * @param bNewValue New value
+	 */
+	public static void updateResetPasswordFromLogin( String strUserName, boolean bNewValue, Plugin plugin )
+	{
+		_dao.updateResetPasswordFromLogin( strUserName, bNewValue, plugin );
+	}
+
+	/**
+	 * Get the id of a user from his login
+	 * @param strLogin Login of the user
+	 * @param plugin The plugin
+	 * @return The id of the user
+	 */
+	public static int findUserIdFromLogin( String strLogin, Plugin plugin )
+	{
+		return _dao.findUserIdFromLogin( strLogin, plugin );
+	}
 }

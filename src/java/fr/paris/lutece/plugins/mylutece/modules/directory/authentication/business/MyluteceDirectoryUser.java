@@ -41,189 +41,207 @@ import java.sql.Timestamp;
  */
 public class MyluteceDirectoryUser
 {
-    // Variables declarations
-    /**
-     * Status of not activated users.
-     */
-    public static final int STATUS_NOT_ACTIVATED = 0;
-    /**
-     * Status of activated users.
-     */
-    public static final int STATUS_ACTIVATED = 1;
-    /**
-     * Status of expired users. Expired users will be anonymized.
-     */
-    public static final int STATUS_EXPIRED = 5;
-    /**
-     * Status of anonymized users.
-     */
-    public static final int STATUS_ANONYMIZED = 10;
-    private int _nIdRecord;
-    private String _strLogin;
-    private String _strPassword;
-    private boolean _bIsPasswordReset;
-    private int _nStatus;
-    private Timestamp _passwordMaxValidDate;
-    private Timestamp _accountMaxValidDate;
+	// Variables declarations
+	/**
+	 * Status of not activated users.
+	 */
+	public static final int STATUS_NOT_ACTIVATED = 0;
+	/**
+	 * Status of activated users.
+	 */
+	public static final int STATUS_ACTIVATED = 1;
+	/**
+	 * Status of expired users. Expired users will be anonymized.
+	 */
+	public static final int STATUS_EXPIRED = 5;
+	/**
+	 * Status of anonymized users.
+	 */
+	public static final int STATUS_ANONYMIZED = 10;
+	private int _nIdRecord;
+	private String _strLogin;
+	private String _strPassword;
+	private boolean _bIsPasswordReset;
+	private int _nStatus;
+	private Timestamp _passwordMaxValidDate;
+	private Timestamp _accountMaxValidDate;
+	private Timestamp _dateLastLogin;
 
-    /**
-     * Returns the IdRecord
-     *
-     * @return The IdRecord
-     */
-    public int getIdRecord(  )
-    {
-        return _nIdRecord;
-    }
+	/**
+	 * Returns the IdRecord
+	 * 
+	 * @return The IdRecord
+	 */
+	public int getIdRecord( )
+	{
+		return _nIdRecord;
+	}
 
-    /**
-     * Sets the IdRecord
-     *
-     * @param nIdRecord The IdRecord
-     */
-    public void setIdRecord( int nIdRecord )
-    {
-        _nIdRecord = nIdRecord;
-    }
+	/**
+	 * Sets the IdRecord
+	 * 
+	 * @param nIdRecord The IdRecord
+	 */
+	public void setIdRecord( int nIdRecord )
+	{
+		_nIdRecord = nIdRecord;
+	}
 
-    /**
-    * Returns the login
-    *
-    * @return The login
-    */
-    public String getLogin(  )
-    {
-        return _strLogin;
-    }
+	/**
+	 * Returns the login
+	 * 
+	 * @return The login
+	 */
+	public String getLogin( )
+	{
+		return _strLogin;
+	}
 
-    /**
-     * Sets the login
-     *
-     * @param strLogin The login
-     */
-    public void setLogin( String strLogin )
-    {
-        _strLogin = strLogin;
-    }
+	/**
+	 * Sets the login
+	 * 
+	 * @param strLogin The login
+	 */
+	public void setLogin( String strLogin )
+	{
+		_strLogin = strLogin;
+	}
 
-    /**
-     * Returns the user's password
-     *
-     * @param The password
-     */
-    public String getPassword( )
-    {
-        return _strPassword;
-    }
+	/**
+	 * Returns the user's password
+	 * 
+	 * @param The password
+	 */
+	public String getPassword( )
+	{
+		return _strPassword;
+	}
 
-    /**
-     * Sets the password
-     *
-     * @param strPassword The password
-     */
-    public void setPassword( String strPassword )
-    {
-        _strPassword = strPassword;
-    }
+	/**
+	 * Sets the password
+	 * 
+	 * @param strPassword The password
+	 */
+	public void setPassword( String strPassword )
+	{
+		_strPassword = strPassword;
+	}
 
-    /**
-     * Check if the password has been reinitialized
-     * @return true if it has been reinitialized, false otherwise
-     */
-    public boolean isPasswordReset( )
-    {
-        return _bIsPasswordReset;
-    }
+	/**
+	 * Check if the password has been reinitialized
+	 * @return true if it has been reinitialized, false otherwise
+	 */
+	public boolean isPasswordReset( )
+	{
+		return _bIsPasswordReset;
+	}
 
-    /**
-     * Set pwd reseted
-     * @param bIsPasswordReset true if it has been reinitialized, false
-     *            otherwise
-     */
-    public void setPasswordReset( boolean bIsPasswordReset )
-    {
-        _bIsPasswordReset = bIsPasswordReset;
-    }
+	/**
+	 * Set pwd reseted
+	 * @param bIsPasswordReset true if it has been reinitialized, false otherwise
+	 */
+	public void setPasswordReset( boolean bIsPasswordReset )
+	{
+		_bIsPasswordReset = bIsPasswordReset;
+	}
 
-    /**
-     * Get the status of the user
-     * @return The status of the user
-     */
-    public int getStatus( )
-    {
-        return _nStatus;
-    }
+	/**
+	 * Get the status of the user
+	 * @return The status of the user
+	 */
+	public int getStatus( )
+	{
+		return _nStatus;
+	}
 
-    /**
-     * Set the status of the user
-     * @param nStatus The status
-     */
-    public void setStatus( int nStatus )
-    {
-        _nStatus = nStatus;
-    }
+	/**
+	 * Set the status of the user
+	 * @param nStatus The status
+	 */
+	public void setStatus( int nStatus )
+	{
+		_nStatus = nStatus;
+	}
 
-    /**
-     * Return true if the user is activated
-     * @return the boolean
-     */
-    public boolean isActivated(  )
-    {
-        return ( _nStatus >= STATUS_ACTIVATED && _nStatus < STATUS_EXPIRED );
-    }
+	/**
+	 * Return true if the user is activated
+	 * @return the boolean
+	 */
+	public boolean isActivated( )
+	{
+		return ( _nStatus >= STATUS_ACTIVATED && _nStatus < STATUS_EXPIRED );
+	}
 
-    /**
-     * Sets the activated.
-     *
-     * @param bIsActivated the new activated
-     * @deprecated Use {@link #setStatus(int)} instead
-     */
-    @Deprecated
+	/**
+	 * Sets the activated.
+	 * 
+	 * @param bIsActivated the new activated
+	 * @deprecated Use {@link #setStatus(int)} instead
+	 */
+	@Deprecated
 	public void setActivated( boolean bIsActivated )
-    {
-    	if ( bIsActivated )
-    	{
-    		_nStatus = STATUS_ACTIVATED;
-    	}
-    	else
-    	{
-    		_nStatus = STATUS_NOT_ACTIVATED;
-    	}
-    }
+	{
+		if ( bIsActivated )
+		{
+			_nStatus = STATUS_ACTIVATED;
+		}
+		else
+		{
+			_nStatus = STATUS_NOT_ACTIVATED;
+		}
+	}
 
-    /**
-     * Get the maximum valid date of the password of the user
-     * @return The maximum valid date of the password of the user
-     */
-    public Timestamp getPasswordMaxValidDate( )
-    {
-        return _passwordMaxValidDate;
-    }
+	/**
+	 * Get the maximum valid date of the password of the user
+	 * @return The maximum valid date of the password of the user
+	 */
+	public Timestamp getPasswordMaxValidDate( )
+	{
+		return _passwordMaxValidDate;
+	}
 
-    /**
-     * Set the maximum valid date of the password of the user
-     * @param passwordMaxValidDate The maximum valid date
-     */
-    public void setPasswordMaxValidDate( Timestamp passwordMaxValidDate )
-    {
-        _passwordMaxValidDate = passwordMaxValidDate;
-    }
+	/**
+	 * Set the maximum valid date of the password of the user
+	 * @param passwordMaxValidDate The maximum valid date
+	 */
+	public void setPasswordMaxValidDate( Timestamp passwordMaxValidDate )
+	{
+		_passwordMaxValidDate = passwordMaxValidDate;
+	}
 
-    /**
-     * Get the maximum valid date of the account of the user
-     * @return The maximum valid date of the account of the user
-     */
-    public Timestamp getAccountMaxValidDate( )
-    {
-        return _accountMaxValidDate;
-    }
+	/**
+	 * Get the maximum valid date of the account of the user
+	 * @return The maximum valid date of the account of the user
+	 */
+	public Timestamp getAccountMaxValidDate( )
+	{
+		return _accountMaxValidDate;
+	}
 
-    /**
-     * Set the maximum valid date of the account of the user
-     * @param accountMaxValidDate The maximum valid date
-     */
-    public void setAccountMaxValidDate( Timestamp accountMaxValidDate )
-    {
-        _accountMaxValidDate = accountMaxValidDate;
-    }
+	/**
+	 * Set the maximum valid date of the account of the user
+	 * @param accountMaxValidDate The maximum valid date
+	 */
+	public void setAccountMaxValidDate( Timestamp accountMaxValidDate )
+	{
+		_accountMaxValidDate = accountMaxValidDate;
+	}
+
+	/**
+	 * Get the last login date of the account of the user
+	 * @return The last login date of the account of the user
+	 */
+	public Timestamp getDateLastLogin( )
+	{
+		return _dateLastLogin;
+	}
+
+	/**
+	 * Set the last login date of the account of the user
+	 * @param dateLastLogin The last login date of the account of the user
+	 */
+	public void setDateLastLogin( Timestamp dateLastLogin )
+	{
+		_dateLastLogin = dateLastLogin;
+	}
 }
