@@ -345,13 +345,18 @@ public class MyluteceDirectoryJspBean extends PluginAdminPageJspBean
         {
             for ( Field field : LuteceUser.class.getFields(  ) )
             {
-                String strValue = (String) field.get( LuteceUser.class );
+				try
+				{
+					String strValue = ( String ) field.get( LuteceUser.class );
 
-                if ( strValue.startsWith( PREFIX_LUTECE_USER ) &&
-                        ( _attributeMappingService.getAttributeMappingByAttributeKey( strValue, getPlugin(  ) ) == null ) )
-                {
-                    attributesList.addItem( strValue, field.getName(  ) );
-                }
+	                if ( strValue.startsWith( PREFIX_LUTECE_USER ) && ( _attributeMappingService.getAttributeMappingByAttributeKey( strValue, getPlugin( ) ) == null ) )
+					{
+						attributesList.addItem( strValue, field.getName( ) );
+					}
+				}
+				catch ( ClassCastException e )
+				{
+				}
             }
         }
         catch ( IllegalArgumentException e )

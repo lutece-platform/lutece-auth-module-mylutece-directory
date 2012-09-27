@@ -269,6 +269,15 @@ public class BaseAuthentication extends PortalAuthentication
 	 * {@inheritDoc}
 	 */
 	@Override
+	public String getLostLoginPageUrl( )
+	{
+		return MyLuteceDirectoryApp.getLostLoginUrl( );
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public Collection<LuteceUser> getUsers( )
 	{
 		return getMyluteceDirectoryService( ).getUsers( this );
