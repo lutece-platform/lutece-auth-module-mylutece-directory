@@ -43,9 +43,12 @@ import fr.paris.lutece.plugins.mylutece.modules.directory.authentication.busines
 import fr.paris.lutece.plugins.mylutece.modules.directory.authentication.service.AttributeMappingService;
 import fr.paris.lutece.plugins.mylutece.modules.directory.authentication.service.IAttributeMappingService;
 import fr.paris.lutece.plugins.mylutece.modules.directory.authentication.service.IMyluteceDirectoryService;
+import fr.paris.lutece.plugins.mylutece.modules.directory.authentication.service.MyluteceDirectoryPlugin;
 import fr.paris.lutece.plugins.mylutece.modules.directory.authentication.service.MyluteceDirectoryService;
 import fr.paris.lutece.portal.service.message.AdminMessage;
 import fr.paris.lutece.portal.service.message.AdminMessageService;
+import fr.paris.lutece.portal.service.plugin.Plugin;
+import fr.paris.lutece.portal.service.plugin.PluginService;
 import fr.paris.lutece.portal.service.security.LuteceUser;
 import fr.paris.lutece.portal.service.spring.SpringContextService;
 import fr.paris.lutece.portal.service.template.AppTemplateService;
@@ -542,4 +545,18 @@ public class MyluteceDirectoryJspBean extends PluginAdminPageJspBean
     {
         return AppPathService.getBaseUrl( request ) + JSP_URL_PREFIX + JSP_URL_MANAGE_DIRECTORY;
     }
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public Plugin getPlugin( )
+	{
+		Plugin plugin = super.getPlugin( );
+		if ( plugin == null )
+		{
+			plugin = PluginService.getPlugin( MyluteceDirectoryPlugin.PLUGIN_NAME );
+		}
+		return plugin;
+	}
 }

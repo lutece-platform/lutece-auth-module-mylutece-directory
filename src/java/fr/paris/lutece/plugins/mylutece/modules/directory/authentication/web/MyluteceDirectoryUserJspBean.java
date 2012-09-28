@@ -179,6 +179,7 @@ public class MyluteceDirectoryUserJspBean extends PluginAdminPageJspBean
     private static final String PARAMETER_EXPIRATION_MAIL = "mylutece_directory_expiration_mail";
     private static final String PARAMETER_ACCOUNT_REACTIVATED = "mylutece_directory_account_reactivated_mail";
     private static final String PARAMETER_CANCEL = "cancel";
+	private static final String PARAMETER_BANNED_DOMAIN_NAMES = "banned_domain_names";
 
     // Markers
     private static final String MARK_LOCALE = "locale";
@@ -897,6 +898,8 @@ public class MyluteceDirectoryUserJspBean extends PluginAdminPageJspBean
         }
 
         SecurityUtils.updateSecurityParameters( _parameterService, request, getPlugin( ) );
+		SecurityUtils.updateLargeParameterValue( _parameterService, PluginService.getPlugin( DirectoryPlugin.PLUGIN_NAME ), PARAMETER_BANNED_DOMAIN_NAMES, request
+				.getParameter( PARAMETER_BANNED_DOMAIN_NAMES ) );
 
         return JSP_MANAGE_ADVANCED_PARAMETERS;
     }
@@ -1290,4 +1293,18 @@ public class MyluteceDirectoryUserJspBean extends PluginAdminPageJspBean
 
         return JSP_MANAGE_ADVANCED_PARAMETERS;
     }
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public Plugin getPlugin( )
+	{
+		Plugin plugin = super.getPlugin( );
+		if ( plugin == null )
+		{
+			plugin = PluginService.getPlugin( MyluteceDirectoryPlugin.PLUGIN_NAME );
+		}
+		return plugin;
+	}
 }

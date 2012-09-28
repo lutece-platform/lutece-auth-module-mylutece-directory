@@ -1,0 +1,1 @@
+INSERT INTO core_datastore VALUES ('directory_banned_domain_names', 'yopmail.com');

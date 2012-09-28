@@ -134,6 +134,7 @@ public class MyluteceDirectoryService implements IMyluteceDirectoryService
 	private static final String MARK_LOGIN_URL = "login_url";
 	private static final String MARK_NEW_PASSWORD = "new_password";
 	private static final String MARK_SITE_LINK = "site_link";
+	private static final String MARK_BANNED_DOMAIN_NAMES = "banned_domain_names";
 
 	// ERRORS
 	private static final String ERROR_DIRECTORY_FIELD = "error_directory_field";
@@ -514,11 +515,15 @@ public class MyluteceDirectoryService implements IMyluteceDirectoryService
 		{
 			String[] listAlgorithms = AppPropertiesService.getProperty( PROPERTY_ENCRYPTION_ALGORITHMS_LIST ).split( COMMA );
 
+			MyluteceDirectoryParameterService parameterService = new MyluteceDirectoryParameterService( );
+
 			model.put( MARK_ENABLE_PASSWORD_ENCRYPTION, MyluteceDirectoryParameterHome.findByKey( PARAMETER_ENABLE_PASSWORD_ENCRYPTION, plugin ).getName( ) );
 			model.put( MARK_ENCRYPTION_ALGORITHM, MyluteceDirectoryParameterHome.findByKey( PARAMETER_ENCRYPTION_ALGORITHM, plugin ).getName( ) );
 			model.put( MARK_ENCRYPTION_ALGORITHMS_LIST, listAlgorithms );
+			// we save the banned domain name list with the Directory plugin so that it can get it directly.
+			model.put( MARK_BANNED_DOMAIN_NAMES, SecurityUtils.getLargeSecurityParameter( parameterService, PluginService.getPlugin( DirectoryPlugin.PLUGIN_NAME ), MARK_BANNED_DOMAIN_NAMES ) );
 
-			model = SecurityUtils.checkSecurityParameters( new MyluteceDirectoryParameterService( ), model, plugin );
+			model = SecurityUtils.checkSecurityParameters( parameterService, model, plugin );
 		}
 
 		return model;
