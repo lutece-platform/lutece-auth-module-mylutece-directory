@@ -4,6 +4,6 @@
 
 <%
 	DirectoryUser.init( request, DirectoryUser.RIGHT_MANAGE_MYLUTECE_DIRECTORY_USERS ) ; 
-	response.sendRedirect( DirectoryUser.doModifyDatabaseUserParameters( request ) );  
+	response.sendRedirect( DirectoryUser.doModifyDirectoryUserParameters( request ) );  
 %>
 

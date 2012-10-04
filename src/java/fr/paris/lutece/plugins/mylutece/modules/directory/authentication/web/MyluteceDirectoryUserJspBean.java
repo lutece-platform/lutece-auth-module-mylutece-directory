@@ -889,7 +889,7 @@ public class MyluteceDirectoryUserJspBean extends PluginAdminPageJspBean
      * @throws AccessDeniedException access denied if the user does have the
      *             right
      */
-    public String doModifyDatabaseUserParameters( HttpServletRequest request ) throws AccessDeniedException
+	public String doModifyDirectoryUserParameters( HttpServletRequest request ) throws AccessDeniedException
     {
         if ( !RBACService.isAuthorized( MyluteceDirectoryResourceIdService.RESOURCE_TYPE, RBAC.WILDCARD_RESOURCES_ID,
                 MyluteceDirectoryResourceIdService.PERMISSION_MANAGE, getUser( ) ) )

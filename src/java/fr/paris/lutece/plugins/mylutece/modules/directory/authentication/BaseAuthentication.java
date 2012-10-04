@@ -49,6 +49,7 @@ import fr.paris.lutece.plugins.mylutece.service.MyLutecePlugin;
 import fr.paris.lutece.portal.service.i18n.I18nService;
 import fr.paris.lutece.portal.service.plugin.Plugin;
 import fr.paris.lutece.portal.service.plugin.PluginService;
+import fr.paris.lutece.portal.service.security.FailedLoginCaptchaException;
 import fr.paris.lutece.portal.service.security.LuteceUser;
 import fr.paris.lutece.portal.service.spring.SpringContextService;
 import fr.paris.lutece.portal.service.util.AppLogService;
@@ -82,9 +83,11 @@ public class BaseAuthentication extends PortalAuthentication
 	public static final String AUTHENTICATION_BEAN_NAME = "mylutece-directory.authentication";
 	private static final String AUTH_SERVICE_NAME = AppPropertiesService.getProperty( "mylutece-directory.service.name" );
 	private static final String CONSTANT_PATH_ICON = "images/local/skin/plugins/mylutece/modules/directory/mylutece-directory.png";
+	private static final String PLUGIN_JCAPTCHA = "jcaptcha";
 
 	// PROPERTIES
 	private static final String PROPERTY_MAX_ACCESS_FAILED = "access_failures_max";
+	private static final String PROPERTY_ACCESS_FAILED_CAPTCHA = "access_failures_captcha";
 	private static final String PROPERTY_INTERVAL_MINUTES = "access_failures_interval";
 
 	// Messages properties
@@ -127,15 +130,33 @@ public class BaseAuthentication extends PortalAuthentication
 
 		// Test the number of errors during an interval of minutes
 		int nMaxFailed = MyluteceDirectoryParameterHome.getIntegerSecurityParameter( PROPERTY_MAX_ACCESS_FAILED, plugin );
+		int nMaxFailedCaptcha = 0;
 		int nIntervalMinutes = MyluteceDirectoryParameterHome.getIntegerSecurityParameter( PROPERTY_INTERVAL_MINUTES, plugin );
+		boolean bEnableCaptcha = false;
 
-		if ( nMaxFailed > 0 && nIntervalMinutes > 0 )
+		if ( PluginService.isPluginEnable( PLUGIN_JCAPTCHA ) )
+		{
+			nMaxFailedCaptcha = MyluteceDirectoryParameterHome.getIntegerSecurityParameter( PROPERTY_ACCESS_FAILED_CAPTCHA, plugin );
+		}
+
+		if ( ( nMaxFailed > 0 || nMaxFailedCaptcha > 0 ) && nIntervalMinutes > 0 )
 		{
 			int nNbFailed = ConnectionLogHome.getLoginErrors( connectionLog, nIntervalMinutes, pluginMyLutece );
 
-			if ( nNbFailed > nMaxFailed )
+			if ( nMaxFailedCaptcha > 0 && nNbFailed >= nMaxFailedCaptcha )
 			{
-				throw new FailedLoginException( );
+				bEnableCaptcha = true;
+			}
+			if ( nMaxFailed > 0 && nNbFailed > nMaxFailed )
+			{
+				if ( bEnableCaptcha )
+				{
+					throw new FailedLoginCaptchaException( bEnableCaptcha );
+				}
+				else
+				{
+					throw new FailedLoginException( );
+				}
 			}
 		}
 
@@ -146,7 +167,14 @@ public class BaseAuthentication extends PortalAuthentication
 		if ( user == null )
 		{
 			AppLogService.info( "Unable to find user in the directory : " + strUserName );
-			throw new FailedLoginException( I18nService.getLocalizedString( PROPERTY_MESSAGE_USER_NOT_FOUND_DIRECTORY, locale ) );
+			if ( bEnableCaptcha )
+			{
+				throw new FailedLoginCaptchaException( I18nService.getLocalizedString( PROPERTY_MESSAGE_USER_NOT_FOUND_DIRECTORY, locale ), bEnableCaptcha );
+			}
+			else
+			{
+				throw new FailedLoginException( I18nService.getLocalizedString( PROPERTY_MESSAGE_USER_NOT_FOUND_DIRECTORY, locale ) );
+			}
 		}
 
 		IMyluteceDirectorySecurityService securityService = SpringContextService.getBean( MyluteceDirectorySecurityService.BEAN_SERVICE );
@@ -155,7 +183,14 @@ public class BaseAuthentication extends PortalAuthentication
 		if ( !securityService.checkPassword( strUserName, strUserPassword ) )
 		{
 			AppLogService.info( "User login : Incorrect login or password " + strUserName );
-			throw new FailedLoginException( I18nService.getLocalizedString( PROPERTY_MESSAGE_USER_NOT_FOUND_DIRECTORY, locale ) );
+			if ( bEnableCaptcha )
+			{
+				throw new FailedLoginCaptchaException( I18nService.getLocalizedString( PROPERTY_MESSAGE_USER_NOT_FOUND_DIRECTORY, locale ), bEnableCaptcha );
+			}
+			else
+			{
+				throw new FailedLoginException( I18nService.getLocalizedString( PROPERTY_MESSAGE_USER_NOT_FOUND_DIRECTORY, locale ) );
+			}
 		}
 
 		// Check if user is activated

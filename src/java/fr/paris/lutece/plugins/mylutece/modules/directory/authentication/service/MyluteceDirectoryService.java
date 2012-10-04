@@ -110,6 +110,7 @@ public class MyluteceDirectoryService implements IMyluteceDirectoryService
 
 	// CONSTANTS
 	private static final String COMMA = ",";
+	private static final String PLUGIN_JCAPTCHA = "jcaptcha";
 
 	// PROPERTIES
 	private static final String PROPERTY_ENCRYPTION_ALGORITHMS_LIST = "encryption.algorithmsList";
@@ -135,6 +136,7 @@ public class MyluteceDirectoryService implements IMyluteceDirectoryService
 	private static final String MARK_NEW_PASSWORD = "new_password";
 	private static final String MARK_SITE_LINK = "site_link";
 	private static final String MARK_BANNED_DOMAIN_NAMES = "banned_domain_names";
+	private static final String MARK_IS_PLUGIN_JCAPTCHA_ENABLE = "is_plugin_jcatpcha_enable";
 
 	// ERRORS
 	private static final String ERROR_DIRECTORY_FIELD = "error_directory_field";
@@ -195,7 +197,7 @@ public class MyluteceDirectoryService implements IMyluteceDirectoryService
 
 	/**
 	 * Do modify the password
-	 * @param user the DatabaseUser
+	 * @param user the user
 	 * @param bNewValue the new password
 	 * @param plugin the plugin
 	 */
@@ -523,6 +525,7 @@ public class MyluteceDirectoryService implements IMyluteceDirectoryService
 			// we save the banned domain name list with the Directory plugin so that it can get it directly.
 			model.put( MARK_BANNED_DOMAIN_NAMES, SecurityUtils.getLargeSecurityParameter( parameterService, PluginService.getPlugin( DirectoryPlugin.PLUGIN_NAME ), MARK_BANNED_DOMAIN_NAMES ) );
 
+			model.put( MARK_IS_PLUGIN_JCAPTCHA_ENABLE, PluginService.isPluginEnable( PLUGIN_JCAPTCHA ) );
 			model = SecurityUtils.checkSecurityParameters( parameterService, model, plugin );
 		}
 
@@ -725,9 +728,9 @@ public class MyluteceDirectoryService implements IMyluteceDirectoryService
 	 * {@inheritDoc}
 	 */
 	@Override
-	public boolean mustUserChangePassword( LuteceUser databaseUser, Plugin plugin )
+	public boolean mustUserChangePassword( LuteceUser user, Plugin plugin )
 	{
-		return MyluteceDirectoryHome.findResetPasswordFromLogin( databaseUser.getName( ), plugin );
+		return MyluteceDirectoryHome.findResetPasswordFromLogin( user.getName( ), plugin );
 	}
 
 	/**
