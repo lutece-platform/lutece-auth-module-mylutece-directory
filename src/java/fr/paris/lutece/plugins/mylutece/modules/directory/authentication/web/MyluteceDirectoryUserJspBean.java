@@ -148,6 +148,7 @@ public class MyluteceDirectoryUserJspBean extends PluginAdminPageJspBean
     private static final String PROPERTY_OTHER_EMAIL = "mylutece.accountLifeTime.labelOtherEmail";
     private static final String PROPERTY_ACCOUNT_DEACTIVATES_EMAIL = "mylutece.accountLifeTime.labelAccountDeactivatedEmail";
     private static final String PROPERTY_ACCOUNT_UPDATED_EMAIL = "mylutece.accountLifeTime.labelAccountUpdatedEmail";
+	private static final String PROPERTY_UNBLOCK_USER = "mylutece.ip.unblockUser";
 
     // Parameters
     private static final String PARAMETER_ID_DIRECTORY = "id_directory";
@@ -180,6 +181,9 @@ public class MyluteceDirectoryUserJspBean extends PluginAdminPageJspBean
     private static final String PARAMETER_ACCOUNT_REACTIVATED = "mylutece_directory_account_reactivated_mail";
     private static final String PARAMETER_CANCEL = "cancel";
 	private static final String PARAMETER_BANNED_DOMAIN_NAMES = "banned_domain_names";
+	private static final String PARAMETER_UNBLOCK_USER_MAIL_SENDER = "unblock_user_mail_sender";
+	private static final String PARAMETER_UNBLOCK_USER_MAIL_SUBJECT = "unblock_user_mail_subject";
+	private static final String PARAMETER_UNBLOCK_USER = "mylutece_database_unblock_user";
 
     // Markers
     private static final String MARK_LOCALE = "locale";
@@ -222,6 +226,7 @@ public class MyluteceDirectoryUserJspBean extends PluginAdminPageJspBean
     private static final String CONSTANT_EMAIL_TYPE_OTHER = "other";
     private static final String CONSTANT_EMAIL_TYPE_EXPIRED = "expired";
     private static final String CONSTANT_EMAIL_TYPE_REACTIVATED = "reactivated";
+	private static final String CONSTANT_EMAIL_TYPE_IP_BLOCKED = "ip_blocked";
 
     // Session fields
     private int _nDefaultItemsPerPage = AppPropertiesService.getPropertyInt( PROPERTY_ITEM_PER_PAGE, 50 );
@@ -1227,6 +1232,13 @@ public class MyluteceDirectoryUserJspBean extends PluginAdminPageJspBean
             strBodyKey = PARAMETER_ACCOUNT_REACTIVATED;
             strTitle = PROPERTY_ACCOUNT_UPDATED_EMAIL;
         }
+		else if ( CONSTANT_EMAIL_TYPE_IP_BLOCKED.equalsIgnoreCase( strEmailType ) )
+		{
+			strSenderKey = PARAMETER_UNBLOCK_USER_MAIL_SENDER;
+			strSubjectKey = PARAMETER_UNBLOCK_USER_MAIL_SUBJECT;
+			strBodyKey = PARAMETER_UNBLOCK_USER;
+			strTitle = PROPERTY_UNBLOCK_USER;
+		}
 
         ReferenceItem referenceItem = _parameterService.findByKey( strSenderKey, getPlugin( ) );
         String strSender = referenceItem == null ? StringUtils.EMPTY : referenceItem.getName( );
@@ -1284,6 +1296,12 @@ public class MyluteceDirectoryUserJspBean extends PluginAdminPageJspBean
             strSubjectKey = PARAMETER_REACTIVATED_ALERT_MAIL_SUBJECT;
             strBodyKey = PARAMETER_ACCOUNT_REACTIVATED;
         }
+		else if ( CONSTANT_EMAIL_TYPE_IP_BLOCKED.equalsIgnoreCase( strEmailType ) )
+		{
+			strSenderKey = PARAMETER_UNBLOCK_USER_MAIL_SENDER;
+			strSubjectKey = PARAMETER_UNBLOCK_USER_MAIL_SUBJECT;
+			strBodyKey = PARAMETER_UNBLOCK_USER;
+		}
 
         SecurityUtils.updateParameterValue( _parameterService, getPlugin( ), strSenderKey,
                 request.getParameter( MARK_EMAIL_SENDER ) );

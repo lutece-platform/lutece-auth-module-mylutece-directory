@@ -21,10 +21,12 @@
 				#i18n{mylutece.accountLifeTime.labelParameters} : 
 				<ul>
 				<#if email_type != "reactivated" && email_type != "expired">
-				 <li>${r"${url}"} : #i18n{portal.users.accountLifeTime.labelUrl}</li>
+					<li>${r"${url}"} : #i18n{portal.users.accountLifeTime.labelUrl}</li>
 				</#if>
-				 <li>${r"${login}"} : #i18n{mylutece.accountLifeTime.labelLogin}</li>
-				 <li>${r"${date_valid}"} : #i18n{mylutece.accountLifeTime.labelDateValid}</li>
+				<#if email_type != "ip_blocked">
+					<li>${r"${login}"} : #i18n{mylutece.accountLifeTime.labelLogin}</li>
+					<li>${r"${date_valid}"} : #i18n{mylutece.accountLifeTime.labelDateValid}</li>
+				</#if>
 				</ul>
 			</p>
 			
