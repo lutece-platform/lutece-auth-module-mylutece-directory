@@ -149,6 +149,7 @@ public class MyluteceDirectoryUserJspBean extends PluginAdminPageJspBean
     private static final String PROPERTY_ACCOUNT_DEACTIVATES_EMAIL = "mylutece.accountLifeTime.labelAccountDeactivatedEmail";
     private static final String PROPERTY_ACCOUNT_UPDATED_EMAIL = "mylutece.accountLifeTime.labelAccountUpdatedEmail";
 	private static final String PROPERTY_UNBLOCK_USER = "mylutece.ip.unblockUser";
+	private static final String PROPERTY_NOTIFY_PASSWORD_EXPIRED = "mylutece.accountLifeTime.labelPasswordExpired";
 
     // Parameters
     private static final String PARAMETER_ID_DIRECTORY = "id_directory";
@@ -184,7 +185,11 @@ public class MyluteceDirectoryUserJspBean extends PluginAdminPageJspBean
 	private static final String PARAMETER_UNBLOCK_USER_MAIL_SENDER = "unblock_user_mail_sender";
 	private static final String PARAMETER_UNBLOCK_USER_MAIL_SUBJECT = "unblock_user_mail_subject";
 	private static final String PARAMETER_UNBLOCK_USER = "mylutece_database_unblock_user";
+	private static final String PARAMETER_PASSWORD_EXPIRED_MAIL_SENDER = "password_expired_mail_sender";
+	private static final String PARAMETER_PASSWORD_EXPIRED_MAIL_SUBJECT = "password_expired_mail_subject";
+	private static final String PARAMETER_NOTIFY_PASSWORD_EXPIRED = "mylutece_directory_password_expired";
 
+	
     // Markers
     private static final String MARK_LOCALE = "locale";
     private static final String MARK_PAGINATOR = "paginator";
@@ -227,6 +232,7 @@ public class MyluteceDirectoryUserJspBean extends PluginAdminPageJspBean
     private static final String CONSTANT_EMAIL_TYPE_EXPIRED = "expired";
     private static final String CONSTANT_EMAIL_TYPE_REACTIVATED = "reactivated";
 	private static final String CONSTANT_EMAIL_TYPE_IP_BLOCKED = "ip_blocked";
+	private static final String CONSTANT_EMAIL_PASSWORD_EXPIRED = "password_expired";
 
     // Session fields
     private int _nDefaultItemsPerPage = AppPropertiesService.getPropertyInt( PROPERTY_ITEM_PER_PAGE, 50 );
@@ -258,8 +264,7 @@ public class MyluteceDirectoryUserJspBean extends PluginAdminPageJspBean
         String strIdDirectory = request.getParameter( PARAMETER_ID_DIRECTORY );
         int nIdDirectory = 0;
         Map<String, Object> model = new HashMap<String, Object>(  );
-        String strURL = getJspManageDirectoryRecord( request, nIdDirectory );
-        UrlItem url = new UrlItem( strURL );
+        
         boolean bNoDirectory = true;
 
         if ( StringUtils.isBlank( strIdDirectory ) || !StringUtils.isNumeric( strIdDirectory ) )
@@ -277,9 +282,12 @@ public class MyluteceDirectoryUserJspBean extends PluginAdminPageJspBean
             bNoDirectory = false;
             nIdDirectory = DirectoryUtils.convertStringToInt( strIdDirectory );
         }
-
+        
         if ( !bNoDirectory )
         {
+        	String strURL = getJspManageDirectoryRecord( request, nIdDirectory );
+            UrlItem url = new UrlItem( strURL );
+        	
             Directory directory = _myluteceDirectoryService.getDirectory( nIdDirectory );
 
             if ( directory == null )
@@ -1239,6 +1247,13 @@ public class MyluteceDirectoryUserJspBean extends PluginAdminPageJspBean
 			strBodyKey = PARAMETER_UNBLOCK_USER;
 			strTitle = PROPERTY_UNBLOCK_USER;
 		}
+		else if ( CONSTANT_EMAIL_PASSWORD_EXPIRED.equalsIgnoreCase( strEmailType ) )
+		{
+			strSenderKey = PARAMETER_PASSWORD_EXPIRED_MAIL_SENDER;
+			strSubjectKey = PARAMETER_PASSWORD_EXPIRED_MAIL_SUBJECT;
+			strBodyKey = PARAMETER_NOTIFY_PASSWORD_EXPIRED;
+			strTitle = PROPERTY_NOTIFY_PASSWORD_EXPIRED;
+		}
 
         ReferenceItem referenceItem = _parameterService.findByKey( strSenderKey, getPlugin( ) );
         String strSender = referenceItem == null ? StringUtils.EMPTY : referenceItem.getName( );
@@ -1301,6 +1316,12 @@ public class MyluteceDirectoryUserJspBean extends PluginAdminPageJspBean
 			strSenderKey = PARAMETER_UNBLOCK_USER_MAIL_SENDER;
 			strSubjectKey = PARAMETER_UNBLOCK_USER_MAIL_SUBJECT;
 			strBodyKey = PARAMETER_UNBLOCK_USER;
+		}
+		else if ( CONSTANT_EMAIL_PASSWORD_EXPIRED.equalsIgnoreCase( strEmailType ) )
+		{
+			strSenderKey = PARAMETER_PASSWORD_EXPIRED_MAIL_SENDER;
+			strSubjectKey = PARAMETER_PASSWORD_EXPIRED_MAIL_SUBJECT;
+			strBodyKey = PARAMETER_NOTIFY_PASSWORD_EXPIRED;
 		}
 
         SecurityUtils.updateParameterValue( _parameterService, getPlugin( ), strSenderKey,

@@ -11,6 +11,8 @@ import fr.paris.lutece.portal.service.spring.SpringContextService;
  */
 public class MyluteceDirectoryAnonymizationDaemon extends AbstractAnonymizationDaemon
 {
+	private static final String DAEMON_NAME = "MyluteceDirectoryAnonymizationDaemon";
+
     MyluteceDirectoryAnonymizationService _anonymizationService = SpringContextService
             .<MyluteceDirectoryAnonymizationService> getBean( MyluteceDirectoryAnonymizationService.BEAN_SERVICE );
 
@@ -32,4 +34,12 @@ public class MyluteceDirectoryAnonymizationDaemon extends AbstractAnonymizationD
         return _anonymizationService;
     }
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public String getDaemonName( )
+	{
+		return DAEMON_NAME;
+	}
 }

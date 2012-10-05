@@ -110,6 +110,7 @@ public class BaseAuthentication extends PortalAuthentication
 	// PARAMETERS
 	private static final String PARAMETER_UNBLOCK_USER_MAIL_SENDER = "unblock_user_mail_sender";
 	private static final String PARAMETER_UNBLOCK_USER_MAIL_SUBJECT = "unblock_user_mail_subject";
+	private static final String PARAMETER_ENABLE_UNBLOCK_IP = "enable_unblock_ip";
 
 	// MARK
 	private static final String MARK_URL = "url";
@@ -173,7 +174,11 @@ public class BaseAuthentication extends PortalAuthentication
 			{
 				if ( nMaxFailed == nNbFailed )
 				{
-					sendUnlockLinkToUser( strUserName, nIntervalMinutes, request, plugin );
+					ReferenceItem item = MyluteceDirectoryParameterHome.findByKey( PARAMETER_ENABLE_UNBLOCK_IP, plugin );
+					if ( item != null && item.isChecked( ) )
+					{
+						sendUnlockLinkToUser( strUserName, nIntervalMinutes, request, plugin );
+					}
 				}
 				Object[] args =
 				{ Integer.toString( nIntervalMinutes ) };
@@ -227,6 +232,7 @@ public class BaseAuthentication extends PortalAuthentication
 			AppLogService.info( "User login : User is not activated" + strUserName );
 			throw new LoginException( I18nService.getLocalizedString( PROPERTY_MESSAGE_USER_NOT_ACTIVATED, locale ) );
 		}
+
 
 		// We update the status of the user if his password has become obsolete
 		Timestamp passwordMaxValidDate = MyluteceDirectoryHome.findPasswordMaxValideDateFromLogin( strUserName, plugin );

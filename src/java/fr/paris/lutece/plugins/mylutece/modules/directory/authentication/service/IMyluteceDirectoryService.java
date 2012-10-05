@@ -340,4 +340,5 @@ public interface IMyluteceDirectoryService
      * @param plugin The plugin
      */
     void updateUserExpirationDate( int nIdUser, Plugin plugin );
+
 }

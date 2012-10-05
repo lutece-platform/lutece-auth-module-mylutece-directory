@@ -122,7 +122,7 @@ public class MyluteceDirectoryService implements IMyluteceDirectoryService
 	private static final String PARAMETER_ACCOUNT_REACTIVATED_MAIL_SENDER = "account_reactivated_mail_sender";
 	private static final String PARAMETER_ACCOUNT_REACTIVATED_MAIL_SUBJECT = "account_reactivated_mail_subject";
 	private static final String PARAMETER_ACCOUNT_REACTIVATED_MAIL_BODY = "mylutece_directory_account_reactivated_mail";
-
+	
 	// MARKS
 	private static final String MARK_SEARCH_IS_SEARCH = "search_is_search";
 	private static final String MARK_SEARCH_MYLUTECE_USER_FIELD_FILTER = "search_mylutece_user_field_filter";
@@ -776,4 +776,5 @@ public class MyluteceDirectoryService implements IMyluteceDirectoryService
 			MailService.sendMailHtml( strUserMail, strSender, strSender, strSubject, template.getHtml( ) );
 		}
 	}
+
 }

@@ -38,6 +38,7 @@ public class MyluteceDirectoryAccountLifeTimeService implements IAccountLifeTime
     private static final String PARAMETER_MYLUTECE_DIRECTORY_FIRST_ALERT_MAIL = "mylutece_directory_first_alert_mail";
     private static final String PARAMETER_MYLUTECE_DIRECTORY_OTHER_ALERT_MAIL = "mylutece_directory_other_alert_mail";
     private static final String PARAMETER_ENTRY_TYPE_MAIL_CLASS_NAME = "mylutece-directory.entryTypeMailClassName";
+	private static final String PARAMETER_NOTIFY_PASSWORD_EXPIRED = "mylutece_directory_password_expired";
 
     private static final String MARK_LOGIN = "login";
     private static final String MARK_DATE_VALID = "date_valid";
@@ -110,6 +111,15 @@ public class MyluteceDirectoryAccountLifeTimeService implements IAccountLifeTime
                 getPlugin( ) );
     }
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public List<Integer> getIdUsersWithExpiredPasswordsList( Timestamp currentTimestamp )
+	{
+		return MyluteceDirectoryUserHome.getIdUsersWithExpiredPasswordsList( currentTimestamp, getPlugin( ) );
+	}
+
     /**
      * {@inheritDoc}
      */
@@ -118,6 +128,15 @@ public class MyluteceDirectoryAccountLifeTimeService implements IAccountLifeTime
     {
         MyluteceDirectoryUserHome.updateNbAlert( listIdUser, getPlugin( ) );
     }
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void updateChangePassword( List<Integer> listIdUser )
+	{
+		MyluteceDirectoryUserHome.updateChangePassword( listIdUser, getPlugin( ) );
+	}
 
     /**
      * {@inheritDoc}
@@ -154,6 +173,15 @@ public class MyluteceDirectoryAccountLifeTimeService implements IAccountLifeTime
     {
         return DatabaseTemplateService.getTemplateFromKey( PARAMETER_MYLUTECE_DIRECTORY_OTHER_ALERT_MAIL );
     }
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public String getPasswordExpiredMailBody( )
+	{
+		return DatabaseTemplateService.getTemplateFromKey( PARAMETER_NOTIFY_PASSWORD_EXPIRED );
+	}
 
     /**
      * {@inheritDoc}
@@ -215,4 +243,5 @@ public class MyluteceDirectoryAccountLifeTimeService implements IAccountLifeTime
         }
         return null;
     }
+
 }

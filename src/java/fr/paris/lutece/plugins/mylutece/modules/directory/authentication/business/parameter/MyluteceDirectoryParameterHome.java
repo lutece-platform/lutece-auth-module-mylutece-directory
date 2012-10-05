@@ -116,4 +116,23 @@ public final class MyluteceDirectoryParameterHome
             }
         }
     }
+
+	/**
+	 * Get the boolean value of a security parameter
+	 * @param strParameterkey Key of the parameter
+	 * @param plugin Plugin
+	 * @return The boolean value of a security parameter
+	 */
+	public static boolean getBooleanSecurityParameter( String strParameterkey, Plugin plugin )
+	{
+		ReferenceItem refItem = findByKey( strParameterkey, plugin );
+		if ( refItem == null || StringUtils.isEmpty( refItem.getName( ) ) )
+		{
+			return false;
+		}
+		else
+		{
+			return Boolean.parseBoolean( refItem.getName( ) );
+		}
+	}
 }

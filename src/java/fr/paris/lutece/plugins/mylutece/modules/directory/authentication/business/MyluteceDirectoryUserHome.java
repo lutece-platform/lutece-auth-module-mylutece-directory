@@ -476,24 +476,45 @@ public final class MyluteceDirectoryUserHome
 	}
 
 	/**
+	 * Get the list of id of users that have an expired password but not the change password flag
+	 * @param currentTimestamp Timestamp describing the current time.
+	 * @param plugin The plugin
+	 * @return the list of id of users with expired passwords
+	 */
+	public static List<Integer> getIdUsersWithExpiredPasswordsList( Timestamp currentTimestamp, Plugin plugin )
+	{
+		return _dao.getIdUsersWithExpiredPasswordsList( currentTimestamp, plugin );
+	}
+
+	/**
 	 * Update status of a list of user accounts
-	 * @param idUserList List of user accounts to update
+	 * @param listIdUser List of user accounts to update
 	 * @param nNewStatus New status of the user
 	 * @param plugin The plugin
 	 */
-	public static void updateUserStatus( List<Integer> idUserList, int nNewStatus, Plugin plugin )
+	public static void updateUserStatus( List<Integer> listIdUser, int nNewStatus, Plugin plugin )
 	{
-		_dao.updateUserStatus( idUserList, nNewStatus, plugin );
+		_dao.updateUserStatus( listIdUser, nNewStatus, plugin );
 	}
 
 	/**
 	 * Increment the number of alert send to users by 1
+	 * @param listIdUser The list of users to update
+	 * @param plugin The plugin
+	 */
+	public static void updateNbAlert( List<Integer> listIdUser, Plugin plugin )
+	{
+		_dao.updateNbAlert( listIdUser, plugin );
+	}
+
+	/**
+	 * Set the "change password" flag of users to true
 	 * @param nIdUserList The list of users to update
 	 * @param plugin The plugin
 	 */
-	public static void updateNbAlert( List<Integer> idUserList, Plugin plugin )
+	public static void updateChangePassword( List<Integer> idUserList, Plugin plugin )
 	{
-		_dao.updateNbAlert( idUserList, plugin );
+		_dao.updateChangePassword( idUserList, plugin );
 	}
 
 	/**
@@ -528,4 +549,5 @@ public final class MyluteceDirectoryUserHome
 	{
 		_dao.updateUserLastLoginDate( strLogin, new java.sql.Timestamp( dateLastLogin.getTime( ) ), plugin );
 	}
+
 }

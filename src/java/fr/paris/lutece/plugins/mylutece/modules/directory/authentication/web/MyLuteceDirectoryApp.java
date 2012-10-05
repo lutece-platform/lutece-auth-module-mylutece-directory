@@ -160,7 +160,7 @@ public class MyLuteceDirectoryApp implements XPageApplication
 	private static final String ACTION_DO_CREATE_ACCOUNT = "doCreateAccount";
 	private static final String ACTION_REINIT_PASSWORD = "reinitPassword";
 	private static final String ACTION_UPDATE_ACCOUNT = "updateAccount";
-	private static final String ACTION_GET_RESET_PASSWORD = "getResetPassordPage";
+	private static final String ACTION_GET_RESET_PASSWORD = "getResetPasswordPage";
 
 	// Errors
 	private static final String ERROR_OLD_PASSWORD = "error_old_password";
@@ -251,7 +251,7 @@ public class MyLuteceDirectoryApp implements XPageApplication
 	private static final String MESSAGE_PASSWORD_EXPIRED = "module.mylutece.directory.message.passwordExpired";
 	private static final String MESSAGE_MUST_CHANGE_PASSWORD = "module.mylutece.directory.message.userMustChangePassword";
 
-	private static final String JSP_URL_GET_RESET_PASSWORD_PAGE = "jsp/site/Portal.jsp?page=mylutecedirectory&action=getResetPassordPage";
+	private static final String JSP_URL_GET_RESET_PASSWORD_PAGE = "jsp/site/Portal.jsp?page=mylutecedirectory&action=getResetPasswordPage";
 	private static final String JSP_URL_MYLUTECE_LOGIN = "jsp/site/Portal.jsp?page=mylutece&action=login";
 
 	// Constants

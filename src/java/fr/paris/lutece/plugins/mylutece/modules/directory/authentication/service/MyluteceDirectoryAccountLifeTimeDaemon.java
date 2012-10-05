@@ -12,6 +12,8 @@ import fr.paris.lutece.portal.service.spring.SpringContextService;
  */
 public class MyluteceDirectoryAccountLifeTimeDaemon extends AbstractAccountLifeTimeDaemon
 {
+	private static final String DAEMON_NAME = "MyluteceDirectoryAccountLifeTimeDaemon";
+
     MyluteceDirectoryParameterService _parameterService = SpringContextService
             .<MyluteceDirectoryParameterService> getBean( MyluteceDirectoryParameterService.BEAN_SERVICE );
 
@@ -33,13 +35,21 @@ public class MyluteceDirectoryAccountLifeTimeDaemon extends AbstractAccountLifeT
         return new MyluteceDirectoryAccountLifeTimeService( );
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
     public IUserParameterService getParameterService( )
     {
         return _parameterService;
     }
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public String getDaemonName( )
+	{
+		return DAEMON_NAME;
+	}
 }
