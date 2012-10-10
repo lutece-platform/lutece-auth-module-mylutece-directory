@@ -5,12 +5,12 @@
 				<legend>#i18n{module.mylutece.directory.manage_advanced_parameters.pageTitle}
 					<span class="btn-group pull-right">
 						<#if use_advanced_security_parameters?? && use_advanced_security_parameters>
-							<a href="jsp/admin/plugins/mylutece/modules/directory/GetChangeUseAdvancedSecurityParameters.jsp" class="btn btn-primary" title="#i18n{mylutece.manage_advanced_parameters.removeAdvancedSecurityParameters}" >#i18n{mylutece.manage_advanced_parameters.removeAdvancedSecurityParameters}</a>
+							<a href="jsp/admin/plugins/mylutece/modules/directory/GetChangeUseAdvancedSecurityParameters.jsp" class="btn btn-primary btn-small" title="#i18n{mylutece.manage_advanced_parameters.removeAdvancedSecurityParameters}" >#i18n{mylutece.manage_advanced_parameters.removeAdvancedSecurityParameters}</a>
 						<#else>
-							<a href="jsp/admin/plugins/mylutece/modules/directory/GetChangeUseAdvancedSecurityParameters.jsp" class="btn btn-primary" title="#i18n{mylutece.manage_advanced_parameters.useAdvancedSecurityParameters}" >#i18n{mylutece.manage_advanced_parameters.useAdvancedSecurityParameters}</a>
+							<a href="jsp/admin/plugins/mylutece/modules/directory/GetChangeUseAdvancedSecurityParameters.jsp" class="btn btn-primary btn-small" title="#i18n{mylutece.manage_advanced_parameters.useAdvancedSecurityParameters}" >#i18n{mylutece.manage_advanced_parameters.useAdvancedSecurityParameters}</a>
 						</#if>
-						<a href="jsp/admin/plugins/mylutece/attribute/ManageAttributes.jsp" class="btn btn-primary" title="#i18n{module.mylutece.directory.manage_advanced_parameters.btnManageAttributes}">#i18n{module.mylutece.directory.manage_advanced_parameters.btnManageAttributes}</a>
-						<a href="jsp/admin/plugins/mylutece/modules/directory/ChangeFieldAnonymizeUsers.jsp" class="btn btn-primary" title="#i18n{mylutece.manage_advanced_parameters.buttonLabelAnonymizationOptions}" >#i18n{mylutece.manage_advanced_parameters.buttonLabelAnonymizationOptions}</a> 
+						<a href="jsp/admin/plugins/mylutece/attribute/ManageAttributes.jsp" class="btn btn-primary btn-small" title="#i18n{module.mylutece.directory.manage_advanced_parameters.btnManageAttributes}">#i18n{module.mylutece.directory.manage_advanced_parameters.btnManageAttributes}</a>
+						<a href="jsp/admin/plugins/mylutece/modules/directory/ChangeFieldAnonymizeUsers.jsp" class="btn btn-primary btn-small" title="#i18n{mylutece.manage_advanced_parameters.buttonLabelAnonymizationOptions}" >#i18n{mylutece.manage_advanced_parameters.buttonLabelAnonymizationOptions}</a> 
 					</span>
 				</legend>
 			</fieldset>
@@ -53,7 +53,7 @@
 					<#if use_advanced_security_parameters>
 						<input type="hidden" name="encryption_algorithm" value="${encryption_algorithm!}"/>
 					</#if>
-					<input type="submit" class="btn btn-primary" title="#i18n{module.mylutece.directory.manage_advanced_parameters.buttonModify}" value="#i18n{module.mylutece.directory.manage_advanced_parameters.buttonModify}" />
+					<input type="submit" class="btn btn-primary btn-small" title="#i18n{module.mylutece.directory.manage_advanced_parameters.buttonModify}" value="#i18n{module.mylutece.directory.manage_advanced_parameters.buttonModify}" />
 				</div>
 			</form>
 		</div>
@@ -175,7 +175,7 @@
 						</div>
 					</div>
 					<div class="form-actions">
-						<input type="submit" class="btn btn-primary" value="#i18n{module.mylutece.directory.manage_advanced_parameters.buttonModify}" />
+						<input type="submit" class="btn btn-primary btn-small" value="#i18n{module.mylutece.directory.manage_advanced_parameters.buttonModify}" />
 					</div>
 				</fieldset>
 			</form>
@@ -198,7 +198,7 @@
 						</div>
 					</div>
 					<div class="form-actions">
-						<button class="btn btn-primary" type="submit" ><i class="icon-envelope icon-white"></i>&nbsp;#i18n{mylutece.accountLifeTime.labelEditEmail}</button>
+						<button class="btn btn-primary btn-small" type="submit" ><i class="icon-envelope icon-white"></i>&nbsp;#i18n{mylutece.accountLifeTime.labelEditEmail}</button>
 					</div>
 				</fieldset>
 			</form>
