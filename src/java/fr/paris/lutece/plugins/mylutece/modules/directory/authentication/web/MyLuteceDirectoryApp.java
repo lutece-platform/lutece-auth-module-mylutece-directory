@@ -71,6 +71,7 @@ import fr.paris.lutece.portal.service.security.SecurityService;
 import fr.paris.lutece.portal.service.security.UserNotSignedException;
 import fr.paris.lutece.portal.service.spring.SpringContextService;
 import fr.paris.lutece.portal.service.template.AppTemplateService;
+import fr.paris.lutece.portal.service.template.DatabaseTemplateService;
 import fr.paris.lutece.portal.service.util.AppLogService;
 import fr.paris.lutece.portal.service.util.AppPathService;
 import fr.paris.lutece.portal.service.util.AppPropertiesService;
@@ -79,11 +80,14 @@ import fr.paris.lutece.portal.service.workflow.WorkflowService;
 import fr.paris.lutece.portal.web.constants.Messages;
 import fr.paris.lutece.portal.web.xpages.XPage;
 import fr.paris.lutece.portal.web.xpages.XPageApplication;
+import fr.paris.lutece.util.ReferenceItem;
 import fr.paris.lutece.util.date.DateUtil;
 import fr.paris.lutece.util.html.HtmlTemplate;
 import fr.paris.lutece.util.password.PasswordUtil;
 import fr.paris.lutece.util.string.StringUtil;
 import fr.paris.lutece.util.url.UrlItem;
+
+import org.apache.commons.lang.StringUtils;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -97,8 +101,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletRequest;
-
-import org.apache.commons.lang.StringUtils;
 
 
 /**
@@ -149,6 +151,8 @@ public class MyLuteceDirectoryApp implements XPageApplication
 	private static final String PARAMETER_KEY = "key";
 	private static final String PARAMETER_FORCE_CHANGE_PASSWORD_REINIT = "force_change_password_reinit";
 	private static final String PARAMETER_TIME_BEFORE_ALERT_ACCOUNT = "time_before_alert_account";
+	private static final String PARAMETER_MAIL_LOST_PASSWORD_SENDER = "mail_lost_password_sender";
+    private static final String PARAMETER_MAIL_LOST_PASSWORD_SUBJECT = "mail_lost_password_subject";
 
 	// Actions
 	private static final String ACTION_MODIFY_ACCOUNT = "modifyAccount";
@@ -189,7 +193,6 @@ public class MyLuteceDirectoryApp implements XPageApplication
 	private static final String TEMPLATE_CHANGE_PASSWORD_PAGE = "skin/plugins/mylutece/modules/directory/change_password.html";
 	private static final String TEMPLATE_CREATE_ACCOUNT_PAGE = "skin/plugins/mylutece/modules/directory/create_account.html";
 	private static final String TEMPLATE_REINIT_PASSWORD_PAGE = "skin/plugins/mylutece/modules/directory/reinit_password.html";
-	private static final String TEMPLATE_EMAIL_REINIT = "skin/plugins/mylutece/email_reinit.html";
 	private static final String TEMPLATE_EMAIL_LOST_LOGIN = "skin/plugins/mylutece/email_lost_login.html";
 
 	// Properties
@@ -241,6 +244,7 @@ public class MyLuteceDirectoryApp implements XPageApplication
 	private static final String PROPERTY_ERROR_NO_ACCOUNT_TO_REACTIVATED = "mylutece.message.error.noAccountToReactivate";
 	private static final String PROPERTY_ACCOUNT_REACTIVATED = "mylutece.user.messageAccountReactivated";
 	private static final String PROPERTY_ACCOUNT_REACTIVATED_TITLE = "mylutece.user.messageAccountReactivatedTitle";
+	private static final String PROPERTY_DIRECTORY_MAIL_LOST_PASSWORD = "mylutece_directory_mailLostPassword";
 
 	// MESSAGES
 	private static final String MESSAGE_REINIT_PASSWORD_SUCCESS = "module.mylutece.directory.message.reinit_password.success";
@@ -269,7 +273,7 @@ public class MyLuteceDirectoryApp implements XPageApplication
 	private Locale _locale;
 
 	/**
-	 * 
+	 *
 	 * @param request The HTTP request
 	 * @param plugin The plugin
 	 */
@@ -280,7 +284,7 @@ public class MyLuteceDirectoryApp implements XPageApplication
 	}
 
 	/**
-	 * 
+	 *
 	 * @param request The HTTP request
 	 * @param nMode The mode (admin, ...)
 	 * @param plugin The plugin
@@ -288,6 +292,7 @@ public class MyLuteceDirectoryApp implements XPageApplication
 	 * @throws UserNotSignedException if user not signed
 	 * @throws SiteMessageException Occurs when a site message need to be displayed
 	 */
+	@Override
 	public XPage getPage( HttpServletRequest request, int nMode, Plugin plugin ) throws UserNotSignedException, SiteMessageException
 	{
 		XPage page = new XPage( );
@@ -989,7 +994,7 @@ public class MyLuteceDirectoryApp implements XPageApplication
 
 	/**
 	 * Check the password with the password confirmation string Check if password is empty
-	 * 
+	 *
 	 * @param strPassword The password
 	 * @param strConfirmation The password confirmation
 	 * @return true if password is equal to confirmation password and not empty
@@ -1008,7 +1013,7 @@ public class MyLuteceDirectoryApp implements XPageApplication
 
 	/**
 	 * This method is call by the JSP named DoSendPassword.jsp
-	 * 
+	 *
 	 * @param request The HTTP request
 	 * @return The URL to forward depending of the result of the sending.
 	 */
@@ -1066,11 +1071,9 @@ public class MyLuteceDirectoryApp implements XPageApplication
 					}
 
 					String strHost = AppPropertiesService.getProperty( PROPERTY_MAIL_HOST );
-					String strSender = AppPropertiesService.getProperty( PROPERTY_NOREPLY_EMAIL );
-					String strObject = I18nService.getLocalizedString( PROPERTY_EMAIL_OBJECT, _locale );
 
-					if ( StringUtils.isBlank( strError ) && ( StringUtils.isBlank( strHost ) || StringUtils.isBlank( strSender ) || StringUtils.isBlank( strObject ) ) )
-					{
+					if ( StringUtils.isBlank( strError ) && StringUtils.isBlank( strHost ) )
+                    {
 						strError = ERROR_SENDING_EMAIL;
 					}
 					else
@@ -1081,9 +1084,14 @@ public class MyLuteceDirectoryApp implements XPageApplication
 						model.put( MARK_REINIT_URL, _userKeyService.getReinitUrl( key.getKey( ), request ) );
 						model.put( MARK_SITE_LINK, MailService.getSiteLink( AppPathService.getBaseUrl( request ), true ) );
 
-						HtmlTemplate template = AppTemplateService.getTemplate( TEMPLATE_EMAIL_REINIT, _locale, model );
+						HtmlTemplate template = AppTemplateService.getTemplateFromStringFtl(
+                        		DatabaseTemplateService.getTemplateFromKey( PROPERTY_DIRECTORY_MAIL_LOST_PASSWORD ), _locale, model );
 
-						MailService.sendMailHtml( strEmail, PROPERTY_NO_REPLY_EMAIL, strSender, strObject, template.getHtml( ) );
+                        ReferenceItem referenceItem = _parameterService.findByKey( PARAMETER_MAIL_LOST_PASSWORD_SENDER, plugin );
+                        String strSender = referenceItem == null ? StringUtils.EMPTY : referenceItem.getName( );
+                        referenceItem = _parameterService.findByKey( PARAMETER_MAIL_LOST_PASSWORD_SUBJECT, plugin );
+                        String strSubject = referenceItem == null ? StringUtils.EMPTY : referenceItem.getName( );
+                        MailService.sendMailHtml( strEmail, PROPERTY_NO_REPLY_EMAIL, strSender, strSubject, template.getHtml( ) );
 
 					}
 				}
@@ -1111,7 +1119,7 @@ public class MyLuteceDirectoryApp implements XPageApplication
 
 	/**
 	 * This method is call by the JSP named DoSendLogin.jsp
-	 * 
+	 *
 	 * @param request The HTTP request
 	 * @return The URL to forward depending of the result of the sending.
 	 */
@@ -1348,7 +1356,7 @@ public class MyLuteceDirectoryApp implements XPageApplication
 			return null;
 		}
 
-		MyluteceDirectoryUser user = ( MyluteceDirectoryUser ) listUsers.iterator( ).next( );
+		MyluteceDirectoryUser user = listUsers.iterator( ).next( );
 
 		return user;
 	}
