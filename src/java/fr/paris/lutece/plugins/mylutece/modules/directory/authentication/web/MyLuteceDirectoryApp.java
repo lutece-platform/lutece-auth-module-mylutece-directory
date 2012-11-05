@@ -87,8 +87,6 @@ import fr.paris.lutece.util.password.PasswordUtil;
 import fr.paris.lutece.util.string.StringUtil;
 import fr.paris.lutece.util.url.UrlItem;
 
-import org.apache.commons.lang.StringUtils;
-
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -101,6 +99,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletRequest;
+
+import org.apache.commons.lang.StringUtils;
 
 
 /**
@@ -245,7 +245,6 @@ public class MyLuteceDirectoryApp implements XPageApplication
 	private static final String PROPERTY_ERROR_NO_ACCOUNT_TO_REACTIVATED = "mylutece.message.error.noAccountToReactivate";
 	private static final String PROPERTY_ACCOUNT_REACTIVATED = "mylutece.user.messageAccountReactivated";
 	private static final String PROPERTY_ACCOUNT_REACTIVATED_TITLE = "mylutece.user.messageAccountReactivatedTitle";
-	private static final String PROPERTY_DIRECTORY_MAIL_LOST_PASSWORD = "mylutece_directory_mailLostPassword";
 
 	// MESSAGES
 	private static final String MESSAGE_REINIT_PASSWORD_SUCCESS = "module.mylutece.directory.message.reinit_password.success";

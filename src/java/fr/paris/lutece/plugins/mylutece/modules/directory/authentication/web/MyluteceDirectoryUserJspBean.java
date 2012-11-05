@@ -87,8 +87,6 @@ import fr.paris.lutece.util.html.HtmlTemplate;
 import fr.paris.lutece.util.html.Paginator;
 import fr.paris.lutece.util.url.UrlItem;
 
-import org.apache.commons.lang.StringUtils;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -96,6 +94,8 @@ import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
+
+import org.apache.commons.lang.StringUtils;
 
 
 /**
@@ -148,8 +148,7 @@ public class MyluteceDirectoryUserJspBean extends PluginAdminPageJspBean
     private static final String PROPERTY_OTHER_EMAIL = "mylutece.accountLifeTime.labelOtherEmail";
     private static final String PROPERTY_ACCOUNT_DEACTIVATES_EMAIL = "mylutece.accountLifeTime.labelAccountDeactivatedEmail";
     private static final String PROPERTY_ACCOUNT_UPDATED_EMAIL = "mylutece.accountLifeTime.labelAccountUpdatedEmail";
-    private static final String PROPERTY_MAIL_LOST_PASSWORD = "mylutece.accountLifeTime.labelLostPasswordMail";
-	private static final String PROPERTY_UNBLOCK_USER = "mylutece.ip.unblockUser";
+    private static final String PROPERTY_UNBLOCK_USER = "mylutece.ip.unblockUser";
 	private static final String PROPERTY_NOTIFY_PASSWORD_EXPIRED = "mylutece.accountLifeTime.labelPasswordExpired";
     private static final String PROPERTY_MAIL_LOST_PASSWORD = "mylutece.accountLifeTime.labelLostPasswordMail";
     private static final String PROPERTY_MAIL_PASSWORD_ENCRYPTION_CHANGED = "mylutece.accountLifeTime.labelPasswordEncryptionChangedMail";
@@ -184,10 +183,7 @@ public class MyluteceDirectoryUserJspBean extends PluginAdminPageJspBean
     private static final String PARAMETER_EXPIRATION_MAIL = "mylutece_directory_expiration_mail";
     private static final String PARAMETER_ACCOUNT_REACTIVATED = "mylutece_directory_account_reactivated_mail";
     private static final String PARAMETER_CANCEL = "cancel";
-    private static final String PARAMETER_MAIL_LOST_PASSWORD = "mylutece_directory_mailLostPassword";
-    private static final String PARAMETER_MAIL_LOST_PASSWORD_SENDER = "mail_lost_password_sender";
-    private static final String PARAMETER_MAIL_LOST_PASSWORD_SUBJECT = "mail_lost_password_subject";
-	private static final String PARAMETER_BANNED_DOMAIN_NAMES = "banned_domain_names";
+    private static final String PARAMETER_BANNED_DOMAIN_NAMES = "banned_domain_names";
 	private static final String PARAMETER_UNBLOCK_USER_MAIL_SENDER = "unblock_user_mail_sender";
 	private static final String PARAMETER_UNBLOCK_USER_MAIL_SUBJECT = "unblock_user_mail_subject";
 	private static final String PARAMETER_UNBLOCK_USER = "mylutece_database_unblock_user";
@@ -243,8 +239,7 @@ public class MyluteceDirectoryUserJspBean extends PluginAdminPageJspBean
     private static final String CONSTANT_EMAIL_TYPE_OTHER = "other";
     private static final String CONSTANT_EMAIL_TYPE_EXPIRED = "expired";
     private static final String CONSTANT_EMAIL_TYPE_REACTIVATED = "reactivated";
-    private static final String CONSTANT_EMAIL_TYPE_LOST_PASSWORD = "lost_password";
-	private static final String CONSTANT_EMAIL_TYPE_IP_BLOCKED = "ip_blocked";
+    private static final String CONSTANT_EMAIL_TYPE_IP_BLOCKED = "ip_blocked";
 	private static final String CONSTANT_EMAIL_PASSWORD_EXPIRED = "password_expired";
     private static final String CONSTANT_EMAIL_TYPE_LOST_PASSWORD = "lost_password";
     private static final String CONSTANT_EMAIL_PASSWORD_ENCRYPTION_CHANGED = "password_encryption_changed";
