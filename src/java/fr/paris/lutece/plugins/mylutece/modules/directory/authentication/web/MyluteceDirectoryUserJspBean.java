@@ -151,6 +151,8 @@ public class MyluteceDirectoryUserJspBean extends PluginAdminPageJspBean
     private static final String PROPERTY_MAIL_LOST_PASSWORD = "mylutece.accountLifeTime.labelLostPasswordMail";
 	private static final String PROPERTY_UNBLOCK_USER = "mylutece.ip.unblockUser";
 	private static final String PROPERTY_NOTIFY_PASSWORD_EXPIRED = "mylutece.accountLifeTime.labelPasswordExpired";
+    private static final String PROPERTY_MAIL_LOST_PASSWORD = "mylutece.accountLifeTime.labelLostPasswordMail";
+    private static final String PROPERTY_MAIL_PASSWORD_ENCRYPTION_CHANGED = "mylutece.accountLifeTime.labelPasswordEncryptionChangedMail";
 
     // Parameters
     private static final String PARAMETER_ID_DIRECTORY = "id_directory";
@@ -192,6 +194,12 @@ public class MyluteceDirectoryUserJspBean extends PluginAdminPageJspBean
 	private static final String PARAMETER_PASSWORD_EXPIRED_MAIL_SENDER = "password_expired_mail_sender";
 	private static final String PARAMETER_PASSWORD_EXPIRED_MAIL_SUBJECT = "password_expired_mail_subject";
 	private static final String PARAMETER_NOTIFY_PASSWORD_EXPIRED = "mylutece_directory_password_expired";
+    private static final String PARAMETER_MAIL_LOST_PASSWORD = "mylutece_directory_mailLostPassword";
+    private static final String PARAMETER_MAIL_LOST_PASSWORD_SENDER = "mail_lost_password_sender";
+    private static final String PARAMETER_MAIL_LOST_PASSWORD_SUBJECT = "mail_lost_password_subject";
+    private static final String PARAMETER_MAIL_PASSWORD_ENCRYPTION_CHANGED = "mylutece_directory_mailPasswordEncryptionChanged";
+    private static final String PARAMETER_MAIL_PASSWORD_ENCRYPTION_CHANGED_SENDER = "mail_password_encryption_changed_sender";
+    private static final String PARAMETER_MAIL_PASSWORD_ENCRYPTION_CHANGED_SUBJECT = "mail_password_encryption_changed_subject";
 
 
     // Markers
@@ -238,6 +246,8 @@ public class MyluteceDirectoryUserJspBean extends PluginAdminPageJspBean
     private static final String CONSTANT_EMAIL_TYPE_LOST_PASSWORD = "lost_password";
 	private static final String CONSTANT_EMAIL_TYPE_IP_BLOCKED = "ip_blocked";
 	private static final String CONSTANT_EMAIL_PASSWORD_EXPIRED = "password_expired";
+    private static final String CONSTANT_EMAIL_TYPE_LOST_PASSWORD = "lost_password";
+    private static final String CONSTANT_EMAIL_PASSWORD_ENCRYPTION_CHANGED = "password_encryption_changed";
 
     // Session fields
     private int _nDefaultItemsPerPage = AppPropertiesService.getPropertyInt( PROPERTY_ITEM_PER_PAGE, 50 );
@@ -1266,6 +1276,20 @@ public class MyluteceDirectoryUserJspBean extends PluginAdminPageJspBean
 			strBodyKey = PARAMETER_NOTIFY_PASSWORD_EXPIRED;
 			strTitle = PROPERTY_NOTIFY_PASSWORD_EXPIRED;
 		}
+        else if ( CONSTANT_EMAIL_TYPE_LOST_PASSWORD.equalsIgnoreCase( strEmailType ) )
+        {
+            strSenderKey = PARAMETER_MAIL_LOST_PASSWORD_SENDER;
+            strSubjectKey = PARAMETER_MAIL_LOST_PASSWORD_SUBJECT;
+            strBodyKey = PARAMETER_MAIL_LOST_PASSWORD;
+            strTitle = PROPERTY_MAIL_LOST_PASSWORD;
+        }
+        else if ( CONSTANT_EMAIL_PASSWORD_ENCRYPTION_CHANGED.equalsIgnoreCase( strEmailType ) )
+        {
+            strSenderKey = PARAMETER_MAIL_PASSWORD_ENCRYPTION_CHANGED_SENDER;
+            strSubjectKey = PARAMETER_MAIL_PASSWORD_ENCRYPTION_CHANGED_SUBJECT;
+            strBodyKey = PARAMETER_MAIL_PASSWORD_ENCRYPTION_CHANGED;
+            strTitle = PROPERTY_MAIL_PASSWORD_ENCRYPTION_CHANGED;
+        }
 
         ReferenceItem referenceItem = _parameterService.findByKey( strSenderKey, getPlugin( ) );
         String strSender = referenceItem == null ? StringUtils.EMPTY : referenceItem.getName( );
@@ -1341,6 +1365,18 @@ public class MyluteceDirectoryUserJspBean extends PluginAdminPageJspBean
 			strSubjectKey = PARAMETER_PASSWORD_EXPIRED_MAIL_SUBJECT;
 			strBodyKey = PARAMETER_NOTIFY_PASSWORD_EXPIRED;
 		}
+        else if ( CONSTANT_EMAIL_TYPE_LOST_PASSWORD.equalsIgnoreCase( strEmailType ) )
+        {
+            strSenderKey = PARAMETER_MAIL_LOST_PASSWORD_SENDER;
+            strSubjectKey = PARAMETER_MAIL_LOST_PASSWORD_SUBJECT;
+            strBodyKey = PARAMETER_MAIL_LOST_PASSWORD;
+        }
+        else if ( CONSTANT_EMAIL_PASSWORD_ENCRYPTION_CHANGED.equalsIgnoreCase( strEmailType ) )
+        {
+            strSenderKey = PARAMETER_MAIL_PASSWORD_ENCRYPTION_CHANGED_SENDER;
+            strSubjectKey = PARAMETER_MAIL_PASSWORD_ENCRYPTION_CHANGED_SUBJECT;
+            strBodyKey = PARAMETER_MAIL_PASSWORD_ENCRYPTION_CHANGED;
+        }
 
         SecurityUtils.updateParameterValue( _parameterService, getPlugin( ), strSenderKey,
                 request.getParameter( MARK_EMAIL_SENDER ) );

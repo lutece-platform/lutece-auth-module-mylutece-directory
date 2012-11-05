@@ -1,40 +1,45 @@
 <#include "/admin/util/editor/editor.html" />
 <div class="content-box">
-	<h2>#i18n{${emailLabel}}</h2>
 	<form method="post" action="jsp/admin/plugins/mylutece/modules/directory/DoModifyAccountLifeTimeEmails.jsp">
-		<input type="hidden" name="email_type" value="${email_type}" />
-		<p>
-			<label for="email_sender"> #i18n{mylutece.accountLifeTime.labelSenderEmail} : </label>
-			<input type="text" name="email_sender" value="${email_sender!}" size="100" />
-			<br />
-			
-			<label for="email_subject"> #i18n{mylutece.accountLifeTime.labelSubjectEmail} : </label>
-			<input type="text" name="email_subject" value="${email_subject!}" size="100" />
-			<br />
-			
-			<label for="email_body"> #i18n{mylutece.accountLifeTime.labelBodyEmail} : </label>
-			<div class="editor">
-				<textarea class="richtext" rows="30" cols="100" id="email_body" name="email_body" >${email_body!}</textarea>
-			</div>
-			<br />
+		<fieldset>
+			<legend>#i18n{${emailLabel}}</legend>
+			<input type="hidden" name="email_type" value="${email_type}" />
 			<p>
-				#i18n{mylutece.accountLifeTime.labelParameters} : 
-				<ul>
-					<#if email_type = "lost_password">
+				<label for="email_sender"> #i18n{mylutece.accountLifeTime.labelSenderEmail} : </label>
+				<input type="text" name="email_sender" value="${email_sender!}" size="100" />
+				<br />
+				
+				<label for="email_subject"> #i18n{mylutece.accountLifeTime.labelSubjectEmail} : </label>
+				<input type="text" name="email_subject" value="${email_subject!}" size="100" />
+				<br />
+				
+				<label for="email_body"> #i18n{mylutece.accountLifeTime.labelBodyEmail} : </label>
+				<div class="editor">
+					<textarea class="richtext" rows="30" cols="100" id="email_body" name="email_body" >${email_body!}</textarea>
+				</div>
+				<br />
+				<p>
+					#i18n{mylutece.accountLifeTime.labelParameters} : 
+					<ul>
+					<#if email_type = "lost_password" || email_type = "password_encryption_changed" >
 						<li>${r"${new_password}"} : #i18n{mylutece.accountLifeTime.labelNewPassword}</li>
 						<li>${r"${reinit_url}"} : #i18n{mylutece.accountLifeTime.labelReinitUrl}</li>
 					<#else>
-						<#if email_type != "reactivated" && email_type != "expired">
-						 <li>${r"${url}"} : #i18n{portal.users.accountLifeTime.labelUrl}</li>
+						<#if email_type != "reactivated" && email_type != "expired" && email_type != "password_expired">
+							<li>${r"${url}"} : #i18n{portal.users.accountLifeTime.labelUrl}</li>
 						</#if>
-						 <li>${r"${login}"} : #i18n{mylutece.accountLifeTime.labelLogin}</li>
-						 <li>${r"${date_valid}"} : #i18n{mylutece.accountLifeTime.labelDateValid}</li>
-					 </#if>
-				</ul>
+						<#if email_type != "ip_blocked">
+							<li>${r"${login}"} : #i18n{mylutece.accountLifeTime.labelLogin}</li>
+							<#if email_type != "password_expired" >
+								<li>${r"${date_valid}"} : #i18n{mylutece.accountLifeTime.labelDateValid}</li>
+							</#if>
+						</#if>
+					</#if>
+					</ul>
+				</p>
+				<input type="submit" class="button" value="#i18n{portal.util.labelModify}" />
 			</p>
-			
-			<input type="submit" class="button" value="#i18n{portal.util.labelModify}" />
-		</p>
+		</fieldset>
 	</form>
 </div>
 <@initEditor />

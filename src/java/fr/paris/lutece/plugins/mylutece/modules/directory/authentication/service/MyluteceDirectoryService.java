@@ -122,7 +122,10 @@ public class MyluteceDirectoryService implements IMyluteceDirectoryService
 	private static final String PARAMETER_ACCOUNT_REACTIVATED_MAIL_SENDER = "account_reactivated_mail_sender";
 	private static final String PARAMETER_ACCOUNT_REACTIVATED_MAIL_SUBJECT = "account_reactivated_mail_subject";
 	private static final String PARAMETER_ACCOUNT_REACTIVATED_MAIL_BODY = "mylutece_directory_account_reactivated_mail";
-	
+    private static final String PARAMETER_MAIL_PASSWORD_ENCRYPTION_CHANGED = "mylutece_directory_mailPasswordEncryptionChanged";
+    private static final String PARAMETER_MAIL_PASSWORD_ENCRYPTION_CHANGED_SENDER = "mail_password_encryption_changed_sender";
+    private static final String PARAMETER_MAIL_PASSWORD_ENCRYPTION_CHANGED_SUBJECT = "mail_password_encryption_changed_subject";
+
 	// MARKS
 	private static final String MARK_SEARCH_IS_SEARCH = "search_is_search";
 	private static final String MARK_SEARCH_MYLUTECE_USER_FIELD_FILTER = "search_mylutece_user_field_filter";
@@ -144,11 +147,6 @@ public class MyluteceDirectoryService implements IMyluteceDirectoryService
 	// PROPERTIES
 	private static final String PROPERTY_ERROR_FIELD = "module.mylutece.directory.message.error.field";
 	private static final String PROPERTY_ERROR_MANDATORY_FIELDS = "module.mylutece.directory.message.account.errorMandatoryFields";
-	private static final String PROPERTY_NO_REPLY_EMAIL = "mail.noreply.email";
-	private static final String PROPERTY_MESSAGE_EMAIL_SUBJECT = "module.mylutece.directory.forgot_password.email.subject";
-
-	// TEMPLATES
-	private static final String TEMPLATE_EMAIL_FORGOT_PASSWORD = "admin/plugins/mylutece/modules/directory/email_forgot_password.html";
 
 	@Inject
 	private IMyluteceDirectoryParameterService _parameterService;
@@ -707,14 +705,22 @@ public class MyluteceDirectoryService implements IMyluteceDirectoryService
 			if ( ( listEmails != null ) && !listEmails.isEmpty( ) )
 			{
 				// send password by e-mail
-				String strSenderEmail = AppPropertiesService.getProperty( PROPERTY_NO_REPLY_EMAIL );
-				String strEmailSubject = I18nService.getLocalizedString( PROPERTY_MESSAGE_EMAIL_SUBJECT, locale );
+                ReferenceItem referenceItem = _parameterService.findByKey(
+                        PARAMETER_MAIL_PASSWORD_ENCRYPTION_CHANGED_SENDER, plugin );
+                String strSenderEmail = referenceItem == null ? StringUtils.EMPTY : referenceItem.getName( );
+                referenceItem = _parameterService
+                        .findByKey( PARAMETER_MAIL_PASSWORD_ENCRYPTION_CHANGED_SUBJECT, plugin );
+                String strEmailSubject = referenceItem == null ? StringUtils.EMPTY : referenceItem.getName( );
+
 				Map<String, Object> model = new HashMap<String, Object>( );
 				model.put( MARK_NEW_PASSWORD, strPasswordCpy );
 				model.put( MARK_LOGIN_URL, strBaseURL + AdminAuthenticationService.getInstance( ).getLoginPageUrl( ) );
 				model.put( MARK_SITE_LINK, MailService.getSiteLink( strBaseURL, true ) );
 
-				HtmlTemplate template = AppTemplateService.getTemplate( TEMPLATE_EMAIL_FORGOT_PASSWORD, locale, model );
+                String strTemplate = DatabaseTemplateService
+                        .getTemplateFromKey( PARAMETER_MAIL_PASSWORD_ENCRYPTION_CHANGED );
+
+                HtmlTemplate template = AppTemplateService.getTemplateFromStringFtl( strTemplate, locale, model );
 
 				for ( String email : listEmails )
 				{

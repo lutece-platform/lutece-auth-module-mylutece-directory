@@ -151,7 +151,7 @@ public class MyLuteceDirectoryApp implements XPageApplication
 	private static final String PARAMETER_KEY = "key";
 	private static final String PARAMETER_FORCE_CHANGE_PASSWORD_REINIT = "force_change_password_reinit";
 	private static final String PARAMETER_TIME_BEFORE_ALERT_ACCOUNT = "time_before_alert_account";
-	private static final String PARAMETER_MAIL_LOST_PASSWORD_SENDER = "mail_lost_password_sender";
+    private static final String PARAMETER_MAIL_LOST_PASSWORD_SENDER = "mail_lost_password_sender";
     private static final String PARAMETER_MAIL_LOST_PASSWORD_SUBJECT = "mail_lost_password_subject";
 
 	// Actions
@@ -213,6 +213,7 @@ public class MyLuteceDirectoryApp implements XPageApplication
 	private static final String PROPERTY_NEED_ACTIVATION = "mylutece-directory.account_creation.must_validate";
 	private static final String PROPERTY_NO_REPLY_EMAIL = "mail.noreply.email";
 	private static final String PROPERTY_ACCOUNT_REF_ENCRYPT_ALGO = "mylutece-directory.account_life_time.refEncryptionAlgorythm";
+    private static final String PROPERTY_DIRECTORY_MAIL_LOST_PASSWORD = "mylutece_directory_mailLostPassword";
 
 	// i18n Properties
 	private static final String PROPERTY_CHANGE_PASSWORD_LABEL = "module.mylutece.directory.xpage.changePassword.label";
@@ -273,7 +274,7 @@ public class MyLuteceDirectoryApp implements XPageApplication
 	private Locale _locale;
 
 	/**
-	 *
+	 * 
 	 * @param request The HTTP request
 	 * @param plugin The plugin
 	 */
@@ -284,7 +285,7 @@ public class MyLuteceDirectoryApp implements XPageApplication
 	}
 
 	/**
-	 *
+	 * 
 	 * @param request The HTTP request
 	 * @param nMode The mode (admin, ...)
 	 * @param plugin The plugin
@@ -994,7 +995,7 @@ public class MyLuteceDirectoryApp implements XPageApplication
 
 	/**
 	 * Check the password with the password confirmation string Check if password is empty
-	 *
+	 * 
 	 * @param strPassword The password
 	 * @param strConfirmation The password confirmation
 	 * @return true if password is equal to confirmation password and not empty
@@ -1013,7 +1014,7 @@ public class MyLuteceDirectoryApp implements XPageApplication
 
 	/**
 	 * This method is call by the JSP named DoSendPassword.jsp
-	 *
+	 * 
 	 * @param request The HTTP request
 	 * @return The URL to forward depending of the result of the sending.
 	 */
@@ -1072,8 +1073,8 @@ public class MyLuteceDirectoryApp implements XPageApplication
 
 					String strHost = AppPropertiesService.getProperty( PROPERTY_MAIL_HOST );
 
-					if ( StringUtils.isBlank( strError ) && StringUtils.isBlank( strHost ) )
-                    {
+                    if ( StringUtils.isBlank( strError ) && StringUtils.isBlank( strHost ) )
+					{
 						strError = ERROR_SENDING_EMAIL;
 					}
 					else
@@ -1084,14 +1085,19 @@ public class MyLuteceDirectoryApp implements XPageApplication
 						model.put( MARK_REINIT_URL, _userKeyService.getReinitUrl( key.getKey( ), request ) );
 						model.put( MARK_SITE_LINK, MailService.getSiteLink( AppPathService.getBaseUrl( request ), true ) );
 
-						HtmlTemplate template = AppTemplateService.getTemplateFromStringFtl(
-                        		DatabaseTemplateService.getTemplateFromKey( PROPERTY_DIRECTORY_MAIL_LOST_PASSWORD ), _locale, model );
+                        HtmlTemplate template = AppTemplateService.getTemplateFromStringFtl(
+                                DatabaseTemplateService.getTemplateFromKey( PROPERTY_DIRECTORY_MAIL_LOST_PASSWORD ),
+                                _locale, model );
 
-                        ReferenceItem referenceItem = _parameterService.findByKey( PARAMETER_MAIL_LOST_PASSWORD_SENDER, plugin );
+                        ReferenceItem referenceItem = _parameterService.findByKey( PARAMETER_MAIL_LOST_PASSWORD_SENDER,
+                                plugin );
                         String strSender = referenceItem == null ? StringUtils.EMPTY : referenceItem.getName( );
+
                         referenceItem = _parameterService.findByKey( PARAMETER_MAIL_LOST_PASSWORD_SUBJECT, plugin );
                         String strSubject = referenceItem == null ? StringUtils.EMPTY : referenceItem.getName( );
-                        MailService.sendMailHtml( strEmail, PROPERTY_NO_REPLY_EMAIL, strSender, strSubject, template.getHtml( ) );
+
+                        MailService.sendMailHtml( strEmail, PROPERTY_NO_REPLY_EMAIL, strSender, strSubject,
+                                template.getHtml( ) );
 
 					}
 				}
@@ -1119,7 +1125,7 @@ public class MyLuteceDirectoryApp implements XPageApplication
 
 	/**
 	 * This method is call by the JSP named DoSendLogin.jsp
-	 *
+	 * 
 	 * @param request The HTTP request
 	 * @return The URL to forward depending of the result of the sending.
 	 */
