@@ -23,7 +23,9 @@
 					<ul>
 					<#if email_type = "lost_password" || email_type = "password_encryption_changed" >
 						<li>${r"${new_password}"} : #i18n{mylutece.accountLifeTime.labelNewPassword}</li>
-						<li>${r"${reinit_url}"} : #i18n{mylutece.accountLifeTime.labelReinitUrl}</li>
+						<#if email_type != "password_encryption_changed">
+							<li>${r"${reinit_url}"} : #i18n{mylutece.accountLifeTime.labelReinitUrl}</li>
+						</#if>
 					<#else>
 						<#if email_type != "reactivated" && email_type != "expired" && email_type != "password_expired">
 							<li>${r"${url}"} : #i18n{portal.users.accountLifeTime.labelUrl}</li>
