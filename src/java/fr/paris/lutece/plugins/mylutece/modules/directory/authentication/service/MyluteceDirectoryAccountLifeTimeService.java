@@ -207,8 +207,6 @@ public class MyluteceDirectoryAccountLifeTimeService implements IAccountLifeTime
         sbUrl.append( CryptoService.encrypt( Long.toString( user.getAccountMaxValidDate( ).getTime( ) ),
                 AppPropertiesService.getProperty( PROPERTY_ACCOUNT_REF_ENCRYPT_ALGO ) ) );
 
-        sbUrl.append( nIdUser.toString( ) );
-
         String activationURL = sbUrl.toString( );
 
         model.put( MARK_DATE_VALID, accountMaxValidDate );
