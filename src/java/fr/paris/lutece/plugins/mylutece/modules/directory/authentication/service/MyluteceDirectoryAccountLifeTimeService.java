@@ -47,7 +47,7 @@ public class MyluteceDirectoryAccountLifeTimeService implements IAccountLifeTime
     private static final String MARK_REF = "ref";
 
     private static final String PROPERTY_ACCOUNT_REF_ENCRYPT_ALGO = "mylutece-directory.account_life_time.refEncryptionAlgorythm";
-    private static final String PROPERTY_PROD_URL = "init.webapp.prod.url";
+    private static final String PROPERTY_PROD_URL = "lutece.prod.url";
 
     private static final String JSP_URL_REACTIVATE_ACCOUNT = "/jsp/site/Portal.jsp?page=mylutecedirectory&action=updateAccount";
     private static final String CONSTANT_AND = "&";
