@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="ISO-8859-1" standalone="no"?><plug-in>
     <name>mylutece-directory</name>
     <class>fr.paris.lutece.plugins.mylutece.modules.directory.authentication.service.MyluteceDirectoryPlugin</class>
-    <version>2.0.4</version>
+    <version>2.0.3</version>
     <description>module.mylutece.directory.module.description</description>
     <documentation/>
     <installation/>
