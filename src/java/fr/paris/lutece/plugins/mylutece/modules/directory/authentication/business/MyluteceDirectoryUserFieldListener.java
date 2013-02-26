@@ -44,12 +44,12 @@ import fr.paris.lutece.portal.business.user.AdminUser;
 import fr.paris.lutece.portal.service.plugin.Plugin;
 import fr.paris.lutece.portal.service.plugin.PluginService;
 
-import org.apache.commons.lang.StringUtils;
-
 import java.util.List;
 import java.util.Locale;
 
 import javax.servlet.http.HttpServletRequest;
+
+import org.apache.commons.lang.StringUtils;
 
 
 /**
@@ -72,17 +72,27 @@ public class MyluteceDirectoryUserFieldListener implements MyLuteceUserFieldList
         for ( IAttribute attribute : listAttributes )
         {
             List<MyLuteceUserField> userFields = attribute.getUserFieldsData( request, nIdUser );
+            doCreateUserFields( nIdUser, userFields, locale );
+        }
+    }
 
-            for ( MyLuteceUserField userField : userFields )
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void doCreateUserFields( int nIdUser, List<MyLuteceUserField> listUserFields, Locale locale )
+    {
+        Plugin myLutecePlugin = PluginService.getPlugin( MyLutecePlugin.PLUGIN_NAME );
+
+        for ( MyLuteceUserField userField : listUserFields )
+        {
+            if ( ( userField != null ) && StringUtils.isNotBlank( userField.getValue( ) ) )
             {
-                if ( ( userField != null ) && StringUtils.isNotBlank( userField.getValue(  ) ) )
-                {
-                    // Change the value of the user field
-                    // Instead of having the ID of the attribute field, we put the attribute field title
-                    // which represents the locale
-                    userField.setValue( userField.getAttributeField(  ).getTitle(  ) );
-                    MyLuteceUserFieldHome.create( userField, myLutecePlugin );
-                }
+                // Change the value of the user field
+                // Instead of having the ID of the attribute field, we put the attribute field title
+                // which represents the locale
+                userField.setValue( userField.getAttributeField( ).getTitle( ) );
+                MyLuteceUserFieldHome.create( userField, myLutecePlugin );
             }
         }
     }
@@ -100,17 +110,28 @@ public class MyluteceDirectoryUserFieldListener implements MyLuteceUserFieldList
         for ( IAttribute attribute : listAttributes )
         {
             List<MyLuteceUserField> userFields = attribute.getUserFieldsData( request, nIdUser );
+            doModifyUserFields( nIdUser, userFields, locale, currentUser );
+        }
+    }
 
-            for ( MyLuteceUserField userField : userFields )
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void doModifyUserFields( int nIdUser, List<MyLuteceUserField> listUserFields, Locale locale,
+            AdminUser currentUser )
+    {
+        Plugin myLutecePlugin = PluginService.getPlugin( MyLutecePlugin.PLUGIN_NAME );
+
+        for ( MyLuteceUserField userField : listUserFields )
+        {
+            if ( ( userField != null ) && StringUtils.isNotBlank( userField.getValue( ) ) )
             {
-                if ( ( userField != null ) && StringUtils.isNotBlank( userField.getValue(  ) ) )
-                {
-                    // Change the value of the user field
-                    // Instead of having the ID of the attribute field, we put the attribute field title
-                    // which represents the locale
-                    userField.setValue( userField.getAttributeField(  ).getTitle(  ) );
-                    MyLuteceUserFieldHome.create( userField, myLutecePlugin );
-                }
+                // Change the value of the user field
+                // Instead of having the ID of the attribute field, we put the attribute field title
+                // which represents the locale
+                userField.setValue( userField.getAttributeField( ).getTitle( ) );
+                MyLuteceUserFieldHome.create( userField, myLutecePlugin );
             }
         }
     }
@@ -120,6 +141,15 @@ public class MyluteceDirectoryUserFieldListener implements MyLuteceUserFieldList
      */
     @Override
     public void doRemoveUserFields( int nIdUser, HttpServletRequest request, Locale locale )
+    {
+        // No action
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void doRemoveUserFields( int nIdUser, Locale locale )
     {
         // No action
     }
