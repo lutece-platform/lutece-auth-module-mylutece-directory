@@ -1,9 +1,9 @@
-<div class="content-box" >
+<div class="row-fluid" >
     <h2>#i18n{module.mylutece.directory.manage_roles_user.table_title}</h2>
     
     <form method="post" action="jsp/admin/plugins/mylutece/modules/directory/DoAssignRoleUser.jsp">
         <input type="hidden" name="id_record" value="${user.idRecord}" />
-        <table>
+       <table class="table table-striped table-condensed"> 
             <tr>
                 <th>#i18n{module.mylutece.directory.manage_roles_user.colName}</th>
                 <th>#i18n{module.mylutece.directory.manage_roles_user.colLabel}</th>
@@ -31,7 +31,9 @@
             </#list>
         </table>
         <p>
-            <input type="submit" class="button" value="#i18n{module.mylutece.directory.manage_roles_user.btnAssign}" />
+            <button type="submit" class="btn btn-primary">
+            #i18n{module.mylutece.directory.manage_roles_user.btnAssign}
+            </button>
         </p>
     </form>
 </div>

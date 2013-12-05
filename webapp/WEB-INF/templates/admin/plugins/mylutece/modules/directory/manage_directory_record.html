@@ -1,132 +1,139 @@
 <div id="content-box-actions">
-	<#if permission_advanced_parameter?? && permission_advanced_parameter >
-		<form method="post" action="jsp/admin/plugins/mylutece/modules/directory/ManageAdvancedParameters.jsp">
-			<input type="submit" value="#i18n{module.mylutece.directory.manage_directory_record.buttonLabelManageAdvancedParameters}" class="button bt-toolbar" />
-		</form>
+    <#if permission_advanced_parameter?? && permission_advanced_parameter >
+        <form method="post" action="jsp/admin/plugins/mylutece/modules/directory/ManageAdvancedParameters.jsp">
+            <button type="submit"class="btn btn-primary" >
+            #i18n{module.mylutece.directory.manage_directory_record.buttonLabelManageAdvancedParameters}
+            </button>
+        </form>
     </#if>
 </div>
 <#if no_directory?has_content>
-	<div class="content-box">
-		<p>
-			<em>#i18n{module.mylutece.directory.message.no_users_directory}</em>
-		</p>
-	</div> 
+    <div class="content-box">
+        <p>
+            <em>#i18n{module.mylutece.directory.message.no_users_directory}</em>
+        </p>
+    </div> 
 <#else>
 
-<script language="JavaScript" type="text/javascript">
-
-	 var	tabCalendar=new Array();
-	 $.fn.clearForm = function() {
-	  return this.each(function() {
-		var type = this.type, tag = this.tagName.toLowerCase();
-		if (tag == 'form')
-		  return $(':input',this).clearForm();
-		if (type == 'text' || type == 'password' || tag == 'textarea')
-		  this.value = '';
-		else if (type == 'checkbox' || type == 'radio')
-		  this.checked = false;
-		else if (tag == 'select')
-		  this.selectedIndex = 0;
-	  });
-	};
-	
-	$(document).ready(function () {
-		 $("#complementary").hide(); 
-		 $("#reset").click(function() {  
-			$("#searchForm").clearForm();
-			});
-			
-	for (i=0; i<tabCalendar.length; i++) {
-		var input="#"+tabCalendar[i];
-		<#-- Hack for datepicker : the call to script must be here because of tabCalendar -->
-		$.datepicker.setDefaults({showOn: 'button', buttonImageOnly: true, 
-			buttonImage: 'js/jquery/plugins/ui/datepicker/calendar.png', buttonText: 'Calendar', 
-		    showAnim: 'slideDown', speed: 'fast'});
-		$(input).datepicker($.extend({showStatus: true}, $.datepicker.regional['<#if !('${locale}'=='en')>${locale}</#if>'])); 
-					
-		}	
-	});
-
+<script type="text/javascript" src="js/tools.js"></script> 
+<script type="text/javascript">
+     var    tabCalendar=new Array();
+     $.fn.clearForm = function() {
+      return this.each(function() {
+        var type = this.type, tag = this.tagName.toLowerCase();
+        if (tag == 'form')
+          return $(':input',this).clearForm();
+        if (type == 'text' || type == 'password' || tag == 'textarea')
+          this.value = '';
+        else if (type == 'checkbox' || type == 'radio')
+          this.checked = false;
+        else if (tag == 'select')
+          this.selectedIndex = 0;
+      });
+    };
+    
+    $(document).ready(function () {
+         $("#complementary").hide(); 
+         $("#reset").click(function() {  
+            $("#searchForm").clearForm();
+            });
+            
+    for (i=0; i<tabCalendar.length; i++) {
+        var input="#"+tabCalendar[i];
+        <#-- Hack for datepicker : the call to script must be here because of tabCalendar -->
+        $.datepicker.setDefaults({showOn: 'button', buttonImageOnly: true, 
+            buttonImage: 'js/jquery/plugins/ui/datepicker/calendar.png', buttonText: 'Calendar', 
+            showAnim: 'slideDown', speed: 'fast'});
+        $(input).datepicker($.extend({showStatus: true}, $.datepicker.regional['<#if !('${locale}'=='en')>${locale}</#if>'])); 
+                    
+        }   
+    });
 </script> 
-<div class="content-box">
-	<h2> #i18n{module.mylutece.directory.manage_directory_record.table_title} : '${directory.title}'</h2>
-	<div class="highlight-box">
-	  <div id="form-content">
-			<form action="jsp/admin/plugins/mylutece/modules/directory/ManageRecords.jsp" method="post" name="" id="searchForm" >
-			<input name="page" value="directory" type="hidden">
-			<input name="session" value="session" type="hidden">
-			<input type="hidden" name="search_is_search" value="true"/>
-			
-			 <input name="id_directory" value="${directory.idDirectory}" type="hidden">
-				<#if entry_list_form_main_search?has_content>
-					<#list entry_list_form_main_search as entry>	
-						<#assign entryKey=""+entry.idEntry>	
-						<#if map_id_entry_list_record_field?exists && map_id_entry_list_record_field[entryKey]?exists>
-			      			${entry.getHtmlFormSearchEntry( locale,map_id_entry_list_record_field[entryKey] , false )}
-			      		<#else>
-			      			${entry.getHtmlFormSearchEntry( locale , false)}
-			      		</#if>
-		      		</#list>
-		      	</#if>
-		      	<#if entry_list_form_complementary_search?has_content>
-					<div class="highlight-box">
-				      
-				      	<div>
-									<a href="#"  onclick="displayId('complementary'); return false;">
-										<img    src="images/admin/skin/open_block.gif" alt="#i18n{directory.manage_directory_record.title_open_block}" title="#i18n{directory.manage_directory_record.title_open_block}" /></a>
-									<a href="#" onclick="hideId('complementary'); return false;"> 
-										<img    src="images/admin/skin/closed_block.gif" alt="#i18n{directory.manage_directory_record.title_close_block}" title="#i18n{directory.manage_directory_record.title_open_block}"/></a>
-										<span > #i18n{directory.manage_directory_record.label_complementary_search}
-									</span>
-						</div>
-					    <div id="complementary">
-						    	<#list entry_list_form_complementary_search as entry>	
-									<#assign entryKey=""+entry.idEntry>	
-									<#if map_id_entry_list_record_field?exists && map_id_entry_list_record_field[entryKey]?exists>
-					      				${entry.getHtmlFormSearchEntry( locale,map_id_entry_list_record_field[entryKey] , false )}
-					      			<#else>
-					      				${entry.getHtmlFormSearchEntry( locale , false)}
-					      			</#if>
-				      			</#list>
-					    </div>
-					 </div> 	
-				   </#if>
-				<#list attributes_list as attribute>
-					<#if attribute.shownInSearch>
-						${attribute.getHtmlFormSearchAttribute( search_mylutece_user_field_filter, locale )}
-					</#if>
-				</#list>
-	  			<p>	
-	  			 	<input type="submit" value="#i18n{module.mylutece.directory.manage_directory_record.button_search}" class="button" name="search" />
-	  			 	<input type="button" value="#i18n{module.mylutece.directory.manage_directory_record.button_reset}" class="button" name="reset" id="reset" />	
-	  			</p>
-			</form>
-		</div>
+
+<div class="rowfluid">
+    <h2> #i18n{module.mylutece.directory.manage_directory_record.table_title} : '${directory.title}'</h2>
+    <div class="highlight-box">
+      <div id="form-content">
+            <form action="jsp/admin/plugins/mylutece/modules/directory/ManageRecords.jsp" method="post" name="" id="searchForm" >
+            <input name="page" value="directory" type="hidden">
+            <input name="session" value="session" type="hidden">
+            <input type="hidden" name="search_is_search" value="true"/>
+            
+             <input name="id_directory" value="${directory.idDirectory}" type="hidden">
+                <#if entry_list_form_main_search?has_content>
+                    <#list entry_list_form_main_search as entry>    
+                        <#assign entryKey=""+entry.idEntry> 
+                        <#if map_id_entry_list_record_field?exists && map_id_entry_list_record_field[entryKey]?exists>
+                            ${entry.getHtmlFormSearchEntry( locale,map_id_entry_list_record_field[entryKey] , false )}
+                        <#else>
+                            ${entry.getHtmlFormSearchEntry( locale , false)}
+                        </#if>
+                    </#list>
+                </#if>
+                <#if entry_list_form_complementary_search?has_content>
+                    <div class="well">
+                        <div>
+                            <a class="btn btn-primary btn-mini" onclick="displayId('complementary'); return false;">
+                                <i class="icon-white icon-plus"></i>
+                            </a>
+                            <a class="btn btn-primary btn-mini" onclick="hideId('complementary'); return false;"> 
+                                <i class="icon-white icon-minus"></i>
+                              </a>
+                              <span > #i18n{directory.manage_directory_record.label_complementary_search}
+                            </span>
+                        </div>
+                        <div id="complementary">
+                                <#list entry_list_form_complementary_search as entry>   
+                                    <#assign entryKey=""+entry.idEntry> 
+                                    <#if map_id_entry_list_record_field?exists && map_id_entry_list_record_field[entryKey]?exists>
+                                        ${entry.getHtmlFormSearchEntry( locale,map_id_entry_list_record_field[entryKey] , false )}
+                                    <#else>
+                                        ${entry.getHtmlFormSearchEntry( locale , false)}
+                                    </#if>
+                                </#list>
+                        </div>
+                     </div>     
+                   </#if>
+                <#list attributes_list as attribute>
+                    <#if attribute.shownInSearch>
+                        ${attribute.getHtmlFormSearchAttribute( search_mylutece_user_field_filter, locale )}
+                    </#if>
+                </#list>
+                <p> 
+                    <button type="submit" class="btn btn-primary" name="search">
+                        <i class="icon-white icon-search"></i>&nbsp;#i18n{module.mylutece.directory.manage_directory_record.button_search}
+                    </button>
+                    <button type="button" class="btn btn-danger" id="reset" name="reset">
+                        <i class="icon-white icon-remove"></i>&nbsp;#i18n{module.mylutece.directory.manage_directory_record.button_reset}
+                    </button>
+                </p>
+            </form>
+        </div>
      </div>
  
-	<form method="post"  action="jsp/admin/plugins/mylutece/modules/directory/ManageRecords.jsp">
+    <form method="post"  action="jsp/admin/plugins/mylutece/modules/directory/ManageRecords.jsp">
         <@paginationAdmin paginator=paginator combo=1 form=0/>
         <#if search_is_search >
-        	<input type="hidden" name="search_is_search" value="true"/>
-        	<input type="hidden" name="id_directory" value="${directory.idDirectory}" >
-   			<input type="hidden" name="session" value="session" >
-   			<#if search_mylutece_user_field_filter.listUserFields?exists && search_mylutece_user_field_filter.listUserFields?has_content>
-   				<#list search_mylutece_user_field_filter.listUserFields as user_field>
-   					<#if user_field.attribute.attributeType.className == "fr.paris.lutece.plugins.mylutece.business.attribute.AttributeComboBox">
-   						<input type="hidden" name="attribute_${user_field.attribute.idAttribute}" value="${user_field.attributeField.idField}"/>
-   					<#else>
-   						<input type="hidden" name="attribute_${user_field.attribute.idAttribute}" value="${user_field.value}" />
-   					</#if>
-   				</#list>
-   			</#if>
+            <input type="hidden" name="search_is_search" value="true"/>
+            <input type="hidden" name="id_directory" value="${directory.idDirectory}" >
+            <input type="hidden" name="session" value="session" >
+            <#if search_mylutece_user_field_filter.listUserFields?exists && search_mylutece_user_field_filter.listUserFields?has_content>
+                <#list search_mylutece_user_field_filter.listUserFields as user_field>
+                    <#if user_field.attribute.attributeType.className == "fr.paris.lutece.plugins.mylutece.business.attribute.AttributeComboBox">
+                        <input type="hidden" name="attribute_${user_field.attribute.idAttribute}" value="${user_field.attributeField.idField}"/>
+                    <#else>
+                        <input type="hidden" name="attribute_${user_field.attribute.idAttribute}" value="${user_field.value}" />
+                    </#if>
+                </#list>
+            </#if>
         </#if>
     </form>
-	<table>
+    <table class="table table-striped table-condensed"> 
     <tr>
-      <#list entry_list_search_result as entry>	
-      		<th>
-      			${entry.title}
-       		</th>
+      <#list entry_list_search_result as entry> 
+            <th>
+                ${entry.title}
+            </th>
        </#list>
        <th>
        #i18n{module.mylutece.directory.manage_directory_record.login}
@@ -137,67 +144,67 @@
      </tr>
    <#list directory_record_list as recordDisplay>
    <#assign record = recordDisplay.record />
-   	<tr>
-   		<#assign id_entry_store=-1>
-		 <#list record.listRecordField as record_field>
-	   	 	
-		   	 	<#if  id_entry_store!=-1 && record_field.entry.idEntry!=id_entry_store >
-		   	 		</td>
-		   	 	</#if>	
-		 		<#if record_field.entry.idEntry!=id_entry_store || id_entry_store=-1>
-		 			<td>
-		 			<#if record_field_index = 0 && !((recordDisplay.mylutece_record)?? && recordDisplay.mylutece_record.status == 10)>
-						<a href="jsp/admin/plugins/directory/ModifyDirectoryRecord.jsp?id_directory_record=${record.idRecord}">
-							<img src="images/admin/skin/plugins/mylutece/modules/directory/actions/jump_to.png" alt="#i18n{module.mylutece.directory.manage_directory_record.title_modify_directory}" title="#i18n{module.mylutece.directory.manage_directory_record.title_modify_directory}" />
-						</a>
-					</#if>
-		 		<#else>	
-		 			<br>	
-		 		</#if>
-		 			<#if (recordDisplay.mylutece_record)?? && recordDisplay.mylutece_record.status = 10>
-		 				#i18n{mylutece.anonymize_user.statusLabelAnonymize}
-		 			<#else>
-		 				${record_field.entry.getHtmlRecordFieldValue( locale, record_field , false )}
-		 			</#if>
-		     	<#if  !record_field_has_next> 	
-		     	 	</td>
-		     	</#if>
-		 		<#assign id_entry_store=record_field.entry.idEntry>
-		   </#list>
-		   	<#if (recordDisplay.mylutece_record)?? && recordDisplay.mylutece_record?has_content >
-			<td>
-				<#if recordDisplay.mylutece_record.status = 10>#i18n{mylutece.anonymize_user.statusLabelAnonymize}<#else>${recordDisplay.mylutece_record.login}</#if>
-			</td>
-		   <td>
-				<a href="jsp/admin/plugins/mylutece/modules/directory/ModifyUser.jsp?id_record=${record.idRecord}">
-					<img src="images/admin/skin/actions/modify.png" alt="#i18n{module.mylutece.directory.manage_directory_record.title_modify}" title="#i18n{module.mylutece.directory.manage_directory_record.title_modify}" />
-				</a>
-				<a href="jsp/admin/plugins/mylutece/modules/directory/ManageRolesUser.jsp?id_record=${record.idRecord}">
-					<img src="images/admin/skin/actions/roles.png" alt="#i18n{module.mylutece.directory.manage_directory_record.title_manage_roles}" title="#i18n{module.mylutece.directory.manage_directory_record.title_manage_roles}" />
-				</a>
-				<a href="jsp/admin/plugins/mylutece/modules/directory/ConfirmRemoveUser.jsp?id_record=${record.idRecord}">
-					<img src="images/admin/skin/actions/delete.png" alt="#i18n{module.mylutece.directory.manage_directory_record.title_delete}" title="#i18n{module.mylutece.directory.manage_directory_record.title_delete}" />
-				</a>
-				<#if recordDisplay.mylutece_record.status != 10>
-		            <a href="jsp/admin/plugins/mylutece/modules/directory/GetAnonymizeUser.jsp?id_record=${record.idRecord}">
-		            	<img src="images/admin/skin/actions/anonymize.png" class="icon" alt="#i18n{mylutece.anonymize_user.labelAnonymizeUser}" title="#i18n{mylutece.anonymize_user.labelAnonymizeUser}" />
-		            </a>
-		        </#if>
-			</td>
-			<#else>
-			<td>
-				&nbsp;
-			</td>
-			<td>
-				<a href="jsp/admin/plugins/mylutece/modules/directory/CreateUser.jsp?id_record=${record.idRecord}">
-					<img src="images/admin/skin/actions/publish.png" alt="#i18n{module.mylutece.directory.manage_directory_record.title_create}" title="#i18n{module.mylutece.directory.manage_directory_record.title_create}" />
-				</a>
-			</td>	
-			</#if>
-		 	
+    <tr>
+        <#assign id_entry_store=-1>
+         <#list record.listRecordField as record_field>
+            
+                <#if  id_entry_store!=-1 && record_field.entry.idEntry!=id_entry_store >
+                    </td>
+                </#if>  
+                <#if record_field.entry.idEntry!=id_entry_store || id_entry_store=-1>
+                    <td>
+                    <#if record_field_index = 0 && !((recordDisplay.mylutece_record)?? && recordDisplay.mylutece_record.status == 10)>
+                        <a href="jsp/admin/plugins/directory/ModifyDirectoryRecord.jsp?id_directory_record=${record.idRecord}">
+                            <img src="images/admin/skin/plugins/mylutece/modules/directory/actions/jump_to.png" alt="#i18n{module.mylutece.directory.manage_directory_record.title_modify_directory}" title="#i18n{module.mylutece.directory.manage_directory_record.title_modify_directory}" />
+                        </a>
+                    </#if>
+                <#else> 
+                    <br>    
+                </#if>
+                    <#if (recordDisplay.mylutece_record)?? && recordDisplay.mylutece_record.status = 10>
+                        #i18n{mylutece.anonymize_user.statusLabelAnonymize}
+                    <#else>
+                        ${record_field.entry.getHtmlRecordFieldValue( locale, record_field , false )}
+                    </#if>
+                <#if  !record_field_has_next>   
+                    </td>
+                </#if>
+                <#assign id_entry_store=record_field.entry.idEntry>
+           </#list>
+            <#if (recordDisplay.mylutece_record)?? && recordDisplay.mylutece_record?has_content >
+            <td>
+                <#if recordDisplay.mylutece_record.status = 10>#i18n{mylutece.anonymize_user.statusLabelAnonymize}<#else>${recordDisplay.mylutece_record.login}</#if>
+            </td>
+           <td>
+                <a class="btn btn-primary btn-small" href="jsp/admin/plugins/mylutece/modules/directory/ModifyUser.jsp?id_record=${record.idRecord}">
+                    <i class="icon-white icon-edit"></i>
+                </a>
+                <a class="btn btn-primary btn-small" href="jsp/admin/plugins/mylutece/modules/directory/ManageRolesUser.jsp?id_record=${record.idRecord}">
+                    <i class="icon-white icon-list-alt"></i>
+                </a>
+                <a class="btn btn-danger btn-small" href="jsp/admin/plugins/mylutece/modules/directory/ConfirmRemoveUser.jsp?id_record=${record.idRecord}">
+                    <i class="icon-white icon-trash"></i>
+                </a>
+                <#if recordDisplay.mylutece_record.status != 10>
+                    <a class="btn btn-primary btn-small" href="jsp/admin/plugins/mylutece/modules/directory/GetAnonymizeUser.jsp?id_record=${record.idRecord}">
+                        <i class="icon-white icon-eye-close"></i>
+                    </a>
+                </#if>
+            </td>
+            <#else>
+            <td>
+                &nbsp;
+            </td>
+            <td>
+                <a class="btn btn-primary btn-small" href="jsp/admin/plugins/mylutece/modules/directory/CreateUser.jsp?id_record=${record.idRecord}">
+                    <i class="icon-white icon-user"></i>
+                </a>
+            </td>   
+            </#if>
+            
      </tr>
-	</#list>
-	</table>
-	<@paginationAdmin paginator=paginator />
+    </#list>
+    </table>
+    <@paginationAdmin paginator=paginator />
 </div>
 </#if>

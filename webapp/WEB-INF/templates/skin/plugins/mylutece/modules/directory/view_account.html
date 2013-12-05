@@ -1,49 +1,53 @@
-<div id="content" class="span-22 prepend-1 append-1 prepend-top last">
-	<h2 class="page-title">#i18n{module.mylutece.directory.xpage.view_account.pageTitle}</h2>
-		
-	<form class="default-form" id="modifyAccount" name="modifyAccount" action="jsp/site/Portal.jsp" method="post">
-		<div class="portlet-background">
-		<p>
-        	<label class="text-label" for="login">#i18n{module.mylutece.directory.xpage.view_account.login} : </label>
-			<input type="text" readonly="readonly" name="login" maxlength="100" size="35" tabindex="1" value="${user.name!}" />
-			<br />
-			<#if attributes_mapping?has_content>
-         	<#list attributes_mapping as attribute>
-				<label class="text-label" for="${attribute.attributeKey}">#i18n{portal.security.${attribute.attributeKey}} : </label>
-           		<input type="text" readonly="readonly" name="${attribute.attributeKey}" maxlength="100" size="35" tabindex="4" value="${user.getUserInfo(attribute.attributeKey)}" />
-           		<br />
-      		</#list>
-          	</#if>
-          	<#--
-          	<label class="combo-label" for="roles">#i18n{module.mylutece.directory.xpage.view_account.roles} : </label>
-			<#if roles?has_content>
-           		<select name="roles" id="roles" size="4">
-       			<#list roles as role>
-       	    		<option value="${role}">${role}</option>
-				</#list>
-  	       		</select>
- 	       	<#else>
- 	       		#i18n{module.mylutece.directory.xpage.view_account.noRole}
-			</#if>
-			<br />
-          	<label class="combo-label" for="groups">#i18n{module.mylutece.directory.xpage.view_account.groups} : </label>
-			<#if groups?has_content>
-           		<select name="groups" id="groups" size="4">
-          		<#list groups as group>
-       	    		<option value="${group}">${group}</option>
-				</#list>
-  	       		</select>
- 	       	<#else>
- 	       		#i18n{module.mylutece.directory.xpage.view_account.noGroup}
-			</#if>
-			-->
-		</p>
-		<div style="text-align:center;">
-			<input type="hidden" name="page" value="mylutecedirectory" />
-			<input type="hidden" name="action" value="modifyAccount" />
-			<input class="button-mylutecedirectory" id="button-subscribe" type="submit" name="changePasswordBtn" value="#i18n{module.mylutece.directory.xpage.view_account.btnModifyAccount}" />
-			<input class="button-mylutecedirectory" id="button-return" type="button" name="back" value="#i18n{module.mylutece.directory.xpage.account.btnBack}" onclick='javascript:history.go(-1)'/>  
-		</div>
-		</div>
-	</form>		
+<div id="container">
+    <h2 class="page-title">#i18n{module.mylutece.directory.xpage.view_account.pageTitle}</h2>
+        
+    <form class="form-horizontal" id="modifyAccount" name="modifyAccount" action="jsp/site/Portal.jsp" method="post">
+        <div class="well">
+        <p>
+            <label class="text-label" for="login">#i18n{module.mylutece.directory.xpage.view_account.login} : </label>
+            <input type="text" readonly="readonly" name="login" maxlength="100" size="35" tabindex="1" value="${user.name!}" />
+            <br />
+            <#if attributes_mapping?has_content>
+            <#list attributes_mapping as attribute>
+                <label class="text-label" for="${attribute.attributeKey}">#i18n{portal.security.${attribute.attributeKey}} : </label>
+                <input type="text" readonly="readonly" name="${attribute.attributeKey}" maxlength="100" size="35" tabindex="4" value="${user.getUserInfo(attribute.attributeKey)}" />
+                <br />
+            </#list>
+            </#if>
+            <#--
+            <label class="combo-label" for="roles">#i18n{module.mylutece.directory.xpage.view_account.roles} : </label>
+            <#if roles?has_content>
+                <select name="roles" id="roles" size="4">
+                <#list roles as role>
+                    <option value="${role}">${role}</option>
+                </#list>
+                </select>
+            <#else>
+                #i18n{module.mylutece.directory.xpage.view_account.noRole}
+            </#if>
+            <br />
+            <label class="combo-label" for="groups">#i18n{module.mylutece.directory.xpage.view_account.groups} : </label>
+            <#if groups?has_content>
+                <select name="groups" id="groups" size="4">
+                <#list groups as group>
+                    <option value="${group}">${group}</option>
+                </#list>
+                </select>
+            <#else>
+                #i18n{module.mylutece.directory.xpage.view_account.noGroup}
+            </#if>
+            -->
+        </p>
+        <div style="text-align:center;">
+            <input type="hidden" name="page" value="mylutecedirectory" />
+            <input type="hidden" name="action" value="modifyAccount" />
+            <button class="btn btn-primary" type="submit" name="changePasswordBtn" >
+            #i18n{module.mylutece.directory.xpage.view_account.btnModifyAccount}
+            </button>
+            <button class="btn" type="button" name="back" onclick='javascript:history.go(-1)'>
+            #i18n{module.mylutece.directory.xpage.account.btnBack}
+            </button>  
+        </div>
+        </div>
+    </form>     
 </div>

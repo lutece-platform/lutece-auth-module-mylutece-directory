@@ -1,53 +1,49 @@
-<div class="content-box" >
+<div class="row-fluid" >
     
     <h2>#i18n{module.mylutece.directory.modify_user.table_title}</h2>
     
     <form method="post" name="modify_user" action="jsp/admin/plugins/mylutece/modules/directory/DoModifyUser.jsp">
-    	<div class="highlight-box">
-			<div class="highlight-box-content">
-				<p>
-					#i18n{module.mylutece.directory.modify_user.labelIdentity}
-				</p>
-		        <p>
-		            <label for="login">#i18n{module.mylutece.directory.modify_user.login} * : </label>
-		            <input type="text" name="login" maxlength="100" size="35" tabindex="1" value="${login!}" />
-		        </p>
-		
-		        <p>
-		            <label for="password">#i18n{module.mylutece.directory.modify_user.password} : </label>
-		            <input type="password" name="password" maxlength="100" size="35" tabindex="2" value="" />
-		            <br />
-		            <label for="modify_password">&nbsp;</label>
-		            <input type="checkbox" name="modify_password" value="modify_password" />
-		            #i18n{module.mylutece.directory.modify_user.password_comment}
-		        </p>
-		        
-		        <p>
-		            <label for="activate">#i18n{module.mylutece.directory.modify_user.activate} * : </label>
-		            <input type="checkbox" name="activate" <#if activate?? && activate>checked="checked"</#if> />
-		        </p>
-			</div>
-		</div>
-		
-		<#if attributes_list?has_content>
-			<div class="highlight-box">
-				<div class="highlight-box-content">
-					<p>
-						#i18n{module.mylutece.directory.modify_user.labelComplementaryAttributes}
-					</p>
-		            <#list attributes_list as attribute>
-		            	<#assign idAttribute = "" + attribute.idAttribute>
-						${attribute.getHtmlFormAttribute( locale, map_list_attribute_default_values[idAttribute] )}
-					</#list>
-				</div>
-			</div>
-		</#if>
+        <div class="well">
+            <div class="highlight-box-content">
+                <p>
+                    <label for="login">#i18n{module.mylutece.directory.modify_user.login} * : </label>
+                    <input type="text" id="login" name="login" maxlength="100" size="35" tabindex="1" value="${login!}" />
+                </p>
+        
+                <p>
+                    <label for="password">#i18n{module.mylutece.directory.modify_user.password} : </label>
+                    <input type="password" id="password" name="password" maxlength="100" size="35" tabindex="2" value="" />
+                    <br />
+                    <label for="modify_password">#i18n{module.mylutece.directory.modify_user.password_comment} :
+                    <input type="checkbox"  name="modify_password" id="modify_password" /></label>
+                    
+                </p>
+                <p>
+                    <label for="activate">#i18n{module.mylutece.directory.modify_user.activate} * :
+                    <input type="checkbox" id="activate" name="activate" <#if activate?? && activate>checked="checked"</#if> /> </label>
+                </p>
+            </div>
+        </div>
+        
+        <#if attributes_list?has_content>
+            <div class="well">
+                <div class="highlight-box-content">
+                    <p>
+                        #i18n{module.mylutece.directory.modify_user.labelComplementaryAttributes}
+                    </p>
+                    <#list attributes_list as attribute>
+                        <#assign idAttribute = "" + attribute.idAttribute>
+                        ${attribute.getHtmlFormAttribute( locale, map_list_attribute_default_values[idAttribute] )}
+                    </#list>
+                </div>
+            </div>
+        </#if>
 
         <p>
             <input type="hidden" name="plugin_name" value="${plugin_name}" />
             <input type="hidden" name="id_record" value="${id_record!}" />
-            <input type="submit" class="button" value="#i18n{module.mylutece.directory.modify_user.btnModify}" tabindex="5" />
-            <input class="button" type="button" onclick="javascript:history.go(-1)" value="#i18n{portal.admin.message.buttonCancel}" />
+            <button class="btn btn-primary" type="submit" class="button" tabindex="5">#i18n{module.mylutece.directory.modify_user.btnModify}</button>
+            <button class="btn btn-primary" type="button" onclick="javascript:history.go(-1)" >#i18n{portal.admin.message.buttonCancel}</button>
         </p>
     </form>
 </div>

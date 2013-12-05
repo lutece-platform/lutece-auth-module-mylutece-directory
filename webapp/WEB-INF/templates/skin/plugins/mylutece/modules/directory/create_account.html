@@ -1,127 +1,137 @@
-<div id="one-zone-first" class="row-fluid">
-	<div id="one-zone-first-content" class="container">
-		<#if form_error?? && form_error.hasError(  )>
-			<div class="error">
-				<#list form_error.errors?keys as message_key>
-					<#assign error_messages = form_error.errors[message_key]>
-					<#if error_messages?? && error_messages?has_content>
-						<#list error_messages as error_message>
-							${error_message}
-							<br />
-						</#list>
-					</#if>
-				</#list>
-			</div>
-		</#if>
-		
-		<#if action_successful?has_content>
-			<form class="form-horizontal" id="createAccount" name="createAccount" action="${action_successful}" method="post">
-				<fieldset>
-					<legend>#i18n{module.mylutece.directory.xpage.create_account.pageTitle}</legend>
-						<p class="lead">#i18n{module.mylutece.directory.message.create_account.success}</p>
-						<div class="form-actions">
-							<input class="btn btn-primary btn-small" id="button-return" type="submit" name="BtnBack" value="#i18n{module.mylutece.directory.xpage.account.btnBack}" />
-						</div>
-				</fieldset>
-			</form>
-		<#elseif form_error?? && form_error.hasError( "error_directory_undefined" )>
-			<div class="alert">#i18n{module.mylutece.directory.message.error.undefined}</div>			
-		<#else>
-			<form class="form-horizontal" id="createAccount" name="createAccount" action="jsp/site/Portal.jsp" method="post">
-				<fieldset>
-					<legend>#i18n{module.mylutece.directory.xpage.create_account.pageTitle}</legend>
-					<div class="control-group">
-						<label class="control-label" for="login">#i18n{module.mylutece.directory.xpage.create_account.login} * : </label>
-						<div class="controls">
-							<input type="text" name="login" maxlength="100" size="35" tabindex="1" value="${(user.login)?if_exists}" />
-						</div>
-					</div>
-					<div class="control-group">
-						<label class="control-label" for="password">#i18n{module.mylutece.directory.xpage.create_account.password} * : </label>
-						<div class="controls">
-							<input type="password" id="password" name="password" maxlength="100" size="35" tabindex="1" value="" />
-							<div id="status">
-								#i18n{portal.users.create_user.passwordComplexity} : 
-							</div>
-							<div id="progressbar" class="progress progress-striped" style="width:220px;">
-								<div id="progress" ><div id="complexity">0%</div></div>
-							</div>
-						</div>
-					</div>
-					<div class="control-group">
-						<label class="control-label" for="confirmation">#i18n{module.mylutece.directory.xpage.create_account.confirmation} * : </label>
-						<div class="controls">
-							<input type="password" name="confirmation_password" maxlength="100" size="35" tabindex="1" value="" />
-						</div>
-					</div>
-					<div class="control-group">	
-						<#list entry_list as entry>	
-				  			<#if entry.entryType.group>	
-								<label class="control-label" for=""> ${entry.title} </label> 
-			  					<#if entry.children?has_content>
-			  						<#list entry.children as children >
-			  							<#assign has_value = false>
-			  							<#if map_id_entry_list_record_field??>
-				  							<#assign entryKey= "" + children.idEntry>
-				  							<#if map_id_entry_list_record_field[entryKey]??>
-			  									${children.getHtmlFormEntry( locale, map_id_entry_list_record_field[entryKey], true )}
-			  									<#assign has_value = true>
-			  								</#if>
-			  							</#if>
-			  							<#if !has_value>
-			  								${children.getHtmlFormEntry( locale,true )}
-			  							</#if>
-			  						</#list>
-			  					</#if>
-				  			<#else>
-				  				<#if entry.children?has_content>
-			  						<#list entry.children as children >
-						  				<#assign has_value = false>
-						  				<#if map_id_entry_list_record_field??>
-						  					<#assign entryKey= "" + children.idEntry>
-						  					<#if map_id_entry_list_record_field[entryKey]??>
-						  						${entry.getHtmlFormEntry( locale, map_id_entry_list_record_field[entryKey], true )}
-						  						<#assign has_value = true>
-						  					</#if>
-						  				</#if>
-						  				<#if !has_value>
-						  					${entry.getHtmlFormEntry( locale,true )}
-						  				</#if>
-									</#list>
-			  					</#if>
-				  			</#if>	
-				  			<br />
-			  			</#list>
-		  			</div>
-					<#--  <#if properties.captchaActive>  -->
-						<#if is_active_captcha>
-							<div class="control-group">
-								${captcha}
-							</div>
-						</#if>
-					<#-- </#if>  -->				
-					<div class="form-actions">
-						<input type="hidden" name="plugin_name" value="${plugin_name}" />
-						<input type="hidden" name="page" value="mylutecedirectory" />
-						<input type="hidden" name="action" value="doCreateAccount" />
-						<input class="btn btn-primary btn-small" id="button-subscribe" type="submit" name="createAccountBtn" value="#i18n{module.mylutece.directory.xpage.create_account.btnCreateAccount}" />
-						<input class="btn btn-small" id="button-return" type="button" name="back" value="#i18n{module.mylutece.directory.xpage.account.btnBack}" onclick='javascript:history.go(-1)'/>
-		   			</div>
-				</fieldset>
-			</form>
-		</#if>
-	</div>
+<div class="row-fluid">
+    <div class="container">
+        <#if form_error?? && form_error.hasError(  )>
+            <div class="alert alert-error">
+                <#list form_error.errors?keys as message_key>
+                    <#assign error_messages = form_error.errors[message_key]>
+                    <#if error_messages?? && error_messages?has_content>
+                        <#list error_messages as error_message>
+                            ${error_message}
+                            <br />
+                        </#list>
+                    </#if>
+                </#list>
+            </div>
+        </#if>
+        
+        <#if action_successful?has_content>
+            <form class="form-horizontal" id="createAccount" name="createAccount" action="${action_successful}" method="post">
+                <fieldset>
+                    <div class="well">
+                    <legend>#i18n{module.mylutece.directory.xpage.create_account.pageTitle}</legend>
+                        <p class="lead">#i18n{module.mylutece.directory.message.create_account.success}</p>
+                        <div class="form-actions">
+                            <button class="btn btn-primary" type="submit" name="BtnBack">
+                             #i18n{module.mylutece.directory.xpage.account.btnBack}
+                            </button>
+                        </div>
+                        </div>
+                </fieldset>
+            </form>
+        <#elseif form_error?? && form_error.hasError( "error_directory_undefined" )>
+            <div class="alert alert-error">#i18n{module.mylutece.directory.message.error.undefined}</div>           
+        <#else>
+            <form class="form-horizontal" id="createAccount" name="createAccount" action="jsp/site/Portal.jsp" method="post">
+                <fieldset>
+                    <div class="well">
+                    <legend>#i18n{module.mylutece.directory.xpage.create_account.pageTitle}</legend>
+                    <div class="control-group">
+                        <label class="control-label" for="login">#i18n{module.mylutece.directory.xpage.create_account.login} * : </label>
+                        <div class="controls">
+                            <input type="text" name="login" maxlength="100" size="35" tabindex="1" value="${(user.login)?if_exists}" />
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label" for="password">#i18n{module.mylutece.directory.xpage.create_account.password} * : </label>
+                        <div class="controls">
+                            <input type="password" id="password" name="password" maxlength="100" size="35" tabindex="1" value="" />
+                            <div id="status">
+                                #i18n{portal.users.create_user.passwordComplexity} : 
+                            </div>
+                            <div id="progressbar" class="progress progress-striped" style="width:220px;">
+                                <div id="progress" ><div id="complexity">0%</div></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label" for="confirmation">#i18n{module.mylutece.directory.xpage.create_account.confirmation} * : </label>
+                        <div class="controls">
+                            <input type="password" name="confirmation_password" maxlength="100" size="35" tabindex="1" value="" />
+                        </div>
+                    </div>
+                    <div class="control-group"> 
+                        <#list entry_list as entry> 
+                            <#if entry.entryType.group> 
+                                <label class="control-label" for=""> ${entry.title} </label> 
+                                <#if entry.children?has_content>
+                                    <#list entry.children as children >
+                                        <#assign has_value = false>
+                                        <#if map_id_entry_list_record_field??>
+                                            <#assign entryKey= "" + children.idEntry>
+                                            <#if map_id_entry_list_record_field[entryKey]??>
+                                                ${children.getHtmlFormEntry( locale, map_id_entry_list_record_field[entryKey], true )}
+                                                <#assign has_value = true>
+                                            </#if>
+                                        </#if>
+                                        <#if !has_value>
+                                            ${children.getHtmlFormEntry( locale,true )}
+                                        </#if>
+                                    </#list>
+                                </#if>
+                            <#else>
+                                <#if entry.children?has_content>
+                                    <#list entry.children as children >
+                                        <#assign has_value = false>
+                                        <#if map_id_entry_list_record_field??>
+                                            <#assign entryKey= "" + children.idEntry>
+                                            <#if map_id_entry_list_record_field[entryKey]??>
+                                                ${entry.getHtmlFormEntry( locale, map_id_entry_list_record_field[entryKey], true )}
+                                                <#assign has_value = true>
+                                            </#if>
+                                        </#if>
+                                        <#if !has_value>
+                                            ${entry.getHtmlFormEntry( locale,true )}
+                                        </#if>
+                                    </#list>
+                                </#if>
+                            </#if>  
+                            <br />
+                        </#list>
+                    </div>
+                    <#--  <#if properties.captchaActive>  -->
+                        <#if is_active_captcha>
+                            <div class="control-group">
+                                ${captcha}
+                            </div>
+                        </#if>
+                    <#-- </#if>  -->                
+                    <div class="form-actions">
+                        <input type="hidden" name="plugin_name" value="${plugin_name}" />
+                        <input type="hidden" name="page" value="mylutecedirectory" />
+                        <input type="hidden" name="action" value="doCreateAccount" />
+                        <button class="btn btn-primary btn-small" type="submit" name="createAccountBtn" >
+                              #i18n{module.mylutece.directory.xpage.create_account.btnCreateAccount}
+                        </button>
+                        <button class="btn btn-small" type="button" name="back" onclick='javascript:history.go(-1)' >
+                            #i18n{module.mylutece.directory.xpage.account.btnBack}
+                        </button>
+                    </div>
+                    </div>
+                </fieldset>
+            </form>
+        </#if>
+    </div>
 </div>
 <script src="js/jquery.complexify.js"></script>
 <script>
 $(document).ready(function(){
-	$("#password").complexify({}, function (valid, complexity) {
-		if (!valid) {
-			$('#progress').css({'width':complexity + '%'}).removeClass('bar bar-success').addClass('bar bar-danger');
-		} else {
-			$('#progress').css({'width':complexity + '%'}).removeClass('bar bar-danger').addClass('bar bar-success');
-			}
-		$('#complexity').html(Math.round(complexity) + '%');
-	});
+    $("#password").complexify({}, function (valid, complexity) {
+        if (!valid) {
+            $('#progress').css({'width':complexity + '%'}).removeClass('bar bar-success').addClass('bar bar-danger');
+        } else {
+            $('#progress').css({'width':complexity + '%'}).removeClass('bar bar-danger').addClass('bar bar-success');
+            }
+        $('#complexity').html(Math.round(complexity) + '%');
+    });
 });
 </script>

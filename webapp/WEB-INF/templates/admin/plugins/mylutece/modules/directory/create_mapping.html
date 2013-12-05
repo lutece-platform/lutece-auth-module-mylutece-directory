@@ -7,7 +7,9 @@
     	</p>
     	<br/>
     	<p>
-    		<input class="button" type="button" onclick="javascript:history.go(-1)" value="#i18n{portal.admin.message.buttonCancel}" />
+            <button class="btn btn-primary" type="button" onclick="javascript:history.go(-1)" >
+                #i18n{portal.admin.message.buttonCancel}
+            </button>
 		</p>
 		<br/>
     <#else>
@@ -50,8 +52,12 @@
         </p>
         <p>
 			<input type="hidden" name="id_directory" value="${id_directory}" />
-            <input type="submit" class="button" value="#i18n{module.mylutece.directory.create_mapping.btnCreate}" tabindex="5" />
-            <input class="button" type="button" onclick="javascript:history.go(-1)" value="#i18n{portal.admin.message.buttonCancel}" />
+            <button type="submit" class="btn btn-primary" tabindex="5" >
+                #i18n{module.mylutece.directory.create_mapping.btnCreate}
+            </button>
+            <button class="btn btn-primary" type="button" onclick="javascript:history.go(-1)" >
+                #i18n{portal.admin.message.buttonCancel}
+            </button>
         </p>
     </form>
     </#if>
