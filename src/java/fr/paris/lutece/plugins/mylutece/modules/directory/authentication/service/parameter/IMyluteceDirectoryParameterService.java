@@ -34,6 +34,7 @@
 package fr.paris.lutece.plugins.mylutece.modules.directory.authentication.service.parameter;
 
 import fr.paris.lutece.plugins.mylutece.service.IUserParameterService;
+import fr.paris.lutece.portal.service.plugin.Plugin;
 
 
 /**
@@ -43,4 +44,11 @@ import fr.paris.lutece.plugins.mylutece.service.IUserParameterService;
  */
 public interface IMyluteceDirectoryParameterService extends IUserParameterService
 {
+
+	/**
+	 * return true if the authentication form must contain a catpcha
+	 * @param plugin plugin
+	 * @return true if the authentication form must contain a catpcha
+	 */
+	 boolean isEnableCaptchaAuthentication( Plugin plugin );
 }
