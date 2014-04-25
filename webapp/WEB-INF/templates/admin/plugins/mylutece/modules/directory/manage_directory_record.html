@@ -138,6 +138,9 @@
        <th>
        #i18n{module.mylutece.directory.manage_directory_record.login}
        </th>
+        <th>
+      	 #i18n{module.mylutece.directory.manage_directory_record.status}
+       </th>
        <th>
        #i18n{module.mylutece.directory.manage_directory_record.actions}
        </th>
@@ -175,6 +178,17 @@
             <td>
                 <#if recordDisplay.mylutece_record.status = 10>#i18n{mylutece.anonymize_user.statusLabelAnonymize}<#else>${recordDisplay.mylutece_record.login}</#if>
             </td>
+             <td>
+               		<#if (recordDisplay.mylutece_record)?? && recordDisplay.mylutece_record.status ==1>
+               			#i18n{module.mylutece.directory.manage_directory_record.statusActivated}
+               		<#elseif (recordDisplay.mylutece_record)?? && recordDisplay.mylutece_record.status==0>
+               			#i18n{module.mylutece.directory.manage_directory_record.statusNotActivated}
+               		<#elseif (recordDisplay.mylutece_record)?? && recordDisplay.mylutece_record.status==10>
+               			#i18n{module.mylutece.directory.manage_directory_record.statusAnonymized}
+               		<#elseif (recordDisplay.mylutece_record)?? && recordDisplay.mylutece_record.status==5>
+               			#i18n{module.mylutece.directory.manage_directory_record.statusExpired}
+               		</#if>
+               </td>	
            <td>
                 <a class="btn btn-primary btn-small" href="jsp/admin/plugins/mylutece/modules/directory/ModifyUser.jsp?id_record=${record.idRecord}">
                     <i class="icon-white icon-edit"></i>
@@ -189,7 +203,17 @@
                     <a class="btn btn-primary btn-small" href="jsp/admin/plugins/mylutece/modules/directory/GetAnonymizeUser.jsp?id_record=${record.idRecord}">
                         <i class="icon-white icon-eye-close"></i>
                     </a>
-                </#if>
+                 </#if>
+                 <#if (recordDisplay.mylutece_record)?? && recordDisplay.mylutece_record.status == 1>
+               		  <a class="btn btn-danger btn-small" href="jsp/admin/plugins/mylutece/modules/directory/DoDisableUser.jsp?id_record=${record.idRecord}" title="#i18n{module.mylutece.directory.manage_directory_record.title_disable_user}">
+                        <i class="icon-remove icon-white"></i>
+                    </a>
+               	 <#elseif (recordDisplay.mylutece_record)?? && recordDisplay.mylutece_record.status == 0>
+               			 <a class="btn btn-success btn-small" href="jsp/admin/plugins/mylutece/modules/directory/DoEnableUser.jsp?id_record=${record.idRecord}" title="#i18n{module.mylutece.directory.manage_directory_record.title_enable_user}">
+                        <i class="icon-ok icon-white"></i>
+                    </a>
+               	  </#if>
+                 
             </td>
             <#else>
             <td>

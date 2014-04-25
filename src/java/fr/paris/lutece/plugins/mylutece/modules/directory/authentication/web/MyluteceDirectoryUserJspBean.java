@@ -196,8 +196,7 @@ public class MyluteceDirectoryUserJspBean extends PluginAdminPageJspBean
     private static final String PARAMETER_MAIL_PASSWORD_ENCRYPTION_CHANGED = "mylutece_directory_mailPasswordEncryptionChanged";
     private static final String PARAMETER_MAIL_PASSWORD_ENCRYPTION_CHANGED_SENDER = "mail_password_encryption_changed_sender";
     private static final String PARAMETER_MAIL_PASSWORD_ENCRYPTION_CHANGED_SUBJECT = "mail_password_encryption_changed_subject";
-
-
+    private static final String PARAMETER_ENABLE_CAPTCHA_AUTHENTICATION = "enable_captcha_authentication";
     // Markers
     private static final String MARK_LOCALE = "locale";
     private static final String MARK_PAGINATOR = "paginator";
@@ -705,6 +704,80 @@ public class MyluteceDirectoryUserJspBean extends PluginAdminPageJspBean
 
         return url.getUrl(  );
     }
+    
+    
+    
+    /**
+     * Disable User
+     *
+     * @param request The Http request
+     * @return The user's Displaying Url
+     */
+    public String doDisableUser( HttpServletRequest request )
+    {
+        String strIdRecord = request.getParameter( PARAMETER_ID_RECORD );
+     
+        if ( StringUtils.isBlank( strIdRecord )
+                || !StringUtils.isNumeric( strIdRecord ) )
+        {
+            return AdminMessageService.getMessageUrl( request, Messages.MANDATORY_FIELDS, AdminMessage.TYPE_STOP );
+        }
+        
+        
+        int nIdRecord = Integer.parseInt( strIdRecord );
+
+        MyluteceDirectoryUser myluteceDirectoryUser = _myluteceDirectoryService.getMyluteceDirectoryUser( nIdRecord,
+                getPlugin(  ) );
+
+     
+
+        if ( myluteceDirectoryUser != null && myluteceDirectoryUser .getStatus()==MyluteceDirectoryUser.STATUS_ACTIVATED)
+        {
+        		myluteceDirectoryUser.setStatus( MyluteceDirectoryUser.STATUS_NOT_ACTIVATED);
+        	    _myluteceDirectoryService.doModifyMyluteceDirectoryUser( myluteceDirectoryUser, getPlugin(  ) );
+        	
+        }
+        
+        UrlItem url = new UrlItem( JSP_URL_MANAGE_DIRECTORY_RECORD );
+        return url.getUrl(  );
+    }
+    
+    
+    /**
+     * Enable User
+     *
+     * @param request The Http request
+     * @return The user's Displaying Url
+     */
+    public String doEnableUser( HttpServletRequest request )
+    {
+        String strIdRecord = request.getParameter( PARAMETER_ID_RECORD );
+     
+        if ( StringUtils.isBlank( strIdRecord )
+                || !StringUtils.isNumeric( strIdRecord ) )
+        {
+            return AdminMessageService.getMessageUrl( request, Messages.MANDATORY_FIELDS, AdminMessage.TYPE_STOP );
+        }
+        
+        
+        int nIdRecord = Integer.parseInt( strIdRecord );
+
+        MyluteceDirectoryUser myluteceDirectoryUser = _myluteceDirectoryService.getMyluteceDirectoryUser( nIdRecord,
+                getPlugin(  ) );
+
+     
+
+        if ( myluteceDirectoryUser != null && myluteceDirectoryUser .getStatus()==MyluteceDirectoryUser.STATUS_NOT_ACTIVATED)
+        {
+        		myluteceDirectoryUser.setStatus( MyluteceDirectoryUser.STATUS_ACTIVATED);
+        	    _myluteceDirectoryService.doModifyMyluteceDirectoryUser( myluteceDirectoryUser, getPlugin(  ) );
+        	
+        }
+        
+        UrlItem url = new UrlItem( JSP_URL_MANAGE_DIRECTORY_RECORD );
+        return url.getUrl(  );
+    }
+
 
     /**
      * Get the user removal message
@@ -923,6 +996,10 @@ public class MyluteceDirectoryUserJspBean extends PluginAdminPageJspBean
         SecurityUtils.updateSecurityParameters( _parameterService, request, getPlugin( ) );
 		SecurityUtils.updateLargeParameterValue( _parameterService, PluginService.getPlugin( DirectoryPlugin.PLUGIN_NAME ), PARAMETER_BANNED_DOMAIN_NAMES, request
 				.getParameter( PARAMETER_BANNED_DOMAIN_NAMES ) );
+		SecurityUtils.updateParameterValue( _parameterService, getPlugin(  ),
+				  PARAMETER_ENABLE_CAPTCHA_AUTHENTICATION,
+		            request.getParameter( PARAMETER_ENABLE_CAPTCHA_AUTHENTICATION ) );
+		
 
         return JSP_MANAGE_ADVANCED_PARAMETERS;
     }

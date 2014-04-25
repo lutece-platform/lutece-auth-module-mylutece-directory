@@ -131,6 +131,10 @@ public final class MyluteceDirectoryHome
 			{
 				user.setUserInfo( attributeMapping.getAttributeKey( ), rf.getEntry( ).convertRecordFieldValueToString( rf, locale, false, false ) );
 			}
+			else
+			{
+				user.setUserInfo( Integer.toString(rf.getEntry().getIdEntry()), rf.getEntry( ).convertRecordFieldValueToString( rf, locale, false, false ) );
+			}
 		}
 
 		return user;

@@ -2,6 +2,7 @@
 -- Init  table mylutece_directory_parameter
 --
 INSERT INTO mylutece_directory_parameter VALUES ('enable_password_encryption', 'false');
+INSERT INTO mylutece_directory_parameter VALUES ('enable_captcha_authentication', 'false');
 INSERT INTO mylutece_directory_parameter VALUES ('encryption_algorithm', '');
 INSERT INTO mylutece_directory_parameter VALUES ('force_change_password_reinit', '');
 INSERT INTO mylutece_directory_parameter VALUES ('password_minimum_length', '8');
@@ -36,3 +37,4 @@ INSERT INTO mylutece_directory_parameter VALUES ('mail_lost_password_sender', 'l
 INSERT INTO mylutece_directory_parameter VALUES ('mail_lost_password_subject', 'Votre mot de passe a été réinitialisé');
 INSERT INTO mylutece_directory_parameter VALUES ('mail_password_encryption_changed_sender', 'lutece@nowhere.com');
 INSERT INTO mylutece_directory_parameter VALUES ('mail_password_encryption_changed_subject', 'Votre mot de passe a été réinitialisé');
+

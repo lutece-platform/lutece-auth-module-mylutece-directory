@@ -30,6 +30,7 @@
 						<input type="hidden" name="enable_password_encryption" value="<#if enable_password_encryption!>true<#else>false</#if>"/>
 					</#if>
 				</div>
+				
 				<div class="control-group" id="password-encryption-algorithm">
 					<label class="control-label" for="encryption_algorithm">#i18n{module.mylutece.directory.manage_advanced_parameters.labelEncryptionAlgorithm}</label>
 					<div class="controls">
@@ -74,6 +75,18 @@
 						</div>
 					</div>
 					<#if use_advanced_security_parameters>
+						
+						<div class="control-group">
+							<label class="control-label" for="enable_captcha_authentication">#i18n{module.mylutece.directory.manage_advanced_parameters.labelEnableCaptchaAuthentication}</label>
+							<div class="controls">
+								<input type="radio" name="enable_captcha_authentication" value="false" <#if enable_captcha_authentication=='false'>checked="checked"</#if> />
+								#i18n{module.mylutece.directory.manage_advanced_parameters.buttonCaptchaAuthenticationOff}
+								<input type="radio" name="enable_captcha_authentication"   value="true" <#if enable_captcha_authentication=='true'>checked="checked"</#if>/>
+								#i18n{module.mylutece.directory.manage_advanced_parameters.buttonCaptchaAuthenticationOn}
+							</div>
+				
+					   </div>
+				
 						<div class="control-group">
 							<label class="control-label" for="password_format">#i18n{mylutece.message.password.labelPasswordFormat} : </label>
 							<div class="controls">

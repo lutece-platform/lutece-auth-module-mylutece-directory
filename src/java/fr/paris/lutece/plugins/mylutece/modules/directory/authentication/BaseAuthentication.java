@@ -43,6 +43,7 @@ import fr.paris.lutece.plugins.mylutece.modules.directory.authentication.service
 import fr.paris.lutece.plugins.mylutece.modules.directory.authentication.service.MyluteceDirectoryAccountLifeTimeService;
 import fr.paris.lutece.plugins.mylutece.modules.directory.authentication.service.MyluteceDirectoryPlugin;
 import fr.paris.lutece.plugins.mylutece.modules.directory.authentication.service.MyluteceDirectoryService;
+import fr.paris.lutece.plugins.mylutece.modules.directory.authentication.service.parameter.IMyluteceDirectoryParameterService;
 import fr.paris.lutece.plugins.mylutece.modules.directory.authentication.service.security.IMyluteceDirectorySecurityService;
 import fr.paris.lutece.plugins.mylutece.modules.directory.authentication.service.security.MyluteceDirectorySecurityService;
 import fr.paris.lutece.plugins.mylutece.modules.directory.authentication.web.MyLuteceDirectoryApp;
@@ -72,6 +73,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
+import javax.inject.Inject;
 import javax.security.auth.login.FailedLoginException;
 import javax.security.auth.login.LoginException;
 import javax.servlet.http.HttpServletRequest;
@@ -117,6 +119,8 @@ public class BaseAuthentication extends PortalAuthentication
 	private static final String MARK_SITE_LINK = "site_link";
 
 	private static IMyluteceDirectoryService _myluteceDirectoryService;
+	@Inject
+	private IMyluteceDirectoryParameterService _parameterService;
 
 	/**
 	 * {@inheritDoc}
@@ -156,7 +160,7 @@ public class BaseAuthentication extends PortalAuthentication
 		int nIntervalMinutes = MyluteceDirectoryParameterHome.getIntegerSecurityParameter( PROPERTY_INTERVAL_MINUTES, plugin );
 		boolean bEnableCaptcha = false;
 
-		if ( PluginService.isPluginEnable( PLUGIN_JCAPTCHA ) )
+		if (  PluginService.isPluginEnable( PLUGIN_JCAPTCHA ) && _parameterService.isEnableCaptchaAuthentication(plugin))
 		{
 			nMaxFailedCaptcha = MyluteceDirectoryParameterHome.getIntegerSecurityParameter( PROPERTY_ACCESS_FAILED_CAPTCHA, plugin );
 		}

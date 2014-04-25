@@ -57,7 +57,7 @@ public class MyluteceDirectoryParameterService implements IMyluteceDirectoryPara
     // PARAMETERS
     private static final String PARAMETER_ENABLE_PASSWORD_ENCRYPTION = "enable_password_encryption";
     private static final String PARAMETER_ENCRYPTION_ALGORITHM = "encryption_algorithm";
-
+    private static final String MARK_ENABLE_CAPTCHA_AUTHENTICATION = "enable_captcha_authentication";
     /**
      * {@inheritDoc}
      */
@@ -138,5 +138,23 @@ public class MyluteceDirectoryParameterService implements IMyluteceDirectoryPara
     public List<String> selectUserPasswordHistory( int nUserID, Plugin plugin )
     {
         return MyluteceDirectoryUserHome.selectUserPasswordHistory( nUserID, plugin );
+    }
+    
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isEnableCaptchaAuthentication( Plugin plugin )
+    {
+        boolean bIsEnableCaptchaAuthentication = false;
+        ReferenceItem userParam = findByKey( MARK_ENABLE_CAPTCHA_AUTHENTICATION, plugin );
+
+        if ( ( userParam != null ) && userParam.isChecked(  ) )
+        {
+            bIsEnableCaptchaAuthentication = true;
+        }
+
+        return bIsEnableCaptchaAuthentication;
     }
 }

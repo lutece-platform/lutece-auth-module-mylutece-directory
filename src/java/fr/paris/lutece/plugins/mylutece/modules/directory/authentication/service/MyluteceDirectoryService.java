@@ -133,6 +133,7 @@ public class MyluteceDirectoryService implements IMyluteceDirectoryService
 	private static final String MARK_LOCALE = "locale";
 	private static final String MARK_SORT_SEARCH_ATTRIBUTE = "sort_search_attribute";
 	private static final String MARK_ENABLE_PASSWORD_ENCRYPTION = "enable_password_encryption";
+	private static final String MARK_ENABLE_CAPTCHA_AUTHENTICATION = "enable_captcha_authentication";
 	private static final String MARK_ENCRYPTION_ALGORITHM = "encryption_algorithm";
 	private static final String MARK_ENCRYPTION_ALGORITHMS_LIST = "encryption_algorithms_list";
 	private static final String MARK_LOGIN_URL = "login_url";
@@ -517,7 +518,9 @@ public class MyluteceDirectoryService implements IMyluteceDirectoryService
 
 			MyluteceDirectoryParameterService parameterService = new MyluteceDirectoryParameterService( );
 
+			
 			model.put( MARK_ENABLE_PASSWORD_ENCRYPTION, MyluteceDirectoryParameterHome.findByKey( PARAMETER_ENABLE_PASSWORD_ENCRYPTION, plugin ).getName( ) );
+			model.put( MARK_ENABLE_CAPTCHA_AUTHENTICATION, MyluteceDirectoryParameterHome.findByKey( MARK_ENABLE_CAPTCHA_AUTHENTICATION, plugin ).getName( ) );
 			model.put( MARK_ENCRYPTION_ALGORITHM, MyluteceDirectoryParameterHome.findByKey( PARAMETER_ENCRYPTION_ALGORITHM, plugin ).getName( ) );
 			model.put( MARK_ENCRYPTION_ALGORITHMS_LIST, listAlgorithms );
 			// we save the banned domain name list with the Directory plugin so that it can get it directly.

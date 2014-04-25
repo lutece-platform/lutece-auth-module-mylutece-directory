@@ -1,0 +1,1 @@
+INSERT INTO mylutece_directory_parameter VALUES ('enable_captcha_authentication', 'false');
