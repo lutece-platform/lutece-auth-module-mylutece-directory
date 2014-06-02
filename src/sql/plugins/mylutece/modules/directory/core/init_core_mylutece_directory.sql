@@ -40,5 +40,9 @@ INSERT INTO core_template VALUES ('mylutece_directory_unblock_user', '${site_lin
 INSERT INTO core_template VALUES ('mylutece_directory_password_expired', 'Bonjour ! Votre mot de passe a éxpiré. Lors de votre prochaine connection, vous pourrez le changer.');
 INSERT INTO core_template VALUES ('mylutece_directory_mailLostPassword', '<html><head><title>#i18n{mylutece.email_reinit.object}</title></head><body><p>#i18n{mylutece.email_reinit.content.text}<br /></p><p>#i18n{mylutece.email_reinit.content.newPassword} : ${new_password}<br /></p></body></html><p>#i18n{mylutece.email_reinit.content.reinitPassword}<a href="${reinit_url}">#i18n{mylutece.email_reinit.content.labelLink}</a></p>');
 INSERT INTO core_template VALUES ('mylutece_directory_mailPasswordEncryptionChanged', '<html><head><title>Votre mot de passe a été réinitialisé</title></head><body><p>Pour des raisons de sécurité, votre mot de passe a été réinitialisé.<br />\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-</p><p>Votre nouveau mot de passe est : ${new_password}<br />\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-</p></body></html>');
+INSERT INTO core_template VALUES ('mylutece_directory_account_enabled_mail', 'Bonjour  ${login} ! Votre compte utilisateur a été activé ');
+INSERT INTO core_template VALUES ('mylutece_directory_account_disabled_mail', 'Bonjour ${login} ! Votre compte utilisateur a été désactivé ');
+
+
 
 INSERT INTO core_datastore VALUES ('directory_banned_domain_names', 'yopmail.com');

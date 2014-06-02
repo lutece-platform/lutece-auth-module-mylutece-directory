@@ -74,6 +74,25 @@
 							<textarea rows="4" cols="30" name="banned_domain_names" id="banned_domain_names" >${banned_domain_names!}</textarea>
 						</div>
 					</div>
+					<div class="control-group">
+						<label class="control-label" for="enable_send_mail_user_enabled">#i18n{module.mylutece.directory.manage_advanced_parameters.labelEnableSendMailUserEnabled}</label>
+						<div class="controls">
+							<input type="radio" name="enable_send_mail_user_enabled" value="false" <#if enable_send_mail_user_enabled=='false'>checked="checked"</#if> />
+							#i18n{module.mylutece.directory.manage_advanced_parameters.buttonEnableSendMailUserEnabledOff}
+							<input type="radio" name="enable_send_mail_user_enabled"   value="true" <#if enable_send_mail_user_enabled=='true'>checked="checked"</#if>/>
+							#i18n{module.mylutece.directory.manage_advanced_parameters.buttonEnableSendMailUserEnabledOn}
+						</div>
+					</div>
+					<div class="control-group">
+						<label class="control-label" for="enable_send_mail_user_disabled">#i18n{module.mylutece.directory.manage_advanced_parameters.labelEnableSendMailUserDisabled}</label>
+						<div class="controls">
+							<input type="radio" name="enable_send_mail_user_disabled" value="false" <#if enable_send_mail_user_disabled=='false'>checked="checked"</#if> />
+							#i18n{module.mylutece.directory.manage_advanced_parameters.buttonEnableSendMailUserDisabledOff}
+							<input type="radio" name="enable_send_mail_user_disabled"   value="true" <#if enable_send_mail_user_disabled=='true'>checked="checked"</#if>/>
+							#i18n{module.mylutece.directory.manage_advanced_parameters.buttonEnableSendMailUserDisabledOn}
+						</div>
+					</div>				
+					
 					<#if use_advanced_security_parameters>
 						
 						<div class="control-group">
@@ -210,6 +229,10 @@
 								<option value="password_expired" >#i18n{mylutece.accountLifeTime.labelPasswordExpired}</option>
 	    						<option value="lost_password" >#i18n{mylutece.accountLifeTime.labelLostPasswordMail}</option>
 								<option value="password_encryption_changed" >#i18n{mylutece.accountLifeTime.labelPasswordEncryptionChangedMail}</option>
+	    						<option value="mylutece_directory_account_enabled_mail" >#i18n{module.mylutece.directory.manage_advanced_parameters.labelAccountEnabledMail}</option>
+	    						<option value="mylutece_directory_account_disabled_mail" >#i18n{module.mylutece.directory.manage_advanced_parameters.labelAccountDisabledMail}</option>
+	    					
+	    					
 	    					</select>
 						</div>
 					</div>

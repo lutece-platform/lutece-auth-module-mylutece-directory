@@ -261,7 +261,7 @@ public class MyLuteceDirectoryApp implements XPageApplication
 
 	// Constants
 	private static final String JCAPTCHA_PLUGIN = "jcaptcha";
-	private static final String REGEX_LOGIN = "[^a-zA-Z_0-9]";
+
 
 	// Sessions
 	private IMyluteceDirectoryService _myluteceDirectoryService = SpringContextService.getBean( MyluteceDirectoryService.BEAN_SERVICE );
@@ -629,24 +629,7 @@ public class MyLuteceDirectoryApp implements XPageApplication
 		}
 
 		formErrors.addLastValue( PARAMETER_LOGIN, strLogin );
-
-		// Check if the login contain an accent
-		Pattern pattern = Pattern.compile( REGEX_LOGIN );
-		Matcher matcher = pattern.matcher( strLogin );
-		boolean bAccentFound = false;
-
-		while ( matcher.find( ) )
-		{
-			bAccentFound = true;
-
-			break;
-		}
-
-		if ( bAccentFound )
-		{
-			formErrors.addError( ERROR_LOGIN_ACCENTS_OR_BLANK, I18nService.getLocalizedString( PROPERTY_ERROR_LOGIN_ACCENTS, _locale ) );
-		}
-
+		
 		// Check login unique code
 		Collection<MyluteceDirectoryUser> listUsers = _myluteceDirectoryService.getMyluteceDirectoryUsersForLogin( strLogin, _plugin );
 

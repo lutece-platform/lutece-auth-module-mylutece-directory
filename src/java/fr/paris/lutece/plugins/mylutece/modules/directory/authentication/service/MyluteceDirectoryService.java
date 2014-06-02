@@ -33,6 +33,20 @@
  */
 package fr.paris.lutece.plugins.mylutece.modules.directory.authentication.service;
 
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+
+import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
+
+import org.apache.commons.lang.StringUtils;
+import org.springframework.transaction.annotation.Transactional;
+
 import fr.paris.lutece.plugins.directory.business.Directory;
 import fr.paris.lutece.plugins.directory.business.DirectoryFilter;
 import fr.paris.lutece.plugins.directory.business.DirectoryHome;
@@ -84,20 +98,6 @@ import fr.paris.lutece.util.html.HtmlTemplate;
 import fr.paris.lutece.util.password.PasswordUtil;
 import fr.paris.lutece.util.url.UrlItem;
 
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-
-import javax.inject.Inject;
-import javax.servlet.http.HttpServletRequest;
-
-import org.apache.commons.lang.StringUtils;
-import org.springframework.transaction.annotation.Transactional;
-
 
 /**
  * 
@@ -118,14 +118,15 @@ public class MyluteceDirectoryService implements IMyluteceDirectoryService
 	// PARAMETERS
 	private static final String PARAMETER_SEARCH_IS_SEARCH = "search_is_search";
 	private static final String PARAMETER_ENABLE_PASSWORD_ENCRYPTION = "enable_password_encryption";
-	private static final String PARAMETER_ENCRYPTION_ALGORITHM = "encryption_algorithm";
 	private static final String PARAMETER_ACCOUNT_REACTIVATED_MAIL_SENDER = "account_reactivated_mail_sender";
 	private static final String PARAMETER_ACCOUNT_REACTIVATED_MAIL_SUBJECT = "account_reactivated_mail_subject";
 	private static final String PARAMETER_ACCOUNT_REACTIVATED_MAIL_BODY = "mylutece_directory_account_reactivated_mail";
     private static final String PARAMETER_MAIL_PASSWORD_ENCRYPTION_CHANGED = "mylutece_directory_mailPasswordEncryptionChanged";
     private static final String PARAMETER_MAIL_PASSWORD_ENCRYPTION_CHANGED_SENDER = "mail_password_encryption_changed_sender";
     private static final String PARAMETER_MAIL_PASSWORD_ENCRYPTION_CHANGED_SUBJECT = "mail_password_encryption_changed_subject";
-
+    
+   
+    
 	// MARKS
 	private static final String MARK_SEARCH_IS_SEARCH = "search_is_search";
 	private static final String MARK_SEARCH_MYLUTECE_USER_FIELD_FILTER = "search_mylutece_user_field_filter";
@@ -134,9 +135,21 @@ public class MyluteceDirectoryService implements IMyluteceDirectoryService
 	private static final String MARK_SORT_SEARCH_ATTRIBUTE = "sort_search_attribute";
 	private static final String MARK_ENABLE_PASSWORD_ENCRYPTION = "enable_password_encryption";
 	private static final String MARK_ENABLE_CAPTCHA_AUTHENTICATION = "enable_captcha_authentication";
+    private static final String MARK_ENABLE_SEND_MAIL_USER_ENABLED = "enable_send_mail_user_enabled";
+    private static final String MARK_ENABLE_SEND_MAIL_USER_DISABLED = "enable_send_mail_user_disabled";
+    
+    private static final String MARK_MAIL_ENABLED_USER = "mylutece_directory_account_enabled_mail";
+    private static final String MARK_MAIL_ENABLED_USER_SENDER = "mail_enabled_user_sender";
+    private static final String MARK_MAIL_ENABLED_USER_SUBJECT = "mail_enabled_user_subject";
+    private static final String MARK_MAIL_DISABLED_USER = "mylutece_directory_account_disabled_mail";
+    private static final String MARK_MAIL_DISABLED_USER_SENDER = "mail_disabled_user_sender";
+    private static final String MARK_MAIL_DISABLED_USER_SUBJECT = "mail_disabled_user_subject";
+	
+	
 	private static final String MARK_ENCRYPTION_ALGORITHM = "encryption_algorithm";
 	private static final String MARK_ENCRYPTION_ALGORITHMS_LIST = "encryption_algorithms_list";
 	private static final String MARK_LOGIN_URL = "login_url";
+	private static final String MARK_LOGIN = "login";
 	private static final String MARK_NEW_PASSWORD = "new_password";
 	private static final String MARK_SITE_LINK = "site_link";
 	private static final String MARK_BANNED_DOMAIN_NAMES = "banned_domain_names";
@@ -521,7 +534,9 @@ public class MyluteceDirectoryService implements IMyluteceDirectoryService
 			
 			model.put( MARK_ENABLE_PASSWORD_ENCRYPTION, MyluteceDirectoryParameterHome.findByKey( PARAMETER_ENABLE_PASSWORD_ENCRYPTION, plugin ).getName( ) );
 			model.put( MARK_ENABLE_CAPTCHA_AUTHENTICATION, MyluteceDirectoryParameterHome.findByKey( MARK_ENABLE_CAPTCHA_AUTHENTICATION, plugin ).getName( ) );
-			model.put( MARK_ENCRYPTION_ALGORITHM, MyluteceDirectoryParameterHome.findByKey( PARAMETER_ENCRYPTION_ALGORITHM, plugin ).getName( ) );
+			model.put( MARK_ENABLE_SEND_MAIL_USER_ENABLED, MyluteceDirectoryParameterHome.findByKey( MARK_ENABLE_SEND_MAIL_USER_ENABLED, plugin ).getName( ) );
+			model.put( MARK_ENABLE_SEND_MAIL_USER_DISABLED, MyluteceDirectoryParameterHome.findByKey( MARK_ENABLE_SEND_MAIL_USER_DISABLED, plugin ).getName( ) );
+			model.put( MARK_ENCRYPTION_ALGORITHM, MyluteceDirectoryParameterHome.findByKey( MARK_ENCRYPTION_ALGORITHM, plugin ).getName( ) );
 			model.put( MARK_ENCRYPTION_ALGORITHMS_LIST, listAlgorithms );
 			// we save the banned domain name list with the Directory plugin so that it can get it directly.
 			model.put( MARK_BANNED_DOMAIN_NAMES, SecurityUtils.getLargeSecurityParameter( parameterService, PluginService.getPlugin( DirectoryPlugin.PLUGIN_NAME ), MARK_BANNED_DOMAIN_NAMES ) );
@@ -567,13 +582,59 @@ public class MyluteceDirectoryService implements IMyluteceDirectoryService
 		myluteceDirectoryUser.setPasswordMaxValidDate( SecurityUtils.getPasswordMaxValidDate( _parameterService, plugin ) );
 		MyluteceDirectoryUserHome.updatePassword( myluteceDirectoryUser, strPassword, plugin );
 	}
+	
+	
+	
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	@Transactional( "mylutece-directory.transactionManager" )
+	public void  doDisableUser(MyluteceDirectoryUser myluteceDirectoryUser, Plugin plugin, Locale locale)
+	{
+		
+		if ( myluteceDirectoryUser != null )
+        {
+        		myluteceDirectoryUser.setStatus( MyluteceDirectoryUser.STATUS_NOT_ACTIVATED);
+        	    this.doModifyMyluteceDirectoryUser( myluteceDirectoryUser, getPlugin(  ) );
+        	    if(_parameterService.isEnableSendMailUserDisabled(getPlugin(  )))
+        		{
+        			notifyUserChangeState(myluteceDirectoryUser, plugin, locale, MARK_MAIL_DISABLED_USER, MARK_MAIL_DISABLED_USER_SENDER, MARK_MAIL_DISABLED_USER_SUBJECT);
+        		}
+        }
+		
+	}
+	
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	@Transactional( "mylutece-directory.transactionManager" )
+	public void  doEnableUser(MyluteceDirectoryUser myluteceDirectoryUser, Plugin plugin, Locale locale)
+	{
+		
+
+        if ( myluteceDirectoryUser != null )
+        {
+        		myluteceDirectoryUser.setStatus( MyluteceDirectoryUser.STATUS_ACTIVATED);
+        		this.doModifyMyluteceDirectoryUser( myluteceDirectoryUser, getPlugin(  ) );
+        		if(_parameterService.isEnableSendMailUserEnabled(getPlugin(  )))
+        		{
+        			notifyUserChangeState(myluteceDirectoryUser, plugin, locale, MARK_MAIL_ENABLED_USER, MARK_MAIL_ENABLED_USER_SENDER, MARK_MAIL_ENABLED_USER_SUBJECT);
+        		}
+        }
+		
+	}
+	
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
 	@Transactional( "mylutece-directory.transactionManager" )
-	public void doAssignRoleUser( MyluteceDirectoryUser user, String[] roleArray, Plugin plugin )
+	public void doAssignRoleUser( MyluteceDirectoryUser user, String[] roleArray, Plugin plugin)
 	{
 		if ( user != null )
 		{
@@ -727,7 +788,7 @@ public class MyluteceDirectoryService implements IMyluteceDirectoryService
 
 				for ( String email : listEmails )
 				{
-					MailService.sendMailHtml( email, strSenderEmail, strSenderEmail, strEmailSubject, template.getHtml( ) );
+					MailService.sendMailHtml( email, strSenderEmail, MailService.getNoReplyEmail(), strEmailSubject, template.getHtml( ) );
 				}
 			}
 		}
@@ -782,8 +843,53 @@ public class MyluteceDirectoryService implements IMyluteceDirectoryService
 			Map<String, String> model = new HashMap<String, String>( );
 			accountLifeTimeService.addParametersToModel( model, nIdUser );
 			HtmlTemplate template = AppTemplateService.getTemplateFromStringFtl( strBody, Locale.getDefault( ), model );
-			MailService.sendMailHtml( strUserMail, strSender, strSender, strSubject, template.getHtml( ) );
+			MailService.sendMailHtml( strUserMail, strSender, MailService.getNoReplyEmail(), strSubject, template.getHtml( ) );
 		}
 	}
+	
+	
+	/**
+	 * notifyUserChangeState
+	 * @param myluteceDirectoryUser mylutece user
+	 * @param plugin the plugin	
+	 * @param locale the locale
+	 * @param strMailTemplateKey the mail template key
+	 * @param strSenderNameKey	the sender name key
+	 * @param strSubjectKey	the subject key
+	 */
+	private void notifyUserChangeState(MyluteceDirectoryUser myluteceDirectoryUser, Plugin plugin, Locale locale,String strMailTemplateKey,String strSenderNameKey,String strSubjectKey){
+		
+		
+		List<String> listEmails = getListEmails( myluteceDirectoryUser, plugin, locale );
+		if ( ( listEmails != null ) && !listEmails.isEmpty( ) )
+		{
+			// send password by e-mail
+            ReferenceItem referenceItem = _parameterService.findByKey(
+            		strSenderNameKey, plugin );
+            String strSenderEmail = referenceItem == null ? StringUtils.EMPTY : referenceItem.getName( );
+            referenceItem = _parameterService
+                    .findByKey( strSubjectKey, plugin );
+            String strEmailSubject = referenceItem == null ? StringUtils.EMPTY : referenceItem.getName( );
+
+			Map<String, Object> model = new HashMap<String, Object>( );
+			
+			
+			model.put(MARK_LOGIN, myluteceDirectoryUser.getLogin());
+
+			String strTemplate = DatabaseTemplateService
+                     .getTemplateFromKey( strMailTemplateKey );
+
+             HtmlTemplate template = AppTemplateService.getTemplateFromStringFtl( strTemplate, locale, model );
+
+         
+			for ( String email : listEmails )
+			{
+				MailService.sendMailHtml( email, strSenderEmail, MailService.getNoReplyEmail(), strEmailSubject, template.getHtml( ) );
+			}
+		}	
+		
+		
+	}
+	
 
 }

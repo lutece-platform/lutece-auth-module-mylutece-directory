@@ -37,4 +37,19 @@ INSERT INTO mylutece_directory_parameter VALUES ('mail_lost_password_sender', 'l
 INSERT INTO mylutece_directory_parameter VALUES ('mail_lost_password_subject', 'Votre mot de passe a été réinitialisé');
 INSERT INTO mylutece_directory_parameter VALUES ('mail_password_encryption_changed_sender', 'lutece@nowhere.com');
 INSERT INTO mylutece_directory_parameter VALUES ('mail_password_encryption_changed_subject', 'Votre mot de passe a été réinitialisé');
+INSERT INTO mylutece_directory_parameter VALUES ('mail_enable_user_sender', 'lutece@nowhere.com');
+INSERT INTO mylutece_directory_parameter VALUES ('mail_lost_password_subject', 'Votre mot de passe a été réinitialisé');
+INSERT INTO mylutece_directory_parameter VALUES ('enable_send_mail_user_enabled', 'false');
+INSERT INTO mylutece_directory_parameter VALUES ('mail_enabled_user_sender', 'LUTECE');
+INSERT INTO mylutece_directory_parameter VALUES ('mail_enabled_user_subject', 'Votre compte a été activé');
+INSERT INTO mylutece_directory_parameter VALUES ('enable_send_mail_user_disabled', 'false');
+INSERT INTO mylutece_directory_parameter VALUES ('mail_disabled_user_sender', 'LUTECE');
+INSERT INTO mylutece_directory_parameter VALUES ('mail_disabled_user_subject', 'Votre compte a été désactivé');
+
+
+
+
+
+
+
 

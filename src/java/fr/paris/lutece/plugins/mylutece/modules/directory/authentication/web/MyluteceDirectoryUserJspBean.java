@@ -103,7 +103,12 @@ import org.apache.commons.lang.StringUtils;
  */
 public class MyluteceDirectoryUserJspBean extends PluginAdminPageJspBean
 {
-    // Right
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 5039735059833357053L;
+
+	// Right
     public static final String RIGHT_MANAGE_MYLUTECE_DIRECTORY_USERS = "MYLUTECE_DIRECTORY_MANAGEMENT_USERS";
 
     // Templates
@@ -152,7 +157,10 @@ public class MyluteceDirectoryUserJspBean extends PluginAdminPageJspBean
 	private static final String PROPERTY_NOTIFY_PASSWORD_EXPIRED = "mylutece.accountLifeTime.labelPasswordExpired";
     private static final String PROPERTY_MAIL_LOST_PASSWORD = "mylutece.accountLifeTime.labelLostPasswordMail";
     private static final String PROPERTY_MAIL_PASSWORD_ENCRYPTION_CHANGED = "mylutece.accountLifeTime.labelPasswordEncryptionChangedMail";
-
+    private static final String PROPERTY_MAIL_ACCOUNT_ENABLED = "mylutece.accountLifeTime.labelAccountEnabledMail";
+    private static final String PROPERTY_MAIL_ACCOUNT_DISABLED = "mylutece.accountLifeTime.labelAccountDisabledMail";
+    
+    
     // Parameters
     private static final String PARAMETER_ID_DIRECTORY = "id_directory";
     private static final String PARAMETER_PAGE_INDEX = "page_index";
@@ -197,6 +205,15 @@ public class MyluteceDirectoryUserJspBean extends PluginAdminPageJspBean
     private static final String PARAMETER_MAIL_PASSWORD_ENCRYPTION_CHANGED_SENDER = "mail_password_encryption_changed_sender";
     private static final String PARAMETER_MAIL_PASSWORD_ENCRYPTION_CHANGED_SUBJECT = "mail_password_encryption_changed_subject";
     private static final String PARAMETER_ENABLE_CAPTCHA_AUTHENTICATION = "enable_captcha_authentication";
+     private static final String PARAMETER_ENABLE_SEND_MAIL_USER_ENABLED = "enable_send_mail_user_enabled";
+    private static final String PARAMETER_ENABLE_SEND_MAIL_USER_DISABLED = "enable_send_mail_user_disabled";
+    private static final String PARAMETER_MAIL_ENABLED_USER = "mylutece_directory_account_enabled_mail";
+    private static final String PARAMETER_MAIL_ENABLED_USER_SENDER = "mail_enabled_user_sender";
+    private static final String PARAMETER_MAIL_ENABLED_USER_SUBJECT = "mail_enabled_user_subject";
+    private static final String PARAMETER_MAIL_DISABLED_USER = "mylutece_directory_account_disabled_mail";
+    private static final String PARAMETER_MAIL_DISABLED_USER_SENDER = "mail_disabled_user_sender";
+    private static final String PARAMETER_MAIL_DISABLED_USER_SUBJECT = "mail_disabled_user_subject";
+    
     // Markers
     private static final String MARK_LOCALE = "locale";
     private static final String MARK_PAGINATOR = "paginator";
@@ -242,6 +259,8 @@ public class MyluteceDirectoryUserJspBean extends PluginAdminPageJspBean
 	private static final String CONSTANT_EMAIL_PASSWORD_EXPIRED = "password_expired";
     private static final String CONSTANT_EMAIL_TYPE_LOST_PASSWORD = "lost_password";
     private static final String CONSTANT_EMAIL_PASSWORD_ENCRYPTION_CHANGED = "password_encryption_changed";
+    private static final String CONSTANT_EMAIL_ACCOUNT_ENABLED=  "mylutece_directory_account_enabled_mail";
+    private static final String CONSTANT_EMAIL_ACCOUNT_DISABLED=  "mylutece_directory_account_disabled_mail";
 
     // Session fields
     private int _nDefaultItemsPerPage = AppPropertiesService.getPropertyInt( PROPERTY_ITEM_PER_PAGE, 50 );
@@ -585,7 +604,7 @@ public class MyluteceDirectoryUserJspBean extends PluginAdminPageJspBean
         _myluteceDirectoryService.doCreateMyluteceDirectoryUser( myluteceDirectoryUser, strPassword, getPlugin(  ) );
         _myluteceDirectoryService.doModifyResetPassword( myluteceDirectoryUser, true, getPlugin( ) );
         MyLuteceUserFieldService.doCreateUserFields( myluteceDirectoryUser.getIdRecord(  ), request, getLocale(  ) );
-
+   
         Record record = _myluteceDirectoryService.getRecord( nIdRecord, false );
         UrlItem url = new UrlItem( JSP_URL_MANAGE_DIRECTORY_RECORD );
 
@@ -611,7 +630,9 @@ public class MyluteceDirectoryUserJspBean extends PluginAdminPageJspBean
         String strActivate = request.getParameter( PARAMETER_ACTIVATE );
         String strModifyPassword = request.getParameter( PARAMETER_MODIFY_PASSWORD );
         boolean bModifyPassword = StringUtils.isNotBlank( strModifyPassword );
-
+        boolean bStatusChanged=false;
+        
+        
         if ( StringUtils.isBlank( strLogin ) || StringUtils.isBlank( strIdRecord )
                 || !StringUtils.isNumeric( strIdRecord ) || ( bModifyPassword && StringUtils.isBlank( strPassword ) ) )
         {
@@ -637,6 +658,8 @@ public class MyluteceDirectoryUserJspBean extends PluginAdminPageJspBean
         MyluteceDirectoryUser myluteceDirectoryUser = _myluteceDirectoryService.getMyluteceDirectoryUser( nIdRecord,
                 getPlugin(  ) );
 
+        bStatusChanged = ( myluteceDirectoryUser !=null && myluteceDirectoryUser.getStatus() !=nStatus );
+        
         Collection<MyluteceDirectoryUser> listMyluteceDirectoryUsers = _myluteceDirectoryService.getMyluteceDirectoryUsersForLogin( strLogin,
                 getPlugin(  ) );
 
@@ -693,8 +716,26 @@ public class MyluteceDirectoryUserJspBean extends PluginAdminPageJspBean
             MyLuteceUserFieldService.doModifyUserFields( myluteceDirectoryUser.getIdRecord(  ), request, getLocale(  ),
                 getUser(  ) );
         }
+        
+      
+       if( bStatusChanged)
+       {
+    	   if(nStatus == MyluteceDirectoryUser.STATUS_ACTIVATED)
+    	   {
+    		   
+    		   _myluteceDirectoryService.doEnableUser(myluteceDirectoryUser,   getPlugin(  ), getLocale( ));
+    	   }
+    	   else
+    	   {
+    		   _myluteceDirectoryService.doDisableUser(myluteceDirectoryUser,   getPlugin(  ), getLocale( ));
+    		   
+    	   }
+    	   
+       }
 
         Record record = _myluteceDirectoryService.getRecord( nIdRecord, false );
+        
+       
         UrlItem url = new UrlItem( JSP_URL_MANAGE_DIRECTORY_RECORD );
 
         if ( record != null )
@@ -729,13 +770,9 @@ public class MyluteceDirectoryUserJspBean extends PluginAdminPageJspBean
         MyluteceDirectoryUser myluteceDirectoryUser = _myluteceDirectoryService.getMyluteceDirectoryUser( nIdRecord,
                 getPlugin(  ) );
 
-     
-
-        if ( myluteceDirectoryUser != null && myluteceDirectoryUser .getStatus()==MyluteceDirectoryUser.STATUS_ACTIVATED)
+        if ( myluteceDirectoryUser != null)
         {
-        		myluteceDirectoryUser.setStatus( MyluteceDirectoryUser.STATUS_NOT_ACTIVATED);
-        	    _myluteceDirectoryService.doModifyMyluteceDirectoryUser( myluteceDirectoryUser, getPlugin(  ) );
-        	
+        		_myluteceDirectoryService.doDisableUser(myluteceDirectoryUser, getPlugin(), getLocale( ));
         }
         
         UrlItem url = new UrlItem( JSP_URL_MANAGE_DIRECTORY_RECORD );
@@ -766,12 +803,9 @@ public class MyluteceDirectoryUserJspBean extends PluginAdminPageJspBean
                 getPlugin(  ) );
 
      
-
-        if ( myluteceDirectoryUser != null && myluteceDirectoryUser .getStatus()==MyluteceDirectoryUser.STATUS_NOT_ACTIVATED)
+        if ( myluteceDirectoryUser != null)
         {
-        		myluteceDirectoryUser.setStatus( MyluteceDirectoryUser.STATUS_ACTIVATED);
-        	    _myluteceDirectoryService.doModifyMyluteceDirectoryUser( myluteceDirectoryUser, getPlugin(  ) );
-        	
+        		_myluteceDirectoryService.doEnableUser(myluteceDirectoryUser, getPlugin(), getLocale( ));
         }
         
         UrlItem url = new UrlItem( JSP_URL_MANAGE_DIRECTORY_RECORD );
@@ -1000,8 +1034,15 @@ public class MyluteceDirectoryUserJspBean extends PluginAdminPageJspBean
 				  PARAMETER_ENABLE_CAPTCHA_AUTHENTICATION,
 		            request.getParameter( PARAMETER_ENABLE_CAPTCHA_AUTHENTICATION ) );
 		
-
-        return JSP_MANAGE_ADVANCED_PARAMETERS;
+		
+		SecurityUtils.updateParameterValue( _parameterService, getPlugin(  ),
+				  PARAMETER_ENABLE_SEND_MAIL_USER_DISABLED,
+		            request.getParameter( PARAMETER_ENABLE_SEND_MAIL_USER_DISABLED ) );
+		SecurityUtils.updateParameterValue( _parameterService, getPlugin(  ),
+				PARAMETER_ENABLE_SEND_MAIL_USER_ENABLED,
+		            request.getParameter( PARAMETER_ENABLE_SEND_MAIL_USER_ENABLED ) );
+		
+		return JSP_MANAGE_ADVANCED_PARAMETERS;
     }
 
     /**
@@ -1363,6 +1404,22 @@ public class MyluteceDirectoryUserJspBean extends PluginAdminPageJspBean
             strTitle = PROPERTY_MAIL_PASSWORD_ENCRYPTION_CHANGED;
         }
 
+        else if ( CONSTANT_EMAIL_ACCOUNT_DISABLED.equalsIgnoreCase( strEmailType ) )
+        {
+            strSenderKey = PARAMETER_MAIL_DISABLED_USER_SENDER;
+            strSubjectKey = PARAMETER_MAIL_DISABLED_USER_SUBJECT;
+            strBodyKey = PARAMETER_MAIL_DISABLED_USER;
+            strTitle = PROPERTY_MAIL_ACCOUNT_DISABLED;
+        }
+        else if ( CONSTANT_EMAIL_ACCOUNT_ENABLED.equalsIgnoreCase( strEmailType ) )
+        {
+            strSenderKey = PARAMETER_MAIL_ENABLED_USER_SENDER;
+            strSubjectKey = PARAMETER_MAIL_ENABLED_USER_SUBJECT;
+            strBodyKey = PARAMETER_MAIL_ENABLED_USER;
+            strTitle = PROPERTY_MAIL_ACCOUNT_ENABLED;
+        }
+        
+        
         ReferenceItem referenceItem = _parameterService.findByKey( strSenderKey, getPlugin( ) );
         String strSender = referenceItem == null ? StringUtils.EMPTY : referenceItem.getName( );
 
@@ -1449,6 +1506,21 @@ public class MyluteceDirectoryUserJspBean extends PluginAdminPageJspBean
             strSubjectKey = PARAMETER_MAIL_PASSWORD_ENCRYPTION_CHANGED_SUBJECT;
             strBodyKey = PARAMETER_MAIL_PASSWORD_ENCRYPTION_CHANGED;
         }
+        else if ( CONSTANT_EMAIL_ACCOUNT_DISABLED.equalsIgnoreCase( strEmailType ) )
+        {
+            strSenderKey = PARAMETER_MAIL_DISABLED_USER_SENDER;
+            strSubjectKey = PARAMETER_MAIL_DISABLED_USER_SUBJECT;
+            strBodyKey = PARAMETER_MAIL_DISABLED_USER;
+            
+        }
+        else if ( CONSTANT_EMAIL_ACCOUNT_ENABLED.equalsIgnoreCase( strEmailType ) )
+        {
+            strSenderKey = PARAMETER_MAIL_ENABLED_USER_SENDER;
+            strSubjectKey = PARAMETER_MAIL_ENABLED_USER_SUBJECT;
+            strBodyKey = PARAMETER_MAIL_ENABLED_USER;
+          }
+        
+        
 
         SecurityUtils.updateParameterValue( _parameterService, getPlugin( ), strSenderKey,
                 request.getParameter( MARK_EMAIL_SENDER ) );

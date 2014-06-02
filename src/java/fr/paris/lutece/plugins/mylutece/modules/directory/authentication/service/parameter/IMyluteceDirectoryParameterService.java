@@ -51,4 +51,23 @@ public interface IMyluteceDirectoryParameterService extends IUserParameterServic
 	 * @return true if the authentication form must contain a catpcha
 	 */
 	 boolean isEnableCaptchaAuthentication( Plugin plugin );
+	 
+	 
+	 /**
+	  * return true if a mail must be sent when a user is disabled
+	  * @param plugin plugin 
+	  * @return   return true if a mail must be sent when a user is disabled
+	  */
+	 boolean isEnableSendMailUserDisabled( Plugin plugin );
+	 
+	 
+	 
+	 /**
+	  * return true if a mail must be sent when a user is enabled
+	  * @param plugin plugin
+	  * @return true if a mail must be sent when a user is enabled
+	  */
+	 boolean isEnableSendMailUserEnabled( Plugin plugin );
+	 
+	 
 }

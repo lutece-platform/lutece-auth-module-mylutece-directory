@@ -340,5 +340,21 @@ public interface IMyluteceDirectoryService
      * @param plugin The plugin
      */
     void updateUserExpirationDate( int nIdUser, Plugin plugin );
+    
+    /**
+     * Enable user 
+     * @param myluteceDirectoryUser the user
+     * @param plugin the plugin
+     * @param locale the locale
+     */
+    void  doEnableUser(MyluteceDirectoryUser myluteceDirectoryUser, Plugin plugin, Locale locale);
+    
+    /**
+     * disable user
+     * @param myluteceDirectoryUser the user
+     * @param plugin the plugin
+     * @param locale the locale
+     */
+    void  doDisableUser(MyluteceDirectoryUser myluteceDirectoryUser, Plugin plugin, Locale locale);
 
 }
