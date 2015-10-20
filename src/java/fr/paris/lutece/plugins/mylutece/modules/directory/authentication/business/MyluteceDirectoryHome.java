@@ -53,6 +53,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
@@ -356,4 +357,41 @@ public final class MyluteceDirectoryHome
 	{
 		return _dao.findUserIdFromLogin( strLogin, plugin );
 	}
+	
+	
+	
+    /**
+     * select the workflow action associate to the directory selected(used when a modification is made on the user )
+     * @param nIdDirectory the id directory
+     * @param plugin the plugin
+     * @return the workflow action associate to the directory selected
+     */
+	public static  Integer findWorkflowModifyAction( int nIdDirectory, Plugin plugin )
+	{
+		
+		return _dao.selectWorkflowModifyAction(nIdDirectory, plugin);
+	}
+       
+    /**
+     * assign the workflow action associate to the directory selected(used when a modification is made on the user )
+     * @param nIdDirectory the id directory
+     * @param nIdWfAction the worklow action
+     * @param the workflow action associate to the directory selected(used when a modification is made on the user )
+     */
+    public static void assignWorkflowModifyAction( int nIdDirectory,int nIdWfAction, Plugin plugin )
+    {
+    	
+    	_dao.assignWorkflowModifyAction(nIdDirectory, nIdWfAction, plugin);
+    }
+       
+    /**
+     * un asign the workflow action associate to the directory selected(used when a modification is made on the user )
+     * @param nIdDirectory the id directory
+     * @param the workflow action associate to the directory selected(used when a modification is made on the user )
+     */
+    public static void unAssignWorkflowModifyAction( int nIdDirectory ,Plugin plugin )
+    {
+    	_dao.unAssignWorkflowModifyAction(nIdDirectory, plugin);
+    }
+
 }

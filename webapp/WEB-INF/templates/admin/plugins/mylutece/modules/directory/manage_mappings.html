@@ -1,13 +1,26 @@
 <div class="row-fluid" >
     <h2>#i18n{module.mylutece.directory.manage_mappings.table_title}</h2>
+         <#if workflow_actions_list?has_content>
+    	<form method="post" action="jsp/admin/plugins/mylutece/modules/directory/DoAssignModificationAction.jsp">
+	               
+	                <input type="hidden" name="id_directory" value="${id_directory}" />
+	                <p>
+           			 <label for="workflow_action_id">#i18n{module.mylutece.directory.manage_mappings.modifyWorkflowAction}: </label>
+           			 <@combo name="workflow_action_id" default_value=workflow_action_selected items=workflow_actions_list />
+					    <button type="submit" class="btn btn-primary btn-small">
+							<i class="icon-white icon-ok"></i>
+                    </button>
+        			</p>
+	     			
+    </#if>
 <table class="table table-striped table-condensed"> 
     <tr>
         <th>#i18n{module.mylutece.directory.manage_mappings.row_title}</th>
         <th>#i18n{module.mylutece.directory.manage_mappings.row_attribute}</th>
         <th>#i18n{module.mylutece.directory.manage_mappings.row_actions}</th>
     </tr>
-    <#if mapping_display_list?has_content>
-        <#list mapping_display_list as mapping_display>
+        <#if mapping_display_list?has_content>
+    	<#list mapping_display_list as mapping_display>
             <#assign entry = mapping_display.entry />
             <#if !mapping_display.mapping?has_content>
             <form method="post" action="jsp/admin/plugins/mylutece/modules/directory/DoCreateMapping.jsp">

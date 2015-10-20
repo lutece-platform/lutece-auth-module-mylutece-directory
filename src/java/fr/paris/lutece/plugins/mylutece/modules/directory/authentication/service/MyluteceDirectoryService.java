@@ -78,6 +78,9 @@ import fr.paris.lutece.plugins.mylutece.modules.directory.authentication.service
 import fr.paris.lutece.plugins.mylutece.modules.directory.authentication.web.FormErrors;
 import fr.paris.lutece.plugins.mylutece.service.MyLutecePlugin;
 import fr.paris.lutece.plugins.mylutece.util.SecurityUtils;
+import fr.paris.lutece.plugins.workflowcore.business.action.Action;
+import fr.paris.lutece.plugins.workflowcore.business.action.ActionFilter;
+import fr.paris.lutece.plugins.workflowcore.service.action.IActionService;
 import fr.paris.lutece.portal.business.rbac.RBAC;
 import fr.paris.lutece.portal.business.user.AdminUser;
 import fr.paris.lutece.portal.service.admin.AdminAuthenticationService;
@@ -164,6 +167,9 @@ public class MyluteceDirectoryService implements IMyluteceDirectoryService
 
 	@Inject
 	private IMyluteceDirectoryParameterService _parameterService;
+	@Inject
+    private IActionService _actionService;
+
 
 	// GET
 
@@ -706,6 +712,22 @@ public class MyluteceDirectoryService implements IMyluteceDirectoryService
 	{
 		return MyluteceDirectoryHome.isMapped( nIdDirectory, plugin );
 	}
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	 public List<Action> getActionsWorkflowList(int nIdWorkflow)
+	 {
+		 if(_actionService != null)
+		 {
+		     ActionFilter aFilter = new ActionFilter(  );
+	          aFilter.setIdWorkflow( nIdWorkflow );
+
+	         return _actionService.getListActionByFilter( aFilter );
+		 }
+		 return null;
+		 
+	 }
 
 	// PRIVATE METHODS
 
@@ -890,6 +912,9 @@ public class MyluteceDirectoryService implements IMyluteceDirectoryService
 		
 		
 	}
+	
+	
+
 	
 
 }

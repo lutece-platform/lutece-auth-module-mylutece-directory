@@ -33,37 +33,6 @@
  */
 package fr.paris.lutece.plugins.mylutece.modules.directory.authentication.web;
 
-import fr.paris.lutece.plugins.directory.business.Directory;
-import fr.paris.lutece.plugins.directory.business.DirectoryFilter;
-import fr.paris.lutece.plugins.directory.business.EntryFilter;
-import fr.paris.lutece.plugins.directory.business.IEntry;
-import fr.paris.lutece.plugins.directory.utils.DirectoryUtils;
-import fr.paris.lutece.plugins.mylutece.modules.directory.authentication.business.AttributeMapping;
-import fr.paris.lutece.plugins.mylutece.modules.directory.authentication.business.MyluteceDirectoryUser;
-import fr.paris.lutece.plugins.mylutece.modules.directory.authentication.service.AttributeMappingService;
-import fr.paris.lutece.plugins.mylutece.modules.directory.authentication.service.IAttributeMappingService;
-import fr.paris.lutece.plugins.mylutece.modules.directory.authentication.service.IMyluteceDirectoryService;
-import fr.paris.lutece.plugins.mylutece.modules.directory.authentication.service.MyluteceDirectoryPlugin;
-import fr.paris.lutece.plugins.mylutece.modules.directory.authentication.service.MyluteceDirectoryService;
-import fr.paris.lutece.portal.service.message.AdminMessage;
-import fr.paris.lutece.portal.service.message.AdminMessageService;
-import fr.paris.lutece.portal.service.plugin.Plugin;
-import fr.paris.lutece.portal.service.plugin.PluginService;
-import fr.paris.lutece.portal.service.security.LuteceUser;
-import fr.paris.lutece.portal.service.spring.SpringContextService;
-import fr.paris.lutece.portal.service.template.AppTemplateService;
-import fr.paris.lutece.portal.service.util.AppLogService;
-import fr.paris.lutece.portal.service.util.AppPathService;
-import fr.paris.lutece.portal.service.util.AppPropertiesService;
-import fr.paris.lutece.portal.service.workgroup.AdminWorkgroupService;
-import fr.paris.lutece.portal.web.admin.PluginAdminPageJspBean;
-import fr.paris.lutece.portal.web.constants.Messages;
-import fr.paris.lutece.portal.web.util.LocalizedPaginator;
-import fr.paris.lutece.util.ReferenceList;
-import fr.paris.lutece.util.html.HtmlTemplate;
-import fr.paris.lutece.util.html.Paginator;
-import fr.paris.lutece.util.url.UrlItem;
-
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -74,6 +43,45 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang.StringUtils;
+
+import fr.paris.lutece.plugins.directory.business.Directory;
+import fr.paris.lutece.plugins.directory.business.DirectoryFilter;
+import fr.paris.lutece.plugins.directory.business.EntryFilter;
+import fr.paris.lutece.plugins.directory.business.IEntry;
+import fr.paris.lutece.plugins.directory.service.DirectoryPlugin;
+import fr.paris.lutece.plugins.directory.utils.DirectoryUtils;
+import fr.paris.lutece.plugins.mylutece.modules.directory.authentication.business.AttributeMapping;
+import fr.paris.lutece.plugins.mylutece.modules.directory.authentication.business.MyluteceDirectoryHome;
+import fr.paris.lutece.plugins.mylutece.modules.directory.authentication.business.MyluteceDirectoryUser;
+import fr.paris.lutece.plugins.mylutece.modules.directory.authentication.service.AttributeMappingService;
+import fr.paris.lutece.plugins.mylutece.modules.directory.authentication.service.IAttributeMappingService;
+import fr.paris.lutece.plugins.mylutece.modules.directory.authentication.service.IMyluteceDirectoryService;
+import fr.paris.lutece.plugins.mylutece.modules.directory.authentication.service.MyluteceDirectoryPlugin;
+import fr.paris.lutece.plugins.mylutece.modules.directory.authentication.service.MyluteceDirectoryService;
+import fr.paris.lutece.plugins.workflowcore.business.action.Action;
+import fr.paris.lutece.plugins.workflowcore.business.action.ActionFilter;
+import fr.paris.lutece.plugins.workflowcore.service.action.ActionService;
+import fr.paris.lutece.portal.service.i18n.I18nService;
+import fr.paris.lutece.portal.service.message.AdminMessage;
+import fr.paris.lutece.portal.service.message.AdminMessageService;
+import fr.paris.lutece.portal.service.plugin.Plugin;
+import fr.paris.lutece.portal.service.plugin.PluginService;
+import fr.paris.lutece.portal.service.security.LuteceUser;
+import fr.paris.lutece.portal.service.spring.SpringContextService;
+import fr.paris.lutece.portal.service.template.AppTemplateService;
+import fr.paris.lutece.portal.service.util.AppLogService;
+import fr.paris.lutece.portal.service.util.AppPathService;
+import fr.paris.lutece.portal.service.util.AppPropertiesService;
+import fr.paris.lutece.portal.service.workflow.WorkflowService;
+import fr.paris.lutece.portal.service.workgroup.AdminWorkgroupService;
+import fr.paris.lutece.portal.web.admin.PluginAdminPageJspBean;
+import fr.paris.lutece.portal.web.constants.Messages;
+import fr.paris.lutece.portal.web.util.LocalizedPaginator;
+import fr.paris.lutece.util.ReferenceItem;
+import fr.paris.lutece.util.ReferenceList;
+import fr.paris.lutece.util.html.HtmlTemplate;
+import fr.paris.lutece.util.html.Paginator;
+import fr.paris.lutece.util.url.UrlItem;
 
 
 /**
@@ -99,7 +107,9 @@ public class MyluteceDirectoryJspBean extends PluginAdminPageJspBean
     // properties
     private static final String PROPERTY_ITEM_PER_PAGE = "module.mylutece.directory.items_per_page";
     private static final String PROPERTY_PAGE_TITLE_MANAGE_MAPPINGS = "module.mylutece.directory.manage_mappings.page_title";
+    private static final String PROPERTY_REF_ITEM_UNASSOCIATED_WORKFLOW_ACTION = "module.mylutece.directory.manage_mapping.unassociated_workflow_action";
     private static final String PROPERTY_PAGE_TITLE_CREATE_MAPPING = "module.mylutece.directory.create_mapping.page_title";
+   
 
     private static final String MESSAGE_CANNOT_UNASSIGN_DIRECTORY = "module.mylutece.directory.message.cannot_unassign_directory";
     private static final String MESSAGE_CONFIRMATION_REMOVE_DIRECTORY = "module.mylutece.directory.message.confirm_remove_directory";
@@ -108,6 +118,8 @@ public class MyluteceDirectoryJspBean extends PluginAdminPageJspBean
 
     // Parameters
     private static final String PARAMETER_ID_DIRECTORY = "id_directory";
+    private static final String PARAMETER_WORKFLOW_ACTION_ID = "workflow_action_id";
+    
     private static final String PARAMETER_WORKGROUP = "workgroup";
     private static final String PARAMETER_PAGE_INDEX = "page_index";
     private static final String PARAMETER_ID_ENTRY = "id_entry";
@@ -126,7 +138,10 @@ public class MyluteceDirectoryJspBean extends PluginAdminPageJspBean
     private static final String MARK_ID_DIRECTORY = "id_directory";
     private static final String MARK_ID_ENTRY = "id_entry";
     private static final String MARK_ATTRIBUTES_LIST = "attributes_list";
+    private static final String MARK_WORKFLOW_ACTIONS_LIST = "workflow_actions_list";
+    private static final String MARK_WORKFLOW_ACTION_SELECTED = "workflow_action_selected";
     private static final String MARK_MAPPINGS_DISPLAY_LIST = "mapping_display_list";
+    
     private static final String MARK_MAPPING = "mapping";
     private static final String MARK_EMPTY_LIST = "empty_list";
 
@@ -140,8 +155,7 @@ public class MyluteceDirectoryJspBean extends PluginAdminPageJspBean
     private String _strWorkGroup = AdminWorkgroupService.ALL_GROUPS;
     private IMyluteceDirectoryService _myluteceDirectoryService = SpringContextService.getBean( MyluteceDirectoryService.BEAN_SERVICE );
     private IAttributeMappingService _attributeMappingService = SpringContextService.getBean( AttributeMappingService.BEAN_SERVICE );
-
-
+  
     /**
      * Creates a new DirectoryJspBean object.
      */
@@ -211,18 +225,48 @@ public class MyluteceDirectoryJspBean extends PluginAdminPageJspBean
     public String getManageMappings( HttpServletRequest request )
     {
         setPageTitleProperty( PROPERTY_PAGE_TITLE_MANAGE_MAPPINGS );
-
+        
         String strIdDirectory = request.getParameter( PARAMETER_ID_DIRECTORY );
-
-        if ( StringUtils.isBlank( strIdDirectory ) || !StringUtils.isNumeric( strIdDirectory ) )
+          if ( StringUtils.isBlank( strIdDirectory ) || !StringUtils.isNumeric( strIdDirectory ) )
         {
             return getHomeUrl( request );
         }
+        
+      
 
         int nIdDirectory = Integer.parseInt( strIdDirectory );
-
+        
+        Directory directory= _myluteceDirectoryService.getDirectory(nIdDirectory);
+        
+        if(directory == null)
+        {
+        	return getHomeUrl( request );
+        }
         Map<String, Object> model = new HashMap<String, Object>(  );
-
+        
+        if ( directory.getIdWorkflow( ) != DirectoryUtils.CONSTANT_ID_NULL &&  WorkflowService.getInstance( ).isAvailable( ) )
+		{
+        	
+        	
+            Integer nIdModifyActionSelected=MyluteceDirectoryHome.findWorkflowModifyAction(nIdDirectory, PluginService.getPlugin( DirectoryPlugin.PLUGIN_NAME ));
+        
+        	List<Action> listWorkflowAction= _myluteceDirectoryService.getActionsWorkflowList(directory.getIdWorkflow( ) );
+        	 if ( listWorkflowAction != null )
+             {   ReferenceList refListActions=new ReferenceList();
+             	refListActions.addItem(-1,  I18nService.getLocalizedString(PROPERTY_REF_ITEM_UNASSOCIATED_WORKFLOW_ACTION,getLocale()) );
+                  for ( Action action : listWorkflowAction )
+                 {
+                    
+                     refListActions.addItem(Integer.toString( action.getId(  ) ),  action.getName(  ) );
+                 }
+                 model.put(MARK_WORKFLOW_ACTIONS_LIST,refListActions);
+                 model.put(MARK_WORKFLOW_ACTION_SELECTED,nIdModifyActionSelected !=null ? nIdModifyActionSelected:-1);
+                 
+             }
+        	
+		}
+		
+  
         EntryFilter filter = new EntryFilter(  );
         filter.setIdDirectory( nIdDirectory );
         filter.setIsComment( EntryFilter.FILTER_FALSE );
@@ -233,7 +277,7 @@ public class MyluteceDirectoryJspBean extends PluginAdminPageJspBean
         filter.setIsEntryParentNull( EntryFilter.ALL_INT );
 
         Collection<Map<String, Object>> listEntryDisplay = new ArrayList<Map<String, Object>>(  );
-
+        
         for ( IEntry entry : listEntryFirstLevel )
         {
             if ( !entry.getEntryType(  ).getGroup(  ) )
@@ -407,6 +451,41 @@ public class MyluteceDirectoryJspBean extends PluginAdminPageJspBean
 
         return url.getUrl(  );
     }
+    
+    
+    /**
+     * Assign modification Action
+     *
+     * @param request The Http request
+     * @return The mapping's Displaying Url
+     */
+    public String doAssignModificationAction( HttpServletRequest request )
+    {
+        String strIdDirectory = request.getParameter( PARAMETER_ID_DIRECTORY );
+        String strIdAction = request.getParameter( PARAMETER_WORKFLOW_ACTION_ID );
+        int nIdDirectory=DirectoryUtils.convertStringToInt(strIdDirectory);
+        int nIdAction=DirectoryUtils.convertStringToInt(strIdAction);
+                		
+        if(nIdDirectory != DirectoryUtils.CONSTANT_ID_NULL )
+        {
+        	if( nIdAction != DirectoryUtils.CONSTANT_ID_NULL)
+        	{
+        		MyluteceDirectoryHome.assignWorkflowModifyAction(nIdDirectory,nIdAction, PluginService.getPlugin( DirectoryPlugin.PLUGIN_NAME ));
+        	}
+        	else
+        	{
+        		MyluteceDirectoryHome.unAssignWorkflowModifyAction(nIdDirectory, PluginService.getPlugin( DirectoryPlugin.PLUGIN_NAME ));
+        	}
+ 
+        }
+        
+        UrlItem url = new UrlItem( JSP_URL_MANAGE_MAPPINGS );
+        url.addParameter( PARAMETER_ID_DIRECTORY, strIdDirectory );
+
+        return url.getUrl(  );
+    }
+    
+
 
     /**
      * Get the user removal message

@@ -1,0 +1,1 @@
+ALTER TABLE mylutece_directory_directory ADD COLUMN id_wf_action_modify int DEFAULT NULL;

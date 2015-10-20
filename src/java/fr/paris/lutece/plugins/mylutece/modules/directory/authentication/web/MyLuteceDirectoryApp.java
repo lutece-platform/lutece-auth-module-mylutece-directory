@@ -154,6 +154,10 @@ public class MyLuteceDirectoryApp implements XPageApplication
 	private static final String PARAMETER_TIME_BEFORE_ALERT_ACCOUNT = "time_before_alert_account";
     private static final String PARAMETER_MAIL_LOST_PASSWORD_SENDER = "mail_lost_password_sender";
     private static final String PARAMETER_MAIL_LOST_PASSWORD_SUBJECT = "mail_lost_password_subject";
+    private static final String PARAMETER_ACTION_MODIFY_PASSWORD = "modify_password";
+    private static final String PARAMETER_ACTION_MODIFY_ACCOUNT = "modify_account";
+    
+    
 
 	// Actions
 	private static final String ACTION_MODIFY_ACCOUNT = "modifyAccount";
@@ -874,7 +878,7 @@ public class MyLuteceDirectoryApp implements XPageApplication
 	 */
 	public String doModifyAccount( HttpServletRequest request )
 	{
-		boolean bChangePassword = false;
+		
 		Plugin plugin = PluginService.getPlugin( request.getParameter( PARAMETER_PLUGIN_NAME ) );
 		Plugin directoryPlugin = PluginService.getPlugin( DirectoryPlugin.PLUGIN_NAME );
 		init( request, plugin );
@@ -887,7 +891,7 @@ public class MyLuteceDirectoryApp implements XPageApplication
 		String strOldPassword = request.getParameter( PARAMETER_OLD_PASSWORD );
 		String strNewPassword = request.getParameter( PARAMETER_NEW_PASSWORD );
 		String strConfirmationPassword = request.getParameter( PARAMETER_CONFIRMATION_PASSWORD );
-
+			
 		if ( ( user == null ) )
 		{
 			try
@@ -899,55 +903,75 @@ public class MyLuteceDirectoryApp implements XPageApplication
 				return AppPathService.getBaseUrl( request );
 			}
 		}
-
-		if ( StringUtils.isNotBlank( strNewPassword ) && ( StringUtils.isBlank( strOldPassword ) || StringUtils.isBlank( strConfirmationPassword ) ) )
+		
+		if(request.getParameter( PARAMETER_ACTION_MODIFY_PASSWORD)!=null)
+			
 		{
-			strError = ERROR_MANDATORY_FIELDS;
-		}
-		else if ( StringUtils.isNotBlank( strNewPassword ) )
-		{
-			bChangePassword = true;
-		}
-
-		if ( bChangePassword && StringUtils.isBlank( strError ) )
-		{
-			if ( !_securityService.checkPassword( user.getLogin( ), strOldPassword ) )
-			{
-				strError = ERROR_OLD_PASSWORD;
+				if ( StringUtils.isNotBlank( strNewPassword ) && ( StringUtils.isBlank( strOldPassword ) || StringUtils.isBlank( strConfirmationPassword ) ) )
+				{
+					strError = ERROR_MANDATORY_FIELDS;
+				}
+				
+		
+				if ( StringUtils.isBlank( strError ) )
+				{
+					if ( !_securityService.checkPassword( user.getLogin( ), strOldPassword ) )
+					{
+						strError = ERROR_OLD_PASSWORD;
+					}
+					else if ( !checkPassword( strNewPassword, strConfirmationPassword ) )
+					{
+						strError = ERROR_CONFIRMATION_PASSWORD;
+					}
+					else if ( StringUtils.equals( strOldPassword, strNewPassword ) )
+					{
+						strError = ERROR_SAME_PASSWORD;
+					}
+					else
+					{
+						strError = SecurityUtils.checkPasswordForFrontOffice( _parameterService, plugin, strNewPassword, user.getIdRecord( ) );
+					}
+				}
+		
+				if ( StringUtils.isNotBlank( strError ) )
+				{
+					url.addParameter( PARAMETER_ERROR_CODE, strError );
+				}
+				else
+				{
+					
+						_myluteceDirectoryService.doModifyPassword( user, strNewPassword, _plugin );
+						_myluteceDirectoryService.doModifyResetPassword( user, Boolean.FALSE, _plugin );
+						_myluteceDirectoryService.doInsertNewPasswordInHistory( strNewPassword, user.getIdRecord( ), plugin );
+						 url.addParameter( PARAMETER_ACTION_SUCCESSFUL, getDefaultRedirectUrl( ) );
+					
+				}
 			}
-			else if ( !checkPassword( strNewPassword, strConfirmationPassword ) )
-			{
-				strError = ERROR_CONFIRMATION_PASSWORD;
-			}
-			else if ( StringUtils.equals( strOldPassword, strNewPassword ) )
-			{
-				strError = ERROR_SAME_PASSWORD;
-			}
-			else
-			{
-				strError = SecurityUtils.checkPasswordForFrontOffice( _parameterService, plugin, strNewPassword, user.getIdRecord( ) );
-			}
-		}
-
-		if ( StringUtils.isNotBlank( strError ) )
-		{
-			url.addParameter( PARAMETER_ERROR_CODE, strError );
-		}
 		else
 		{
-			if ( bChangePassword )
-			{
-				_myluteceDirectoryService.doModifyPassword( user, strNewPassword, _plugin );
-				_myluteceDirectoryService.doModifyResetPassword( user, Boolean.FALSE, _plugin );
-				_myluteceDirectoryService.doInsertNewPasswordInHistory( strNewPassword, user.getIdRecord( ), plugin );
-			}
-
 			int nIdRecord = user.getIdRecord( );
 			Record record = _myluteceDirectoryService.getRecord( nIdRecord, false );
-
 			try
 			{
 				DirectoryUtils.getDirectoryRecordData( request, record, directoryPlugin, _locale );
+				IRecordService recordService = SpringContextService.getBean( RecordService.BEAN_SERVICE );
+				recordService.updateWidthRecordField( record, directoryPlugin );
+							
+				//run modify Directory action
+				Directory directory=_myluteceDirectoryService.getDirectory(record.getDirectory().getIdDirectory());
+				if (directory!=null &&  WorkflowService.getInstance( ).isAvailable( ) && ( directory.getIdWorkflow( ) != DirectoryUtils.CONSTANT_ID_NULL ) )
+				{
+					
+					Integer nIdModifyActionSelected=MyluteceDirectoryHome.findWorkflowModifyAction(directory.getIdDirectory(), PluginService.getPlugin( DirectoryPlugin.PLUGIN_NAME ));
+					if(nIdModifyActionSelected != null)
+					{
+										
+						 WorkflowService.getInstance().doProcessAction(record.getIdRecord( ), Record.WORKFLOW_RESOURCE_TYPE, nIdModifyActionSelected, Integer.valueOf( directory.getIdDirectory( ) ),request,request.getLocale(),false );
+											 
+					}
+				}
+				 url.addParameter( PARAMETER_ACTION_SUCCESSFUL, getDefaultRedirectUrl( ) );
+					
 			}
 			catch ( DirectoryErrorException error )
 			{
@@ -966,12 +990,10 @@ public class MyLuteceDirectoryApp implements XPageApplication
 
 				return url.getUrl( );
 			}
-
-			IRecordService recordService = SpringContextService.getBean( RecordService.BEAN_SERVICE );
-			recordService.updateWidthRecordField( record, directoryPlugin );
-
-			url.addParameter( PARAMETER_ACTION_SUCCESSFUL, getDefaultRedirectUrl( ) );
+			
+		
 		}
+	
 
 		return url.getUrl( );
 	}

@@ -42,6 +42,7 @@ import fr.paris.lutece.plugins.directory.business.RecordField;
 import fr.paris.lutece.plugins.mylutece.modules.directory.authentication.BaseUser;
 import fr.paris.lutece.plugins.mylutece.modules.directory.authentication.business.MyluteceDirectoryUser;
 import fr.paris.lutece.plugins.mylutece.modules.directory.authentication.web.FormErrors;
+import fr.paris.lutece.plugins.workflowcore.business.action.Action;
 import fr.paris.lutece.portal.business.user.AdminUser;
 import fr.paris.lutece.portal.service.plugin.Plugin;
 import fr.paris.lutece.portal.service.security.LuteceAuthentication;
@@ -356,5 +357,11 @@ public interface IMyluteceDirectoryService
      * @param locale the locale
      */
     void  doDisableUser(MyluteceDirectoryUser myluteceDirectoryUser, Plugin plugin, Locale locale);
+    /**
+     * get actions associated to a given workflow 
+     * @param nIdWorkflow the workflow id
+     * @return a list of workflow actions
+     */
+    List<Action> getActionsWorkflowList(int nIdWorkflow);
 
 }

@@ -34,6 +34,7 @@
 package fr.paris.lutece.plugins.mylutece.modules.directory.authentication.business;
 
 import fr.paris.lutece.portal.service.plugin.Plugin;
+import fr.paris.lutece.util.sql.DAOUtil;
 
 import java.sql.Timestamp;
 import java.util.Collection;
@@ -175,5 +176,28 @@ public interface IMyluteceDirectoryDAO
      * @return The id of the user
      */
     int findUserIdFromLogin( String strLogin, Plugin plugin );
+    
+    /**
+     * select the workflow action associate to the directory selected(used when a modification is made on the user )
+     * @param nIdDirectory the id directory
+     * @param plugin the plugin
+     * @return the workflow action associate to the directory selected
+     */
+    Integer selectWorkflowModifyAction( int nIdDirectory, Plugin plugin );
+       
+    /**
+     * assign the workflow action associate to the directory selected(used when a modification is made on the user )
+     * @param nIdDirectory the id directory
+     * @param nIdWfAction the worklow action
+     * @param the workflow action associate to the directory selected(used when a modification is made on the user )
+     */
+     void assignWorkflowModifyAction( int nIdDirectory,int nIdWfAction, Plugin plugin );
+       
+    /**
+     * un asign the workflow action associate to the directory selected(used when a modification is made on the user )
+     * @param nIdDirectory the id directory
+     * @param the workflow action associate to the directory selected(used when a modification is made on the user )
+     */
+     void unAssignWorkflowModifyAction( int nIdDirectory, Plugin plugin );
 
 }

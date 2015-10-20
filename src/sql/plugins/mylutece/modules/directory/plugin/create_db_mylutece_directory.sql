@@ -12,6 +12,7 @@ DROP TABLE IF EXISTS mylutece_directory_user_password_history;
 --
 CREATE TABLE mylutece_directory_directory (
 	id_directory int NOT NULL,
+	id_wf_action_modify int DEFAULT NULL,
 	PRIMARY KEY (id_directory)
 );
 

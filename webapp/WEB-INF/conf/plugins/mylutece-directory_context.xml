@@ -31,4 +31,26 @@
 	<bean id="mylutece-directory.myluteceDirectoryUserKeyService" class="fr.paris.lutece.plugins.mylutece.modules.directory.authentication.service.key.MyluteceDirectoryUserKeyService" />
 	<bean id="mylutece-directory.authentication" class="fr.paris.lutece.plugins.mylutece.modules.directory.authentication.BaseAuthentication" />
 	<bean id="mylutece-directory.anonymizationService" class="fr.paris.lutece.plugins.mylutece.modules.directory.authentication.service.MyluteceDirectoryAnonymizationService" />
+	
+	<!-- WORKFLOW -->
+	<bean id="mylutece-directory.taskTypeEnableAccount" class="fr.paris.lutece.plugins.workflowcore.business.task.TaskType"
+		 p:key="taskyEnableAccount" 
+ 		 p:titleI18nKey="module.mylutece.directory.taskTypeEnableAccount.task_title" 
+		 p:beanName="mylutece-directory.taskyEnableAccount"
+		 p:configRequired="false"
+		 p:formTaskRequired="true"
+		 p:taskForAutomaticAction="false" />
+
+	<bean id="mylutece-directory.taskyEnableAccount" class="fr.paris.lutece.plugins.mylutece.modules.directory.authentication.service.workflow.TaskEnableMyluteceDirectoryAccount" scope="prototype" />
+	
+	<bean id="mylutece-directory.taskTypeDisableAccount" class="fr.paris.lutece.plugins.workflowcore.business.task.TaskType"
+		 p:key="taskyDisableAccount" 
+ 		 p:titleI18nKey="module.mylutece.directory.taskTypeDisableAccount.task_title" 
+		 p:beanName="mylutece-directory.taskyDisableAccount"
+		 p:configRequired="false"
+		 p:formTaskRequired="true"
+		 p:taskForAutomaticAction="false" />
+
+	<bean id="mylutece-directory.taskyDisableAccount" class="fr.paris.lutece.plugins.mylutece.modules.directory.authentication.service.workflow.TaskDisableMyluteceDirectoryAccount" scope="prototype" />
+	
 </beans>

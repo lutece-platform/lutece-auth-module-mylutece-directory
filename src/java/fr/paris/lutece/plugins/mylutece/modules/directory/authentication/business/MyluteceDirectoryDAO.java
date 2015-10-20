@@ -50,6 +50,9 @@ public class MyluteceDirectoryDAO implements IMyluteceDirectoryDAO
 {
     private static final String SQL_QUERY_IS_MAPPED = "SELECT count(*) FROM mylutece_directory_directory WHERE id_directory = ? ";
     private static final String SQL_QUERY_SELECT_MAPPED_DIRECTORY = "SELECT id_directory FROM mylutece_directory_directory ";
+    private static final String SQL_QUERY_SELECT_WORKFOW_MODIFY_ACTION = "SELECT id_wf_action_modify FROM mylutece_directory_directory where id_directory = ?  ";
+    private static final String SQL_QUERY_ASSIGN_WORKFOW_MODIFY_ACTION = "UPDATE mylutece_directory_directory set id_wf_action_modify= ?   where id_directory = ?  ";
+    private static final String SQL_QUERY_UNASSIGNWORKFOW_MODIFY_ACTION = "UPDATE mylutece_directory_directory set id_wf_action_modify= NULL   where id_directory = ?  ";
     private static final String SQL_QUERY_ASSIGN_DIRECTORY = "INSERT INTO mylutece_directory_directory ( id_directory ) VALUES ( ? ) ";
     private static final String SQL_QUERY_UNASSIGN_DIRECTORY = "DELETE FROM mylutece_directory_directory WHERE id_directory = ? ";
     private static final String SQL_QUERY_UNASSIGN_DIRECTORIES = "DELETE FROM mylutece_directory_directory ";
@@ -87,6 +90,61 @@ public class MyluteceDirectoryDAO implements IMyluteceDirectoryDAO
         daoUtil.free(  );
 
         return arrayRoles;
+    }
+    
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Integer selectWorkflowModifyAction( int nIdDirectory, Plugin plugin )
+    {
+    	Integer nWorkflowAction=null;
+        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECT_WORKFOW_MODIFY_ACTION, plugin );
+        daoUtil.setInt( 1, nIdDirectory );
+        daoUtil.executeQuery(  );
+
+        if ( daoUtil.next(  ) )
+        {
+        	if( daoUtil.getObject( 1 )!=null)
+        	{
+        		
+        		nWorkflowAction=daoUtil.getInt( 1 );
+        	}
+        }
+
+        daoUtil.free(  );
+
+        return nWorkflowAction;
+    }
+    
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void assignWorkflowModifyAction( int nIdDirectory,int nIdWfAction, Plugin plugin )
+    {
+        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_ASSIGN_WORKFOW_MODIFY_ACTION, plugin );
+        daoUtil.setInt( 1, nIdWfAction );
+        daoUtil.setInt( 2, nIdDirectory );
+
+        daoUtil.executeUpdate(  );
+        daoUtil.free(  );
+    }
+    
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void unAssignWorkflowModifyAction( int nIdDirectory, Plugin plugin )
+    {
+        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_UNASSIGNWORKFOW_MODIFY_ACTION, plugin );
+        daoUtil.setInt( 1, nIdDirectory );
+
+        daoUtil.executeUpdate(  );
+        daoUtil.free(  );
     }
 
     /**
