@@ -966,7 +966,7 @@ public class MyLuteceDirectoryApp implements XPageApplication
 					if(nIdModifyActionSelected != null)
 					{
 										
-						 WorkflowService.getInstance().doProcessAction(record.getIdRecord( ), Record.WORKFLOW_RESOURCE_TYPE, nIdModifyActionSelected, Integer.valueOf( directory.getIdDirectory( ) ),request,request.getLocale(),false );
+						 WorkflowService.getInstance().doProcessAction(record.getIdRecord( ), Record.WORKFLOW_RESOURCE_TYPE, nIdModifyActionSelected, Integer.valueOf( directory.getIdDirectory( ) ),request,request.getLocale(),true );
 											 
 					}
 				}
